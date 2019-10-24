@@ -114,6 +114,7 @@ export class CryptoExchangeFlipInputWrapperComponent extends Component<Props> {
             onExchangeAmountChanged={this.onExchangeAmountChanged}
             keyboardVisible={false}
             isFiatOnTop={false}
+            toggleFiatOnTop={null}
             isFocus={false}
           />
         </View>

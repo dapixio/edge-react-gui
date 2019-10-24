@@ -56,6 +56,7 @@ export type FlipInputOwnProps = {
   onAmountChanged(decimalAmount: string): void,
   isEditable: boolean,
   isFiatOnTop: boolean,
+  toggleFiatOnTop: boolean | null,
   isFocus: boolean,
 
   keyboardVisible: boolean
@@ -201,6 +202,14 @@ export class FlipInput extends Component<Props, State> {
     }
     if (nextProps.primaryInfo.currencyCode !== this.props.primaryInfo.currencyCode) {
       setTimeout(() => this.onPrimaryAmountChange('0'), 50)
+    }
+  }
+
+  componentDidUpdate (prevProps: Props) {
+    if (this.props.toggleFiatOnTop != null) {
+      if (this.props.toggleFiatOnTop !== this.state.isToggled) {
+        this.onToggleFlipInput()
+      }
     }
   }
 

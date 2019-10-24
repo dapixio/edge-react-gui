@@ -59,7 +59,8 @@ export type SendConfirmationStateProps = {
   exchangeRates: { [string]: number },
   coreWallet: EdgeCurrencyWallet,
   sceneState: SendConfirmationState,
-  spendingLimits: SpendingLimits
+  spendingLimits: SpendingLimits,
+  toggleFiatOnTop: boolean | null
 }
 
 export type SendConfirmationDispatchProps = {
@@ -241,6 +242,7 @@ export class SendConfirmation extends Component<Props, State> {
                 keyboardVisible={this.state.keyboardVisible}
                 isEditable={this.props.isEditable}
                 isFiatOnTop={this.state.isFiatOnTop}
+                toggleFiatOnTop={this.props.toggleFiatOnTop}
                 isFocus={this.state.isFocus}
               />
 

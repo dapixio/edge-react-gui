@@ -56,6 +56,11 @@ export const newPin = (pin: string) => ({
   data: { pin }
 })
 
+export const toggleFiatOnTop = () => ({
+  type: 'UI/SEND_CONFIMATION/TOGGLE_FIAT_ON_TOP',
+  data: false
+})
+
 export const updateAmount = (nativeAmount: string, exchangeAmount: string, fiatPerCrypto: string, forceUpdateGui?: boolean = false) => (
   dispatch: Dispatch,
   getState: GetState
@@ -158,6 +163,8 @@ export const updateMaxSpend = () => (dispatch: Dispatch, getState: GetState) => 
 
       const exchangeAmount = convertNativeToExchange(exchangeDenomination.multiplier)(nativeAmount)
       const fiatPerCrypto = getExchangeRate(state, currencyCode, isoFiatCurrencyCode)
+
+      dispatch(toggleFiatOnTop())
 
       dispatch(reset())
 

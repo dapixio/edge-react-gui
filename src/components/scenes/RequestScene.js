@@ -254,6 +254,7 @@ export class Request extends Component<Props, State> {
             keyboardVisible={false}
             color={THEME.COLORS.WHITE}
             isFiatOnTop={false}
+            toggleFiatOnTop={null}
             isFocus={false}
           />
 

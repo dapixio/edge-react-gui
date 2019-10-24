@@ -37,6 +37,7 @@ exports[`Request should render with loaded props 1`] = `
       overridePrimaryExchangeAmount=""
       primaryCurrencyInfo={Object {}}
       secondaryCurrencyInfo={Object {}}
+      toggleFiatOnTop={null}
     />
     <View
       style={

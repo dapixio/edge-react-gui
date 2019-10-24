@@ -35,6 +35,7 @@ export type ExchangedFlipInputOwnProps = {
   onExchangeAmountChanged(amounts: ExchangedFlipInputAmounts): mixed,
   isEditable: boolean,
   isFiatOnTop: boolean,
+  toggleFiatOnTop: boolean | null,
   isFocus: boolean
 }
 
@@ -159,6 +160,7 @@ export class ExchangedFlipInput extends Component<Props, State> {
         keyboardVisible={this.props.keyboardVisible}
         isEditable={this.props.isEditable}
         isFiatOnTop={this.props.isFiatOnTop}
+        toggleFiatOnTop={this.props.toggleFiatOnTop}
         isFocus={this.props.isFocus}
         onNext={this.props.onNext}
       />
