@@ -1,30 +1,16 @@
 // @flow
 
 import { fetchLoginMessages } from 'edge-core-js'
-import { AsyncStorage, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import BackgroundFetch from 'react-native-background-fetch'
 import PushNotification from 'react-native-push-notification'
 import { sprintf } from 'sprintf-js'
 
 import ENV from '../../env.json'
-import * as Constants from '../constants/indexConstants.js'
 import s from '../locales/strings.js'
 
 export async function backgroundWorker () {
   console.log('appStateLog: running background task')
-
-  // Only run once per day:
-  const last24HourNotif = await AsyncStorage.getItem(Constants.LOCAL_STORAGE_BACKGROUND_PUSH_KEY)
-  const now = new Date()
-  if (last24HourNotif) {
-    const lastNotifDate = new Date(last24HourNotif).getTime() / 1000
-    const delta = now.getTime() / 1000 - lastNotifDate
-    if (delta < Constants.PUSH_DELAY_SECONDS) {
-      BackgroundFetch.finish()
-      return
-    }
-  }
-  await AsyncStorage.setItem(Constants.LOCAL_STORAGE_BACKGROUND_PUSH_KEY, now.toString())
 
   // Perform tasks:
   return showLoginMessages().then(

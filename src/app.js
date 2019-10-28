@@ -141,7 +141,7 @@ if (ENABLE_PERF_LOGGING) {
 
 BackgroundFetch.configure(
   {
-    minimumFetchInterval: 15,
+    minimumFetchInterval: 24 * 60, // 24 hours, please
     stopOnTerminate: false,
     startOnBoot: true
   },

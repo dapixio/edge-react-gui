@@ -21,5 +21,4 @@ export const PASSWORD_RECOVERY_LINK = 'passwordRecoveryLink'
 export const IOS = 'ios'
 export const ANDROID = 'android'
 export const PUSH_DELAY_SECONDS = 86400
-export const LOCAL_STORAGE_BACKGROUND_PUSH_KEY = 'EdgeWalletLastPushNotification'
 export const DEVELOPER_PLUGIN = 'developerPlugin'
