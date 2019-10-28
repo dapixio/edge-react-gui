@@ -12,6 +12,12 @@ import s from '../locales/strings.js'
 export async function backgroundWorker () {
   console.log('appStateLog: running background task')
 
+  const now = new Date()
+    .toISOString()
+    .replace(/T/, ' ')
+    .replace(/:\d\d[.].*/, '')
+  showSystemNotification('24-hour test', `This should show up every 24 hours (${now})`)
+
   // Perform tasks:
   return showLoginMessages().then(
     () => {
