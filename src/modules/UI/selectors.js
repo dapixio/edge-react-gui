@@ -3,6 +3,7 @@
 import type { EdgeCurrencyInfo, EdgeDenomination } from 'edge-core-js'
 import _ from 'lodash'
 
+import { FIO_STR, FIO_WALLET_TYPE } from '../../constants/WalletAndCurrencyConstants'
 import { intl } from '../../locales/intl.js'
 import type { State } from '../../types/reduxTypes.js'
 import type { GuiDenomination, GuiWallet, TransactionListTx } from '../../types/types.js'
@@ -13,6 +14,19 @@ export const getWallets = (state: State) => {
   // returns an object with GUI Wallets as Keys Not sure how to tpye that
   const wallets = state.ui.wallets.byId
   return wallets
+}
+
+export const getFioWallets = (state: State) => {
+  const { activeWalletIds = [] } = state.core.account
+  const fioWallets = []
+  for (const walletId of activeWalletIds) {
+    const edgeWallet = state.core.account.currencyWallets[walletId]
+    if (edgeWallet && edgeWallet.type === FIO_WALLET_TYPE) {
+      fioWallets.push(edgeWallet)
+    }
+  }
+
+  return fioWallets
 }
 
 export const getWallet = (state: State, walletId: string) => {
@@ -135,6 +149,10 @@ export const getSceneState = (state: State, sceneKey: string) => {
 }
 
 export const getExchangeRate = (state: State, fromCurrencyCode: string, toCurrencyCode: string): number => {
+  if (fromCurrencyCode === FIO_STR || toCurrencyCode === FIO_STR) {
+    return 1
+  }
+
   const exchangeRates = state.exchangeRates
   const rateKey = `${fromCurrencyCode}_${toCurrencyCode}`
   const rate = exchangeRates[rateKey] ? exchangeRates[rateKey] : 0
@@ -206,4 +224,8 @@ export const calculateWalletFiatBalance = (wallet: GuiWallet, state: State): str
   const cryptoAmount: number = parseFloat(convertNativeToExchange(nativeToExchangeRatio)(nativeBalance))
   fiatValue = convertCurrency(state, currencyCode, wallet.isoFiatCurrencyCode, cryptoAmount)
   return intl.formatNumber(fiatValue, { toFixed: 2 }) || '0'
+}
+
+export const getNetworkConnectivity = (state: State) => {
+  return state.ui.settings.isConnected
 }

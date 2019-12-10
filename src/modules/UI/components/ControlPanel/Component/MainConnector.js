@@ -2,7 +2,7 @@
 
 import { connect } from 'react-redux'
 
-import { registerFioAddress } from '../../../../../actions/FioActions.js'
+import { goToScene } from '../../../../../actions/SettingsActions'
 import type { Dispatch, State } from '../../../../../types/reduxTypes.js'
 import { logoutRequest } from '../../../../Login/action'
 import Main from './Main'
@@ -12,9 +12,7 @@ const mapStateToProps = (state: State) => ({
 })
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   logout: (username?: string) => dispatch(logoutRequest(username)),
-  registerFioAddress () {
-    return dispatch(registerFioAddress())
-  }
+  goToScene: (route: string) => dispatch(goToScene(route))
 })
 
 export default connect(

@@ -83,6 +83,7 @@ class FormField extends Component {
           maxLength={this.props.maxLength}
           autoCorrect={this.props.autoCorrect || false}
           autoFocus={this.state.autoFocus}
+          suffix={this.props.suffix}
         />
       )
     } else {

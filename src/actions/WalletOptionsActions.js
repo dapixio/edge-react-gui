@@ -16,6 +16,7 @@ import * as WALLET_SELECTORS from '../modules/UI/selectors.js'
 import { B } from '../styles/common/textStyles.js'
 import { THEME } from '../theme/variables/airbitz.js'
 import type { Dispatch, GetState } from '../types/reduxTypes.js'
+import { showDeleteFioWalletModal } from './DeleteFioWalletModalActions.js'
 import { showDeleteWalletModal } from './DeleteWalletModalActions.js'
 import { showResyncWalletModal } from './ResyncWalletModalActions.js'
 import { showSplitWalletModal } from './SplitWalletModalActions.js'
@@ -53,8 +54,31 @@ export const walletRowOption = (walletId: string, option: string, archived: bool
     }
 
     case 'delete': {
-      return (dispatch: Dispatch) => {
-        dispatch(showDeleteWalletModal(walletId))
+      return async (dispatch: Dispatch, getState: GetState) => {
+        const state = getState()
+        const wallet = WALLET_SELECTORS.getWallet(state, walletId)
+        const type = wallet.type.replace('wallet:', '')
+        let fioAddress = ''
+
+        if (type === 'fio') {
+          const engine = getState().core.account.currencyWallets[walletId]
+          if (engine != null) {
+            fioAddress = await engine.otherMethods.getFioAddress()[0]
+            if (!fioAddress) {
+              try {
+                const data = await engine.otherMethods.fioAction('getFioNames', { fioPublicKey: wallet.receiveAddress.publicAddress })
+                fioAddress = data.fio_addresses[0].fio_address
+              } catch (e) {
+                fioAddress = ''
+              }
+            }
+          }
+        }
+        if (fioAddress) {
+          dispatch(showDeleteFioWalletModal(walletId))
+        } else {
+          dispatch(showDeleteWalletModal(walletId))
+        }
       }
     }
 

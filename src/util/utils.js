@@ -3,11 +3,13 @@
 import { bns, div, eq, gte, mul, toFixed } from 'biggystring'
 import type { EdgeCurrencyInfo, EdgeCurrencyWallet, EdgeDenomination, EdgeMetaToken, EdgeReceiveAddress, EdgeTransaction } from 'edge-core-js'
 import _ from 'lodash'
-import { Platform } from 'react-native'
+import { Alert, Platform } from 'react-native'
 import parse from 'url-parse'
 
-import { FIAT_CODES_SYMBOLS, getSymbolFromCurrency } from '../constants/indexConstants.js'
+import { FIAT_CODES_SYMBOLS, FIO_DOMAIN_DEFAULT, getSymbolFromCurrency } from '../constants/indexConstants.js'
+import { MONTH_NAMES, MONTH_NAMES_SHORT } from '../constants/MonthConstants'
 import { intl } from '../locales/intl.js'
+import s from '../locales/strings'
 import { convertCurrency, convertCurrencyWithoutState } from '../modules/UI/selectors.js'
 import type { State } from '../types/reduxTypes.js'
 import type { CustomTokenInfo, ExchangeData, GuiDenomination, GuiWallet } from '../types/types.js'
@@ -777,4 +779,32 @@ export const getYesterdayDateRoundDownHour = () => {
   date.setMilliseconds(0)
   const yesterday = date.setDate(date.getDate() - 1)
   return new Date(yesterday).toISOString()
+}
+
+export const getMonthName = (month: number, short: boolean = false) => {
+  return short ? MONTH_NAMES_SHORT[month] : MONTH_NAMES[month]
+}
+
+export const formatExpDate = (expiration: Date, short: boolean = false) => {
+  const expirationDate = new Date(expiration)
+  return `${getMonthName(expirationDate.getMonth())}  ${expirationDate.getDate()}, ${expirationDate.getFullYear()}`
+}
+
+export const networkAlert = (): boolean => {
+  return Alert.alert(s.strings.network_alert_title, s.strings.network_alert_text)
+}
+
+export const getFeeDisplayed = (number: number) => {
+  const defaultAmount = 2
+  const dec = number % 10
+
+  if (dec) {
+    return dec.toString().length > 2 ? number.toString() : number.toFixed(defaultAmount)
+  }
+
+  return number.toFixed(defaultAmount)
+}
+
+export const validateFioAddress = (fioAddress: string): boolean => {
+  return new RegExp(`^(([a-z0-9]+)(-?[a-z0-9]+)*:{1}${FIO_DOMAIN_DEFAULT.replace(':', '')}{1})$`, 'gim').test(fioAddress)
 }

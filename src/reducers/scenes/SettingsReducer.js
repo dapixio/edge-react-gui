@@ -3,6 +3,7 @@
 import type { EdgeCurrencyInfo, EdgeDenomination } from 'edge-core-js'
 import _ from 'lodash'
 
+import { NETWORK_STATUS_TYPE } from '../../actions/SettingsActions'
 import * as Constants from '../../constants/indexConstants.js'
 import { CORE_DEFAULTS, LOCAL_ACCOUNT_DEFAULTS, SYNCED_ACCOUNT_DEFAULTS } from '../../modules/Core/Account/settings.js'
 import type { Action } from '../../types/reduxTypes.js'
@@ -36,7 +37,8 @@ export const initialState = {
       amount: 0
     }
   },
-  developerModeOn: false
+  developerModeOn: false,
+  isConnected: true
 }
 
 export type CurrencySetting = {
@@ -105,7 +107,8 @@ export type SettingsState = {
     '2000': boolean,
     '20000': boolean,
     '200000': boolean
-  }
+  },
+  isConnected: boolean
 }
 
 const currencyPLuginUtil = (state, payloadData): SettingsState => {
@@ -562,6 +565,15 @@ export const settingsLegacy = (state: SettingsState = initialState, action: Acti
         }
       }
     }
+
+    case NETWORK_STATUS_TYPE: {
+      if (!action.data) throw new Error('Invalid action')
+      return {
+        ...state,
+        isConnected: action.data.isConnected
+      }
+    }
+
     default:
       return state
   }

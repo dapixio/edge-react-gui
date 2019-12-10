@@ -1,5 +1,6 @@
 // @flow
 
+import NetInfo from '@react-native-community/netinfo'
 import React, { Component, Fragment } from 'react'
 import { Image, Linking, TouchableWithoutFeedback, View, YellowBox } from 'react-native'
 import { Actions, Drawer, Router, Scene, Stack, Tabs } from 'react-native-router-flux'
@@ -37,6 +38,11 @@ import CurrencySettings from '../connectors/scenes/CurrencySettingsConnector'
 import DefaultFiatSettingConnector from '../connectors/scenes/DefaultFiatSettingConnector'
 import EdgeLoginSceneConnector from '../connectors/scenes/EdgeLoginSceneConnector'
 import EditToken from '../connectors/scenes/EditTokenConnector.js'
+import FioAddressConfirmConnector from '../connectors/scenes/FioAddressConfirmConnector'
+import FioAddressConnector from '../connectors/scenes/FioAddressConnector'
+import FioAddressDetailsConnector from '../connectors/scenes/FioAddressDetailsConnector'
+import FioAddressListConnector from '../connectors/scenes/FioAddressListConnector'
+import FioAddressRegisterConnector from '../connectors/scenes/FioAddressRegisterConnector'
 import LoginConnector from '../connectors/scenes/LoginConnector'
 import ManageTokens from '../connectors/scenes/ManageTokensConnector.js'
 import OtpSettingsSceneConnector from '../connectors/scenes/OtpSettingsSceneConnector.js'
@@ -105,6 +111,8 @@ const CREATE_WALLET_SELECT_FIAT = s.strings.title_create_wallet_select_fiat
 const CREATE_WALLET = s.strings.title_create_wallet
 const CREATE_WALLET_ACCOUNT_SETUP = s.strings.create_wallet_create_account
 const CREATE_WALLET_ACCOUNT_ACTIVATE = s.strings.create_wallet_account_activate
+const FIO_ADDRESS = s.strings.title_fio_address
+const FIO_ADDRESS_CONFIRMATION = s.strings.title_fio_address_confirmation
 const TRANSACTIONS_EXPORT = s.strings.title_export_transactions
 const REQUEST = s.strings.title_request
 const SCAN = s.strings.title_scan
@@ -138,11 +146,15 @@ type Props = {
   dispatchAddressDeepLinkReceived: (addressDeepLinkData: Object) => any,
   deepLinkPending: boolean,
   checkAndShowGetCryptoModal: (?string) => void,
-  logout(): () => mixed
+  logout(): () => mixed,
+  goToScene: (route: string, params?: Object) => void,
+  checkConnectivity: () => boolean,
+  changeConnectivity: (isConnected: boolean) => void
 }
 
 export default class Main extends Component<Props> {
   backPressedOnce: boolean
+  netInfoListener: Function | null = null
 
   constructor (props: Props) {
     super(props)
@@ -165,10 +177,18 @@ export default class Main extends Component<Props> {
         if (url) {
           this.doDeepLink(url)
         }
-        // this.navigate(url);
+        // this.navigate(url)
       })
       .catch(showError)
     Linking.addEventListener('url', this.handleOpenURL)
+
+    this.netInfoListener = NetInfo.addEventListener(state => {
+      this.props.changeConnectivity(state.isConnected)
+    })
+  }
+
+  componentWillUnmount () {
+    this.netInfoListener && this.netInfoListener()
   }
 
   handleOpenURL = (event: Object) => {
@@ -660,6 +680,70 @@ export default class Main extends Component<Props> {
                     onLeft={Actions.pop}
                   />
                 </Stack>
+                <Stack key={Constants.FIO_ADDRESS}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS}
+                    navTransparent={true}
+                    component={FioAddressConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                    goToScene={this.props.goToScene}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_LIST}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_LIST}
+                    navTransparent={true}
+                    component={FioAddressListConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderHelpButton()}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                    goToScene={this.props.goToScene}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_REGISTER}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_REGISTER}
+                    navTransparent={true}
+                    component={FioAddressRegisterConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                    goToScene={this.props.goToScene}
+                    checkConnectivity={this.props.checkConnectivity}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_CONFIRM}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_CONFIRM}
+                    navTransparent={true}
+                    component={FioAddressConfirmConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS_CONFIRMATION)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                    checkConnectivity={this.props.checkConnectivity}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_DETAILS}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_DETAILS}
+                    navTransparent={true}
+                    component={FioAddressDetailsConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    goToScene={this.props.goToScene}
+                  />
+                </Stack>
               </Scene>
             </Drawer>
           </Stack>
@@ -798,6 +882,14 @@ export default class Main extends Component<Props> {
     }
     if (this.isCurrentScene(Constants.PLUGIN_VIEW)) {
       handlePluginBack()
+      return true
+    }
+    if (this.isCurrentScene(Constants.FIO_ADDRESS_DETAILS)) {
+      Actions.popTo(Constants.FIO_ADDRESS_LIST)
+      return true
+    }
+    if (this.isCurrentScene(Constants.FIO_ADDRESS)) {
+      Actions.popTo(Constants.WALLET_LIST_SCENE)
       return true
     }
     Actions.pop()
