@@ -360,9 +360,8 @@ export const setDeveloperModeOn = (developerModeOn: boolean) => (dispatch: Dispa
     .catch(showError)
 }
 
-export const NETWORK_STATUS_TYPE = 'UI/SETTINGS/NETWORK_STATUS'
 export const changeConnectivity = (isConnected: boolean) => ({
-  type: NETWORK_STATUS_TYPE,
+  type: 'UI/SETTINGS/NETWORK_STATUS',
   data: { isConnected }
 })
 
