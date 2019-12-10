@@ -14,15 +14,11 @@ import SafeAreaView from '../../modules/UI/components/SafeAreaView/index'
 import styles from '../../styles/scenes/FioAddressStyle'
 import type { GoToSceneProps } from '../../types/types'
 
-export type StateProps = {
-  core: any
-}
-
 export type DispatchProps = {
   registerFirstFioAddress: Function
 }
 
-type Props = StateProps & DispatchProps & GoToSceneProps
+type Props = DispatchProps & GoToSceneProps
 
 export class FioAddressScene extends Component<Props> {
   render () {
