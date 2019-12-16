@@ -44,10 +44,6 @@ export class FioAddressScene extends Component<Props> {
             <Icon style={styles.dot} type={Constants.ENTYPO} name={Constants.DOT_SINGLE} size={26} />
             <T>{s.strings.fio_address_first_screen_item_3}</T>
           </View>
-          <View style={styles.itemList}>
-            <Icon style={styles.dot} type={Constants.ENTYPO} name={Constants.DOT_SINGLE} size={26} />
-            <T>{s.strings.fio_address_first_screen_item_4}</T>
-          </View>
           <T style={styles.lastText}>{s.strings.fio_address_first_screen_end}</T>
           <T style={styles.link}>{s.strings.fio_address_learn_more}</T>
         </View>

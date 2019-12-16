@@ -598,7 +598,6 @@ const strings = {
   fio_address_first_screen_item_1: 'Works across all tokens and coins',
   fio_address_first_screen_item_2: 'Secured from your wallet',
   fio_address_first_screen_item_3: 'Completely decentralized',
-  fio_address_first_screen_item_4: 'Coinomi waives your first Wallet Name registration fee!',
   fio_address_first_screen_end:
     'Similar to website names, your FIO Address can be used to send you tokens/coins without ever having to see or send your public key.',
   fio_address_learn_more: 'Learn More',
