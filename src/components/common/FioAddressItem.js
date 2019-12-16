@@ -32,7 +32,7 @@ const FioAddressItem = (props: FioAddressItemProps) => {
           <View style={styles.info}>
             <T style={styles.infoTitle}>{address.fio_address}</T>
             <T style={styles.infoSubtitle}>
-              {`${s.strings.fio_address_details_screen_expires} `}{' '}
+              {`${s.strings.fio_address_details_screen_expires} `}&nbsp;
               {getMonthName(expiration.getMonth()) + ' ' + expiration.getDate() + ', ' + expiration.getFullYear()}
             </T>
           </View>
