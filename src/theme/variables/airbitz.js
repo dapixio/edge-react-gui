@@ -91,7 +91,7 @@ export const THEME = {
     OFF_WHITE: '#F6F6F6',
     CLEAR: 'rgba(0, 0, 0, 0)',
     OPACITY_WHITE: 'rgba(255, 255, 255, 0.1)',
-    OPACITY_GRAY_1: 'rgba(74, 81, 87, 0.1)',
+    OPACITY_GRAY_1: 'rgba(74, 81, 87, 0.2)',
 
     TRANSPARENT: 'transparent',
 

@@ -45,6 +45,24 @@ test('initialState', () => {
       fioAddresses: [],
       selectedWallet: null
     },
+    fioRequest: {
+      requests: [],
+      pendingMore: 0,
+      pendingPage: 1,
+      amounts: {
+        exchangeAmount: '',
+        nativeAmount: ''
+      },
+      fioModalData: {},
+      sentRequests: [],
+      sentMore: 0,
+      sentPage: 1,
+      fioPendingRequestSelected: {},
+      fioPendingRequestConfirmedStatus: '',
+      fioPendingRequestRejectedStatus: '',
+      fioSentRequestSelected: {},
+      fioWalletByAddress: null
+    },
     request: request(undefined, dummyAction),
     requestType: {
       useLegacyAddress: false,

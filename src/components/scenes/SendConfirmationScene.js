@@ -23,7 +23,7 @@ import { type AuthType, getSpendInfoWithoutState } from '../../modules/UI/scenes
 import { convertCurrencyFromExchangeRates } from '../../modules/UI/selectors.js'
 import { type GuiMakeSpendInfo, type SendConfirmationState } from '../../reducers/scenes/SendConfirmationReducer.js'
 import { rawStyles, styles } from '../../styles/scenes/SendConfirmationStyle.js'
-import type { GuiCurrencyInfo, GuiDenomination, SpendingLimits } from '../../types/types.js'
+import type { CheckConnectivityProps, GuiCurrencyInfo, GuiDenomination, SpendingLimits } from '../../types/types.js'
 import { convertNativeToDisplay, convertNativeToExchange, decimalOrZero, getDenomFromIsoCode } from '../../util/utils.js'
 import { AddressTextWithBlockExplorerModal } from '../common/AddressTextWithBlockExplorerModal'
 import { SceneWrapper } from '../common/SceneWrapper.js'
@@ -79,7 +79,7 @@ type SendConfirmationRouterParams = {
   guiMakeSpendInfo: GuiMakeSpendInfo
 }
 
-type Props = SendConfirmationStateProps & SendConfirmationDispatchProps & SendConfirmationRouterParams
+type Props = SendConfirmationStateProps & SendConfirmationDispatchProps & SendConfirmationRouterParams & CheckConnectivityProps
 
 type State = {|
   secondaryDisplayDenomination: GuiDenomination,
@@ -208,6 +208,12 @@ export class SendConfirmation extends Component<Props, State> {
     const destination = transactionMetadata ? transactionMetadata.name : ''
     const DESTINATION_TEXT = sprintf(s.strings.send_confirmation_to, destination)
     const ADDRESS_TEXT = sprintf(s.strings.send_confirmation_address, address)
+    const fioAddress = this.props.guiMakeSpendInfo ? (this.props.guiMakeSpendInfo.fioAddress ? this.props.guiMakeSpendInfo.fioAddress : '') : ''
+    const memo = this.props.guiMakeSpendInfo ? (this.props.guiMakeSpendInfo.memo ? this.props.guiMakeSpendInfo.memo : '') : ''
+    const FIO_ADDRESS_TEXT = fioAddress ? sprintf(s.strings.fio_address, fioAddress) : ''
+    const MEMO_TITLE = fioAddress ? s.strings.fio_memo : ''
+    const MEMO_TEXT = memo
+    const displayAddress = fioAddress ? '' : address
 
     const feeCalculated = !!networkFee || !!parentNetworkFee
 
@@ -266,7 +272,7 @@ export class SendConfirmation extends Component<Props, State> {
                     </Scene.Row>
                   )}
 
-                  {!!address && (
+                  {!!displayAddress && (
                     <AddressTextWithBlockExplorerModal address={address} addressExplorer={addressExplorer}>
                       <Scene.Row style={{ paddingVertical: 4 }}>
                         <Recipient.Text style={{}}>
@@ -274,6 +280,30 @@ export class SendConfirmation extends Component<Props, State> {
                         </Recipient.Text>
                       </Scene.Row>
                     </AddressTextWithBlockExplorerModal>
+                  )}
+
+                  {!!fioAddress && (
+                    <Scene.Row style={{ paddingVertical: 10 }}>
+                      <Recipient.Text style={{}}>
+                        <Text>{FIO_ADDRESS_TEXT}</Text>
+                      </Recipient.Text>
+                    </Scene.Row>
+                  )}
+
+                  {!!memo && (
+                    <Scene.Row style={{ paddingVertical: 10 }}>
+                      <Recipient.Text style={{}}>
+                        <Text>{MEMO_TITLE}</Text>
+                      </Recipient.Text>
+                    </Scene.Row>
+                  )}
+
+                  {!!memo && (
+                    <Scene.Row style={{ paddingVertical: 10 }}>
+                      <Recipient.Text style={{}}>
+                        <Text>{MEMO_TEXT}</Text>
+                      </Recipient.Text>
+                    </Scene.Row>
                   )}
 
                   {isTaggableCurrency && (
@@ -335,7 +365,8 @@ export class SendConfirmation extends Component<Props, State> {
   }
 
   onExchangeAmountChanged = async ({ nativeAmount, exchangeAmount }: ExchangedFlipInputAmounts) => {
-    const { spendingLimits, fiatPerCrypto, coreWallet, sceneState, currencyCode, newSpendInfo, updateTransaction } = this.props
+    const { spendingLimits, fiatPerCrypto, coreWallet, sceneState, currencyCode, newSpendInfo, updateTransaction, checkConnectivity } = this.props
+    if (!checkConnectivity()) return
     this.setState({
       showSpinner: true
     })

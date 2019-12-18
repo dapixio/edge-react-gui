@@ -4,7 +4,7 @@ import { bns } from 'biggystring'
 import { createSimpleConfirmModal } from 'edge-components'
 import type { EdgeCurrencyInfo, EdgeCurrencyWallet, EdgeEncodeUri } from 'edge-core-js'
 import React, { Component } from 'react'
-import { ActivityIndicator, Clipboard, Dimensions, Platform, View } from 'react-native'
+import { ActivityIndicator, Alert, Clipboard, Dimensions, Platform, View } from 'react-native'
 import ContactsWrapper from 'react-native-contacts-wrapper'
 import RNFS from 'react-native-fs'
 import Share from 'react-native-share'
@@ -13,6 +13,7 @@ import { sprintf } from 'sprintf-js'
 
 import * as Constants from '../../constants/indexConstants'
 import s from '../../locales/strings.js'
+import type { AccountState } from '../../modules/Core/Account/reducer'
 import ExchangeRate from '../../modules/UI/components/ExchangeRate/index.js'
 import type { ExchangedFlipInputAmounts } from '../../modules/UI/components/FlipInput/ExchangedFlipInput2.js'
 import { ExchangedFlipInput } from '../../modules/UI/components/FlipInput/ExchangedFlipInput2.js'
@@ -22,11 +23,12 @@ import ShareButtons from '../../modules/UI/components/ShareButtons/index.js'
 import WalletListModal from '../../modules/UI/components/WalletListModal/WalletListModalConnector'
 import { styles } from '../../styles/scenes/RequestStyle.js'
 import { THEME } from '../../theme/variables/airbitz.js'
-import type { GuiCurrencyInfo, GuiWallet } from '../../types/types.js'
+import type { CheckConnectivityProps, GoToSceneProps, GuiCurrencyInfo, GuiWallet } from '../../types/types.js'
 import { getObjectDiff } from '../../util/utils'
 import { launchModal } from '../common/ModalProvider.js'
 import { QrCode } from '../common/QrCode.js'
 import { SceneWrapper } from '../common/SceneWrapper.js'
+import { createFioAddressModal } from '../modals/RequestFioAddressModal'
 import { showError, showToast } from '../services/AirshipInstance.js'
 
 const PUBLIC_ADDRESS_REFRESH_MS = 2000
@@ -44,7 +46,9 @@ export type RequestStateProps = {
   secondaryCurrencyInfo: GuiCurrencyInfo,
   showToWalletModal: boolean,
   useLegacyAddress: boolean,
-  wallets: { [string]: GuiWallet }
+  wallets: { [string]: GuiWallet },
+  allWallets: any,
+  account: AccountState
 }
 export type RequestLoadingProps = {
   edgeWallet: null,
@@ -58,18 +62,22 @@ export type RequestLoadingProps = {
   legacyAddress: string,
   secondaryCurrencyInfo: null,
   showToWalletModal: null,
-  useLegacyAddress: null
+  useLegacyAddress: null,
+  allWallets: any,
+  account: AccountState
 }
 
 export type RequestDispatchProps = {
   refreshReceiveAddressRequest(string): void,
-  onSelectWallet: (string, string) => void
+  onSelectWallet: (walletId: string, currencyCode: string) => void,
+  requestChangeAmounts: ExchangedFlipInputAmounts => void,
+  requestSaveFioModalData: any => void
 }
 type ModalState = 'NOT_YET_SHOWN' | 'VISIBLE' | 'SHOWN'
 type CurrencyMinimumPopupState = { [currencyCode: string]: ModalState }
 
-export type LoadingProps = RequestLoadingProps & RequestDispatchProps
-export type LoadedProps = RequestStateProps & RequestDispatchProps
+export type LoadingProps = RequestLoadingProps & RequestDispatchProps & CheckConnectivityProps & GoToSceneProps
+export type LoadedProps = RequestStateProps & RequestDispatchProps & CheckConnectivityProps & GoToSceneProps
 export type Props = LoadingProps | LoadedProps
 export type State = {
   publicAddress: string,
@@ -79,6 +87,9 @@ export type State = {
 }
 
 export class Request extends Component<Props, State> {
+  fioWallets = []
+  amounts: ExchangedFlipInputAmounts
+
   constructor (props: Props) {
     super(props)
     const minimumPopupModalState: CurrencyMinimumPopupState = {}
@@ -98,6 +109,15 @@ export class Request extends Component<Props, State> {
       this.state.minimumPopupModalState[props.currencyCode] = 'VISIBLE'
       console.log('stop, in constructor')
       this.enqueueMinimumAmountModal()
+    }
+    const self = this
+    if (this.props.allWallets) {
+      const allWalletsArr: any[] = Object.values(this.props.allWallets)
+      allWalletsArr.forEach(item => {
+        if (item.type === Constants.FIO_WALLET_TYPE) {
+          self.fioWallets.push(item)
+        }
+      })
     }
     slowlog(this, /.*/, global.slowlogOptions)
   }
@@ -270,6 +290,7 @@ export class Request extends Component<Props, State> {
             shareViaSMS={this.shareViaSMS}
             shareViaShare={this.shareViaShare}
             copyToClipboard={this.copyToClipboard}
+            fioAddressModal={this.fioAddressModal}
           />
         </View>
         {this.props.showToWalletModal && <WalletListModal wallets={allowedWallets} type={Constants.TO} onSelectWallet={onSelectWallet} />}
@@ -279,7 +300,9 @@ export class Request extends Component<Props, State> {
 
   onExchangeAmountChanged = async (amounts: ExchangedFlipInputAmounts) => {
     const { publicAddress, legacyAddress } = this.state
-    const { currencyCode } = this.props
+    const { currencyCode, requestChangeAmounts } = this.props
+    this.amounts = amounts
+    requestChangeAmounts(amounts)
     if (!currencyCode) return
     const edgeEncodeUri: EdgeEncodeUri =
       this.props.useLegacyAddress && legacyAddress ? { publicAddress, legacyAddress, currencyCode } : { publicAddress, currencyCode }
@@ -359,13 +382,55 @@ export class Request extends Component<Props, State> {
     ContactsWrapper.getContact()
       .then(() => {
         this.shareMessage()
-        // console.log('shareViaSMS')
       })
       .catch(showError)
   }
 
   shareViaShare = () => {
     this.shareMessage()
-    // console.log('shareViaShare')
+  }
+
+  fioAddressModal = async () => {
+    if (!this.props.checkConnectivity()) return
+    if (this.fioWallets.length === 0) {
+      Alert.alert(s.strings.fio_request_by_fioaddress_error_no_address_header, s.strings.fio_request_by_fioaddress_error_no_address)
+      return
+    }
+    let validFioAddress = false
+    let engine
+    for (const fioWallet of this.fioWallets) {
+      engine = this.props.account.currencyWallets[fioWallet.id]
+      if (engine) {
+        const fioAddresses = await engine.otherMethods.getFioAddress()
+        if (fioAddresses.length > 0) {
+          validFioAddress = true
+          break
+        }
+      }
+    }
+    if (!validFioAddress) {
+      Alert.alert(s.strings.fio_request_by_fioaddress_error_no_address_header, s.strings.fio_request_by_fioaddress_error_no_address)
+      return
+    }
+    if (this.amounts) {
+      const native = parseFloat(this.amounts.nativeAmount)
+      if (native <= 0) {
+        Alert.alert(s.strings.fio_request_by_fioaddress_error_invalid_amount_header, s.strings.fio_request_by_fioaddress_error_invalid_amount)
+        return
+      }
+    } else {
+      Alert.alert(s.strings.fio_request_by_fioaddress_error_invalid_amount_header, s.strings.fio_request_by_fioaddress_error_invalid_amount)
+      return
+    }
+    const fioAddressModal = createFioAddressModal({ engine, checkConnectivity: this.props.checkConnectivity })
+    const data = await launchModal(fioAddressModal)
+    if (data) {
+      await this.props.requestSaveFioModalData(data)
+      this.sendRequest()
+    }
+  }
+
+  sendRequest = () => {
+    this.props.goToScene(Constants.FIO_REQUEST_CONFIRMATION)
   }
 }
