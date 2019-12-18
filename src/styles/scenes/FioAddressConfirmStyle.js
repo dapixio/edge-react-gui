@@ -5,8 +5,6 @@ import { StyleSheet } from 'react-native'
 import THEME from '../../theme/variables/airbitz'
 import { scale } from '../../util/scaling'
 
-const redColor = '#d02424'
-
 const styles = StyleSheet.create({
   scene: {
     flex: 1,
@@ -52,7 +50,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   balanceTitleDisabled: {
-    color: redColor,
+    color: THEME.COLORS.ACCENT_RED,
     fontWeight: 'normal',
     textAlign: 'center'
   },
@@ -67,7 +65,7 @@ const styles = StyleSheet.create({
   },
   errMsg: {
     marginTop: scale(20),
-    color: redColor,
+    color: THEME.COLORS.ACCENT_RED,
     fontSize: 14,
     fontWeight: 'normal',
     textAlign: 'center'
