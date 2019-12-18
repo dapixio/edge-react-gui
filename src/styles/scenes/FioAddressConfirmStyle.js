@@ -14,8 +14,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'stretch'
   },
-  gradient: {
-    height: THEME.HEADER
+  info: {
+    paddingTop: scale(30),
+    paddingLeft: scale(6),
+    paddingRight: scale(6)
   },
   mainView: {
     flex: 1,
@@ -87,6 +89,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     textAlign: 'center'
+  },
+  blockPadding: {
+    paddingTop: scale(54),
+    paddingLeft: scale(20),
+    paddingRight: scale(20)
+  },
+  spacer: {
+    paddingTop: scale(20)
   }
 })
 

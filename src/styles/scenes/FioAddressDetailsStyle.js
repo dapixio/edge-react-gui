@@ -6,9 +6,6 @@ import THEME from '../../theme/variables/airbitz'
 import { scale } from '../../util/scaling'
 
 const styles = StyleSheet.create({
-  gradient: {
-    height: THEME.HEADER
-  },
   view: {
     flex: 2,
     flexDirection: 'column',

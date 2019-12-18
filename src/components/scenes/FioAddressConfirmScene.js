@@ -10,14 +10,13 @@ import * as Constants from '../../constants/indexConstants'
 import { FIO_WALLET_TYPE } from '../../constants/WalletAndCurrencyConstants'
 import s from '../../locales/strings.js'
 import T from '../../modules/UI/components/FormattedText/index'
-import Gradient from '../../modules/UI/components/Gradient/Gradient.ui'
-import SafeAreaView from '../../modules/UI/components/SafeAreaView/index'
 import ABSlider from '../../modules/UI/components/Slider/index.js'
 import { MaterialInput } from '../../styles/components/FormFieldStyles.js'
 import styles from '../../styles/scenes/FioAddressConfirmStyle'
 import type { CheckConnectivityProps } from '../../types/types'
 import { getFeeDisplayed } from '../../util/utils'
 import { FormFieldSelect } from '../common/FormFieldSelect.js'
+import { SceneWrapper } from '../common/SceneWrapper'
 import { showError } from '../services/AirshipInstance'
 
 export type State = {
@@ -264,26 +263,24 @@ export class FioAddressConfirmScene extends Component<Props, State> {
     }
 
     return (
-      <SafeAreaView>
-        <Gradient style={styles.scene}>
-          <Gradient style={styles.gradient} />
-
-          <View style={{ paddingTop: 30, paddingLeft: 6, paddingRight: 6 }}>
+      <SceneWrapper>
+        <View style={styles.scene}>
+          <View style={styles.info}>
             <T style={styles.title}>{s.strings.fio_address_confirm_screen_label}</T>
             <T style={styles.titleLarge}>{fioAddressName}</T>
-            <View style={{ paddingTop: 20 }} />
+            <View style={styles.spacer} />
             <T style={styles.title}>{s.strings.fio_address_confirm_screen_registration_label}</T>
             <T style={styles.title}>
               {displayFee ? getFeeDisplayed(displayFee) : '0'} {balance ? s.strings.fio_address_confirm_screen_fio_label : ''}
             </T>
-            <View style={{ paddingTop: 20 }} />
+            <View style={styles.spacer} />
             <T style={styles.title}>{s.strings.fio_address_confirm_screen_balance_label}</T>
             <T style={balance && displayFee !== null && displayFee <= balance ? styles.title : styles.titleDisabled}>
               {balance ? balance.toFixed(2) : '0'} {balance ? s.strings.fio_address_confirm_screen_fio_label : ''}
             </T>
           </View>
           {fioWallets && fioWallets.length > 1 && (
-            <View style={{ paddingTop: 54, paddingLeft: 20, paddingRight: 20 }}>
+            <View style={styles.blockPadding}>
               <View style={styles.select}>
                 <FormFieldSelect
                   style={MaterialInputStyle}
@@ -298,7 +295,7 @@ export class FioAddressConfirmScene extends Component<Props, State> {
               </View>
             </View>
           )}
-          <View style={{ paddingTop: 54, paddingLeft: 20, paddingRight: 20 }}>
+          <View style={styles.blockPadding}>
             <Scene.Footer style={styles.footer}>
               <ABSlider
                 forceUpdateGuiCounter={false}
@@ -315,8 +312,8 @@ export class FioAddressConfirmScene extends Component<Props, State> {
               />
             </Scene.Footer>
           </View>
-        </Gradient>
-      </SafeAreaView>
+        </View>
+      </SceneWrapper>
     )
   }
 }

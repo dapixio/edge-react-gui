@@ -6,9 +6,8 @@ import { Alert, Image, View } from 'react-native'
 import fioAddressDetailsIcon from '../../assets/images/details_fioAddress.png'
 import s from '../../locales/strings.js'
 import T from '../../modules/UI/components/FormattedText/index'
-import Gradient from '../../modules/UI/components/Gradient/Gradient.ui'
-import SafeAreaView from '../../modules/UI/components/SafeAreaView/index'
 import styles from '../../styles/scenes/FioAddressDetailsStyle'
+import { SceneWrapper } from '../common/SceneWrapper'
 
 export type State = {}
 
@@ -39,8 +38,8 @@ export class FioAddressDetailsScene extends Component<Props, State> {
   render () {
     const { fioAddressName, expirationFormatted } = this.props
     return (
-      <SafeAreaView>
-        <Gradient style={styles.view}>
+      <SceneWrapper>
+        <View style={styles.view}>
           <View style={styles.texts}>
             <View style={styles.image}>
               <Image source={fioAddressDetailsIcon} />
@@ -52,8 +51,8 @@ export class FioAddressDetailsScene extends Component<Props, State> {
               {expirationFormatted}
             </T>
           </View>
-        </Gradient>
-      </SafeAreaView>
+        </View>
+      </SceneWrapper>
     )
   }
 }
