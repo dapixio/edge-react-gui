@@ -43,6 +43,10 @@ import FioAddressConnector from '../connectors/scenes/FioAddressConnector'
 import FioAddressDetailsConnector from '../connectors/scenes/FioAddressDetailsConnector'
 import FioAddressListConnector from '../connectors/scenes/FioAddressListConnector'
 import FioAddressRegisterConnector from '../connectors/scenes/FioAddressRegisterConnector'
+import FioPendingRequestConnector from '../connectors/scenes/FioPendingRequestConnector'
+import FioRequestConfirmationConnector from '../connectors/scenes/FioRequestConfirmationConnector.js'
+import FioRequestListConnector from '../connectors/scenes/FioRequestListConnector'
+import FioSentRequestConnector from '../connectors/scenes/FioSentRequestConnector'
 import LoginConnector from '../connectors/scenes/LoginConnector'
 import ManageTokens from '../connectors/scenes/ManageTokensConnector.js'
 import OtpSettingsSceneConnector from '../connectors/scenes/OtpSettingsSceneConnector.js'
@@ -113,6 +117,9 @@ const CREATE_WALLET_ACCOUNT_SETUP = s.strings.create_wallet_create_account
 const CREATE_WALLET_ACCOUNT_ACTIVATE = s.strings.create_wallet_account_activate
 const FIO_ADDRESS = s.strings.title_fio_address
 const FIO_ADDRESS_CONFIRMATION = s.strings.title_fio_address_confirmation
+const FIO_REQUEST = s.strings.title_fio_request
+const FIO_PENDING_REQUEST_DETAILS = s.strings.title_fio_pending_request_details
+const FIO_SENT_REQUEST_DETAILS = s.strings.title_fio_sent_request_details
 const TRANSACTIONS_EXPORT = s.strings.title_export_transactions
 const REQUEST = s.strings.title_request
 const SCAN = s.strings.title_scan
@@ -426,17 +433,30 @@ export default class Main extends Component<Props> {
                     />
                   </Stack>
 
-                  <Scene
-                    key={Constants.REQUEST}
-                    navTransparent={true}
-                    onEnter={this.props.hideWalletListModal}
-                    icon={this.icon(Constants.REQUEST)}
-                    tabBarLabel={REQUEST}
-                    component={Request}
-                    renderTitle={this.renderWalletListNavBar()}
-                    renderLeftButton={this.renderRequestMenuButton()}
-                    renderRightButton={this.renderMenuButton()}
-                  />
+                  <Stack key={Constants.REQUEST} icon={this.icon(Constants.REQUEST)} tabBarLabel={REQUEST}>
+                    <Scene
+                      key={Constants.REQUEST}
+                      navTransparent={true}
+                      onEnter={this.props.hideWalletListModal}
+                      icon={this.icon(Constants.REQUEST)}
+                      tabBarLabel={REQUEST}
+                      component={Request}
+                      renderTitle={this.renderWalletListNavBar()}
+                      renderLeftButton={this.renderRequestMenuButton()}
+                      renderRightButton={this.renderMenuButton()}
+                      goToScene={this.props.goToScene}
+                      checkConnectivity={this.props.checkConnectivity}
+                    />
+                    <Scene
+                      key={Constants.FIO_REQUEST_CONFIRMATION}
+                      navTransparent={true}
+                      component={FioRequestConfirmationConnector}
+                      renderTitle={this.renderWalletName()}
+                      renderLeftButton={this.renderBackButton(BACK)}
+                      renderRightButton={this.renderMenuButton()}
+                      checkConnectivity={this.props.checkConnectivity}
+                    />
+                  </Stack>
 
                   <Stack key={Constants.SCAN} icon={this.icon(Constants.SCAN)} tabBarLabel={SCAN}>
                     <Scene
@@ -513,6 +533,7 @@ export default class Main extends Component<Props> {
                     renderTitle={this.renderWalletName()}
                     renderLeftButton={this.renderBackButton()}
                     renderRightButton={this.renderSendConfirmationButton()}
+                    checkConnectivity={this.props.checkConnectivity}
                   />
                   <Scene
                     key={Constants.CHANGE_MINING_FEE_SEND_CONFIRMATION}
@@ -680,6 +701,7 @@ export default class Main extends Component<Props> {
                     onLeft={Actions.pop}
                   />
                 </Stack>
+
                 <Stack key={Constants.FIO_ADDRESS}>
                   <Scene
                     key={Constants.FIO_ADDRESS}
@@ -741,6 +763,46 @@ export default class Main extends Component<Props> {
                     renderTitle={this.renderTitle(FIO_ADDRESS)}
                     renderLeftButton={this.renderBackButton(BACK)}
                     renderRightButton={this.renderMenuButton()}
+                    goToScene={this.props.goToScene}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_REQUEST_LIST}>
+                  <Scene
+                    key={Constants.FIO_REQUEST_LIST}
+                    navTransparent={true}
+                    component={FioRequestListConnector}
+                    renderTitle={this.renderTitle(FIO_REQUEST)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                    checkConnectivity={this.props.checkConnectivity}
+                    goToScene={this.props.goToScene}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_PENDING_REQUEST_DETAILS}>
+                  <Scene
+                    key={Constants.FIO_PENDING_REQUEST_DETAILS}
+                    navTransparent={true}
+                    component={FioPendingRequestConnector}
+                    renderTitle={this.renderTitle(FIO_PENDING_REQUEST_DETAILS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderEmptyButton()}
+                    onLeft={Actions.pop}
+                    goToScene={this.props.goToScene}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_SENT_REQUEST_DETAILS}>
+                  <Scene
+                    key={Constants.FIO_SENT_REQUEST_DETAILS}
+                    navTransparent={true}
+                    component={FioSentRequestConnector}
+                    renderTitle={this.renderTitle(FIO_SENT_REQUEST_DETAILS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderEmptyButton()}
+                    onLeft={Actions.pop}
                     goToScene={this.props.goToScene}
                   />
                 </Stack>

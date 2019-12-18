@@ -55,6 +55,10 @@ export const FIO_ADDRESS_LIST = 'fioAddressList'
 export const FIO_ADDRESS_REGISTER = 'fioAddressRegister'
 export const FIO_ADDRESS_CONFIRM = 'fioAddressConfirm'
 export const FIO_ADDRESS_DETAILS = 'fioAddressDetails'
+export const FIO_REQUEST_LIST = 'fioRequestList'
+export const FIO_PENDING_REQUEST_DETAILS = 'fioPendingRequestDetails'
+export const FIO_SENT_REQUEST_DETAILS = 'fioSentRequestDetails'
+export const FIO_REQUEST_CONFIRMATION = 'fioRequestConfirmation'
 
 export const CURRENCY_SETTINGS = {
   btcSettings: {

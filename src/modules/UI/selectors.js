@@ -1,6 +1,7 @@
 // @flow
 
 import type { EdgeCurrencyInfo, EdgeDenomination } from 'edge-core-js'
+import type { EdgeCurrencyWallet } from 'edge-core-js/src/types/types'
 import _ from 'lodash'
 
 import { FIO_STR, FIO_WALLET_TYPE } from '../../constants/WalletAndCurrencyConstants'
@@ -90,6 +91,20 @@ export const getSelectedWalletLoadingPercent = (state: State) => {
 export const getTransactions = (state: State): Array<TransactionListTx> => {
   const transactions = state.ui.scenes.transactionList.transactions
   return transactions
+}
+
+export const getFioSelectedRequest = (state: State): Object => {
+  const request = state.ui.scenes.fioRequest.fioPendingRequestSelected
+  return request
+}
+
+export const getFioSelectedSentRequest = (state: State): Object => {
+  const request = state.ui.scenes.fioRequest.fioSentRequestSelected
+  return request
+}
+
+export const getFioWalletByAddress = (state: State): EdgeCurrencyWallet | null => {
+  return state.ui.scenes.fioRequest.fioWalletByAddress
 }
 
 export const getDenominations = (state: State, currencyCode: string) => {
