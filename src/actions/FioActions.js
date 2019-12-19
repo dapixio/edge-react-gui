@@ -4,10 +4,11 @@ import { type EdgeAccount } from 'edge-core-js/types'
 import { Linking } from 'react-native'
 
 import { showActivity, showError } from '../components/services/AirshipInstance.js'
+import { FIO_WALLET_TYPE } from '../constants/WalletAndCurrencyConstants'
 import s from '../locales/strings.js'
 import { type Dispatch, type GetState } from '../types/reduxTypes.js'
 
-export function registerFioAddress () {
+export function registerFirstFioAddress () {
   return function (dispatch: Dispatch, getState: GetState) {
     const state = getState()
     const defaultFiat = state.ui.settings.defaultIsoFiat
@@ -24,19 +25,24 @@ export function registerFioAddress () {
  */
 async function getFioAddress (account: EdgeAccount, defaultFiat: string) {
   // Create a FIO wallet, if needed:
-  if (account.getFirstWalletInfo('wallet:fio') == null) {
-    await account.createCurrencyWallet('wallet:fio', {
+  let walletInfo
+  for (const currencyWalletKey of Object.keys(account.currencyWallets)) {
+    if (account.currencyWallets[currencyWalletKey].type === FIO_WALLET_TYPE) {
+      walletInfo = account.currencyWallets[currencyWalletKey]
+      break
+    }
+  }
+  if (!walletInfo) {
+    walletInfo = await account.createCurrencyWallet(FIO_WALLET_TYPE, {
       name: s.strings.string_first_fio_wallet_name,
       fiatCurrencyCode: defaultFiat
     })
   }
 
-  // Get the wallet info again (it should definitely exist now):
-  const walletInfo = account.getFirstWalletInfo('wallet:fio')
   if (walletInfo == null) throw new Error('Problem loading FIO wallet')
 
   // Get the wallet object itself:
-  const currencyWallet = await account.waitForCurrencyWallet(walletInfo.id)
-  const address = await currencyWallet.getReceiveAddress()
+  const fioCurrencyWallet = await account.waitForCurrencyWallet(walletInfo.id)
+  const address = await fioCurrencyWallet.getReceiveAddress()
   return address.publicAddress
 }

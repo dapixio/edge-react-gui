@@ -19,10 +19,11 @@ import { updateExchangeRates } from '../modules/ExchangeRates/action.js'
 import { sendLogs } from '../modules/Logs/action.js'
 import * as SETTINGS_ACTIONS from '../modules/Settings/SettingsActions.js'
 import { Icon } from '../modules/UI/components/Icon/Icon.ui.js'
-import { convertCurrency } from '../modules/UI/selectors.js'
+import { convertCurrency, getNetworkConnectivity } from '../modules/UI/selectors.js'
 import { newSpendingLimits } from '../reducers/SpendingLimitsReducer.js'
 import { colors, THEME } from '../theme/variables/airbitz.js'
 import type { Dispatch, GetState, State } from '../types/reduxTypes.js'
+import { networkAlert } from '../util/utils'
 import { disableOtp, keepOtp } from './OtpActions.js'
 
 export const updateOneSetting = (setting: Object) => (dispatch: Dispatch, getState: GetState) => {
@@ -357,4 +358,23 @@ export const setDeveloperModeOn = (developerModeOn: boolean) => (dispatch: Dispa
       dispatch({ type: 'DEVELOPER_MODE_OFF' })
     })
     .catch(showError)
+}
+
+export const changeConnectivity = (isConnected: boolean) => ({
+  type: 'UI/SETTINGS/NETWORK_STATUS',
+  data: { isConnected }
+})
+
+export const goToScene = (route: string, params?: Object) => (dispatch: Dispatch, getState: GetState) => {
+  const state = getState()
+  const isConnected = getNetworkConnectivity(state)
+  if (!isConnected) return networkAlert()
+  Actions[route](params || {})
+}
+
+export const checkConnectivity = () => (dispatch: Dispatch, getState: GetState) => {
+  const state = getState()
+  const isConnected = getNetworkConnectivity(state)
+  if (!isConnected) networkAlert()
+  return isConnected
 }

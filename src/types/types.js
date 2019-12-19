@@ -240,3 +240,11 @@ export type CountryData = {
   'alpha-2': string,
   filename?: string
 }
+
+export type GoToSceneProps = {
+  goToScene: (route: string, params?: Object) => void
+}
+
+export type CheckConnectivityProps = {
+  checkConnectivity: () => boolean
+}

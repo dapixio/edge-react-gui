@@ -36,7 +36,8 @@ export const initialState = {
       amount: 0
     }
   },
-  developerModeOn: false
+  developerModeOn: false,
+  isConnected: true
 }
 
 export type CurrencySetting = {
@@ -105,7 +106,8 @@ export type SettingsState = {
     '2000': boolean,
     '20000': boolean,
     '200000': boolean
-  }
+  },
+  isConnected: boolean
 }
 
 const currencyPLuginUtil = (state, payloadData): SettingsState => {
@@ -561,6 +563,15 @@ export const settingsLegacy = (state: SettingsState = initialState, action: Acti
         }
       }
     }
+
+    case 'UI/SETTINGS/NETWORK_STATUS': {
+      if (!action.data) throw new Error('Invalid action')
+      return {
+        ...state,
+        isConnected: action.data.isConnected
+      }
+    }
+
     default:
       return state
   }

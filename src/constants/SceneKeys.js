@@ -50,6 +50,11 @@ export const PLUGIN_VIEW = 'pluginView'
 export const PLUGIN_VIEW_DEEP = 'pluginViewDeep'
 export const PLUGIN_VIEW_LEGACY = 'pluginViewLegacy'
 export const SPENDING_LIMITS = 'spendingLimits'
+export const FIO_ADDRESS = 'fioAddress'
+export const FIO_ADDRESS_LIST = 'fioAddressList'
+export const FIO_ADDRESS_REGISTER = 'fioAddressRegister'
+export const FIO_ADDRESS_CONFIRM = 'fioAddressConfirm'
+export const FIO_ADDRESS_DETAILS = 'fioAddressDetails'
 
 export const CURRENCY_SETTINGS = {
   btcSettings: {

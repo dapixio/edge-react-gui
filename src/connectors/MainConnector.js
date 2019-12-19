@@ -6,7 +6,7 @@ import { checkEnabledExchanges } from '../actions/CryptoExchangeActions.js'
 import * as actions from '../actions/indexActions'
 import { checkAndShowGetCryptoModal } from '../actions/ScanActions.js'
 import { openDrawer } from '../actions/ScenesActions.js'
-import { showReEnableOtpModal } from '../actions/SettingsActions.js'
+import { changeConnectivity, checkConnectivity, goToScene, showReEnableOtpModal } from '../actions/SettingsActions.js'
 import { selectWallet } from '../actions/WalletActions.js'
 import Main from '../components/Main.ui'
 import { requestPermission } from '../modules/PermissionsManager.js'
@@ -50,8 +50,12 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     }
     dispatch(checkAndShowGetCryptoModal())
   },
-  logout: (username?: string) => dispatch(actions.logoutRequest(username))
+  logout: (username?: string) => dispatch(actions.logoutRequest(username)),
+  changeConnectivity: (isConnected: boolean) => dispatch(changeConnectivity(isConnected)),
+  goToScene: (route: string, params?: Object) => dispatch(goToScene(route, params)),
+  checkConnectivity: () => dispatch(checkConnectivity())
 })
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps
