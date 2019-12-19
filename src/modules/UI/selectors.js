@@ -17,6 +17,26 @@ export const getWallets = (state: State) => {
   return wallets
 }
 
+export const getFioAddressesFromWallets = async (state: State) => {
+  const wallets = getFioWallets(state)
+  const addresses = []
+  for (const wallet of wallets) {
+    let fioAddress = await wallet.otherMethods.getFioAddress()
+    if (!fioAddress) {
+      try {
+        const receiveAddress = await wallet.getReceiveAddress()
+        const data = await wallet.otherMethods.fioAction('getFioNames', { fioPublicKey: receiveAddress.publicAddress })
+        fioAddress = data.fio_addresses[0].fio_address
+      } catch (e) {
+        fioAddress = ''
+      }
+    }
+    addresses.push(fioAddress)
+  }
+
+  return addresses
+}
+
 export const getFioWallets = (state: State) => {
   const { activeWalletIds = [] } = state.core.account
   const fioWallets = []

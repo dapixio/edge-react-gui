@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   buttons: {
     display: 'flex',
     flexDirection: 'column',
-    marginBottom: scale(15)
+    marginBottom: scale(35)
   },
   bottomButton: {
     display: 'flex',
@@ -59,6 +59,9 @@ const styles = StyleSheet.create({
     color: THEME.COLORS.WHITE,
     fontSize: scale(14),
     backgroundColor: THEME.COLORS.TRANSPARENT
+  },
+  underlay: {
+    color: THEME.COLORS.SECONDARY
   }
 })
 
