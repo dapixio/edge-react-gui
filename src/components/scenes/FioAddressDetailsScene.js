@@ -1,12 +1,14 @@
 // @flow
 
 import React, { Component } from 'react'
-import { Alert, Image, View } from 'react-native'
+import { Alert, Image, TouchableHighlight, View } from 'react-native'
 
 import fioAddressDetailsIcon from '../../assets/images/details_fioAddress.png'
+import * as Constants from '../../constants/indexConstants'
 import s from '../../locales/strings.js'
 import T from '../../modules/UI/components/FormattedText/index'
 import styles from '../../styles/scenes/FioAddressDetailsStyle'
+import type { GoToSceneProps } from '../../types/types'
 import { SceneWrapper } from '../common/SceneWrapper'
 
 export type State = {}
@@ -22,7 +24,7 @@ export type SceneProps = {
   fioAddress: string
 }
 
-type Props = StateProps & SceneProps
+type Props = StateProps & SceneProps & GoToSceneProps
 
 export class FioAddressDetailsScene extends Component<Props, State> {
   componentDidMount () {
@@ -33,6 +35,10 @@ export class FioAddressDetailsScene extends Component<Props, State> {
         { text: s.strings.fio_address_details_screen_alert_button }
       ])
     }
+  }
+
+  _onToggleAccountSettings = (fioAddressName, expiration) => {
+    this.props.goToScene(Constants.FIO_ACCOUNT_SETTINGS, { fioAddressName, expiration })
   }
 
   render () {
@@ -50,6 +56,17 @@ export class FioAddressDetailsScene extends Component<Props, State> {
               {`${s.strings.fio_address_details_screen_expires} `}
               {expirationFormatted}
             </T>
+          </View>
+          <View style={styles.buttons}>
+            <TouchableHighlight
+              style={styles.bottomButton}
+              onPress={() => this._onToggleAccountSettings(fioAddressName, expirationFormatted)}
+              underlayColor={styles.underlay.color}
+            >
+              <View style={styles.bottomButtonTextWrap}>
+                <T style={styles.bottomButtonText}>{s.strings.fio_address_details_screen_manage_account_settings}</T>
+              </View>
+            </TouchableHighlight>
           </View>
         </View>
       </SceneWrapper>
