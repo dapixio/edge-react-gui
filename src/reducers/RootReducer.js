@@ -8,6 +8,7 @@ import { type UiState, ui } from '../modules/UI/reducer.js'
 import { type Action } from '../types/reduxTypes.js'
 import { type ContactsState, contacts } from './ContactsReducer.js'
 import { type CryptoExchangeState, cryptoExchange } from './CryptoExchangeReducer.js'
+import { type NetworkState, network } from './NetworkReducer.js'
 import { type PermissionsState, permissions } from './PermissionsReducer.js'
 
 export { core, ui, cryptoExchange, exchangeRates, permissions, contacts }
@@ -18,7 +19,8 @@ export type RootState = {
   +cryptoExchange: CryptoExchangeState,
   +exchangeRates: ExchangeRatesState,
   +permissions: PermissionsState,
-  +ui: UiState
+  +ui: UiState,
+  +network: NetworkState
 }
 
 export const rootReducer: Reducer<RootState, Action> = combineReducers({
@@ -27,5 +29,6 @@ export const rootReducer: Reducer<RootState, Action> = combineReducers({
   cryptoExchange,
   exchangeRates,
   permissions,
-  ui
+  ui,
+  network
 })
