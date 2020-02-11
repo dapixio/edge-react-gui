@@ -37,7 +37,8 @@ export const initialState = {
       amount: 0
     }
   },
-  developerModeOn: false
+  developerModeOn: false,
+  fioDemoServer: false
 }
 
 export type CurrencySetting = {
@@ -108,7 +109,8 @@ export type SettingsState = {
     '2000': boolean,
     '20000': boolean,
     '200000': boolean
-  }
+  },
+  fioDemoServer: boolean
 }
 
 const currencyPLuginUtil = (state, payloadData): SettingsState => {
@@ -581,6 +583,15 @@ export const settingsLegacy = (state: SettingsState = initialState, action: Acti
         }
       }
     }
+
+    case 'ENABLE_FIO_DEMO_SERVER': {
+      if (!action.data) throw new Error('Invalid action')
+      return {
+        ...state,
+        fioDemoServer: action.data.enableFioDemoServer
+      }
+    }
+
     default:
       return state
   }

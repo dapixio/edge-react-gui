@@ -17,6 +17,10 @@ exports[`MyComponent should render Locked SettingsOverview 1`] = `
       }
       text="Account: "
     />
+    <SettingsSwitchRow
+      onPress={[Function]}
+      text="Use demo server for FIO"
+    />
     <SettingsRow
       onPress={[Function]}
       right={
@@ -184,6 +188,10 @@ exports[`MyComponent should render UnLocked SettingsOverview 1`] = `
         />
       }
       text="Account: "
+    />
+    <SettingsSwitchRow
+      onPress={[Function]}
+      text="Use demo server for FIO"
     />
     <SettingsRow
       onPress={[Function]}

@@ -36,6 +36,7 @@ type Props = {
   isLocked: boolean,
   confirmPasswordError: string,
   developerModeOn: boolean,
+  fioDemoServer: boolean,
   setAutoLogoutTimeInSeconds(number): void,
   confirmPassword(string): void,
   lockSettings(): void,
@@ -47,7 +48,8 @@ type Props = {
   showUnlockSettingsModal: () => void,
   showSendLogsModal: () => void,
   showRestoreWalletsModal: () => void,
-  toggleDeveloperMode(boolean): void
+  toggleDeveloperMode(boolean): void,
+  onToggleFioDemoServerEnabled(boolean): void
 }
 
 type State = {
@@ -154,6 +156,13 @@ export default class SettingsOverview extends Component<Props, State> {
           <SettingsHeaderRow
             icon={<FontAwesomeIcon name="user-o" color={THEME.COLORS.WHITE} size={iconSize} />}
             text={`${s.strings.settings_account_title_cap}: ${this.props.username}`}
+          />
+
+          <SettingsSwitchRow
+            text="Use demo server for FIO"
+            key="fioDemoServer"
+            onPress={() => this.props.onToggleFioDemoServerEnabled(!this.props.fioDemoServer)}
+            value={this.props.fioDemoServer}
           />
           <SettingsRow
             text={s.strings[this.props.lockButton]}
