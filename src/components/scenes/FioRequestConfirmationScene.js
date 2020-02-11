@@ -94,7 +94,7 @@ export class FioRequestConfirmationComponent extends Component<Props, LocalState
         this.setState({ loading: true })
         try {
           const getFeeRes = await engine.otherMethods.fioAction('getFee', { endPoint: 'new_funds_request', fioAddress: this.selectedWalletFioAddress })
-          if (getFeeRes.fee) return showError(`${s.strings.fio_no_bundled_err_title}. ${s.strings.fio_no_bundled_err_msg}`)
+          if (getFeeRes.fee) return showError(s.strings.fio_no_bundled_err_msg)
         } catch (e) {
           this.setState({ loading: false })
           return showError(s.strings.fio_get_fee_err_msg)

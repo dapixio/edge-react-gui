@@ -61,6 +61,8 @@ export const FIO_REQUEST_LIST = 'fioRequestList'
 export const FIO_PENDING_REQUEST_DETAILS = 'fioPendingRequestDetails'
 export const FIO_SENT_REQUEST_DETAILS = 'fioSentRequestDetails'
 export const FIO_REQUEST_CONFIRMATION = 'fioRequestConfirmation'
+export const FIO_ACCOUNT_SETTINGS = 'fioAccountSettings'
+export const FIO_RENEW_ADDRESS = 'fioRenewAddress'
 
 export const CURRENCY_SETTINGS = {
   btcSettings: {

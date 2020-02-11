@@ -132,7 +132,7 @@ export const rejectRequest = (fioRequestId: string, payerFioAddress: string, pay
         payeeFioAddress
       })
       .then(({ fee }) => {
-        if (fee) throw new Error(s.strings.fio_no_bundled_err_title)
+        if (fee) throw new Error(s.strings.fio_no_bundled_err_msg)
         wallet.otherMethods
           .fioAction('rejectFundsRequest', {
             fioRequestId: fioRequestId,
@@ -149,7 +149,7 @@ export const rejectRequest = (fioRequestId: string, payerFioAddress: string, pay
           })
       })
       .catch(e => {
-        showError(`${s.strings.fio_no_bundled_err_title}. ${s.strings.fio_no_bundled_err_msg}`)
+        showError(s.strings.fio_no_bundled_err_msg)
         cb(e)
       })
   } else {

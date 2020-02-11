@@ -38,6 +38,10 @@ export class FioAddressDetailsScene extends Component<Props, State> {
     }
   }
 
+  _onToggleAccountSettings = (fioAddressName, expiration) => {
+    Actions[Constants.FIO_ACCOUNT_SETTINGS]({ fioAddressName, expiration })
+  }
+
   renderButton () {
     if (this.props.registerSuccess) {
       return (
@@ -50,6 +54,22 @@ export class FioAddressDetailsScene extends Component<Props, State> {
         </View>
       )
     }
+
+    const { fioAddressName, expiration } = this.props
+
+    return (
+      <View style={styles.buttons}>
+        <TouchableHighlight
+          style={styles.bottomButton}
+          onPress={() => this._onToggleAccountSettings(fioAddressName, intl.formatExpDate(expiration))}
+          underlayColor={styles.underlay.color}
+        >
+          <View style={styles.bottomButtonTextWrap}>
+            <T style={styles.bottomButtonText}>{s.strings.fio_address_details_screen_manage_account_settings}</T>
+          </View>
+        </TouchableHighlight>
+      </View>
+    )
   }
 
   render () {

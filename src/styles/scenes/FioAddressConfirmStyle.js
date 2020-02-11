@@ -95,6 +95,10 @@ const styles = StyleSheet.create({
   },
   spacer: {
     paddingTop: scale(20)
+  },
+  activityIndicator: {
+    flex: 1,
+    alignSelf: 'center'
   }
 })
 

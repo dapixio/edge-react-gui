@@ -150,8 +150,8 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
             fioAddress: pendingRequest.payer_fio_address
           })
           if (getFeeResult.fee) {
-            showError(`${s.strings.fio_no_bundled_err_title}. ${s.strings.fio_no_bundled_err_msg}`)
-            throw new Error(s.strings.fio_no_bundled_err_title)
+            showError(s.strings.fio_no_bundled_err_msg)
+            throw new Error(s.strings.fio_no_bundled_err_msg)
           }
         } catch (e) {
           showError(s.strings.fio_get_fee_err_msg)
