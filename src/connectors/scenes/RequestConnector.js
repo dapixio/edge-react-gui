@@ -3,11 +3,12 @@
 import type { EdgeCurrencyInfo, EdgeCurrencyWallet } from 'edge-core-js'
 import { connect } from 'react-redux'
 
-import { refreshReceiveAddressRequest } from '../../actions/WalletActions'
+import { refreshReceiveAddressRequest, requestChangeAmounts, requestSaveFioModalData } from '../../actions/WalletActions'
 import type { RequestDispatchProps, RequestLoadingProps, RequestStateProps } from '../../components/scenes/RequestScene'
 import { Request } from '../../components/scenes/RequestScene'
 import * as CORE_SELECTORS from '../../modules/Core/selectors.js'
 import * as SETTINGS_SELECTORS from '../../modules/Settings/selectors.js'
+import type { ExchangedFlipInputAmounts } from '../../modules/UI/components/FlipInput/ExchangedFlipInput2.js'
 import * as UI_SELECTORS from '../../modules/UI/selectors.js'
 import type { Dispatch, State } from '../../types/reduxTypes.js'
 import type { GuiCurrencyInfo, GuiDenomination, GuiWallet } from '../../types/types.js'
@@ -17,9 +18,11 @@ const mapStateToProps = (state: State): RequestStateProps | RequestLoadingProps 
   const guiWallet: GuiWallet = UI_SELECTORS.getSelectedWallet(state)
   const currencyCode: string = UI_SELECTORS.getSelectedCurrencyCode(state)
 
+  const allWallets: any = UI_SELECTORS.getWallets(state)
   const plugins: Object = SETTINGS_SELECTORS.getPlugins(state)
   const allCurrencyInfos: Array<EdgeCurrencyInfo> = plugins.allCurrencyInfos
   const currencyInfo: EdgeCurrencyInfo | void = getCurrencyInfo(allCurrencyInfos, currencyCode)
+  const account = CORE_SELECTORS.getAccount(state)
 
   if (!guiWallet || !currencyCode) {
     return {
@@ -33,7 +36,10 @@ const mapStateToProps = (state: State): RequestStateProps | RequestLoadingProps 
       secondaryCurrencyInfo: null,
       publicAddress: '',
       legacyAddress: '',
-      useLegacyAddress: null
+      useLegacyAddress: null,
+      allWallets,
+      account,
+      isConnected: CORE_SELECTORS.isConnectedState(state)
     }
   }
 
@@ -71,12 +77,21 @@ const mapStateToProps = (state: State): RequestStateProps | RequestLoadingProps 
     loading: false,
     primaryCurrencyInfo,
     secondaryCurrencyInfo,
-    useLegacyAddress: state.ui.scenes.requestType.useLegacyAddress
+    useLegacyAddress: state.ui.scenes.requestType.useLegacyAddress,
+    allWallets,
+    account,
+    isConnected: CORE_SELECTORS.isConnectedState(state)
   }
 }
 const mapDispatchToProps = (dispatch: Dispatch): RequestDispatchProps => ({
   refreshReceiveAddressRequest: (walletId: string) => {
     dispatch(refreshReceiveAddressRequest(walletId))
+  },
+  requestChangeAmounts: (amounts: ExchangedFlipInputAmounts) => {
+    dispatch(requestChangeAmounts(amounts))
+  },
+  requestSaveFioModalData: (fioModalData: any) => {
+    dispatch(requestSaveFioModalData(fioModalData))
   }
 })
 

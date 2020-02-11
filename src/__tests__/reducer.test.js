@@ -11,7 +11,8 @@ test('initialState', () => {
     cryptoExchange: cryptoExchange(undefined, {}),
     exchangeRates: exchangeRates(undefined, {}),
     permissions: permissions(undefined, {}),
-    contacts: contacts(undefined, {})
+    contacts: contacts(undefined, {}),
+    network: { isConnected: true }
   }
   const actual = rootReducer(undefined, {})
 

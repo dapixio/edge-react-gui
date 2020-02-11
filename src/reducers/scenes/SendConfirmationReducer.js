@@ -21,8 +21,11 @@ export type GuiMakeSpendInfo = {
   lockInputs?: boolean,
   uniqueIdentifier?: string,
   otherParams?: Object,
+  fioAddress?: any,
+  memo?: any,
   onBack?: () => void,
-  onDone?: (error: Error | null, edgeTransaction?: EdgeTransaction) => void
+  onDone?: (error: Error | null, edgeTransaction?: EdgeTransaction) => void,
+  beforeTransaction?: () => void
 }
 
 export type SendConfirmationState = {

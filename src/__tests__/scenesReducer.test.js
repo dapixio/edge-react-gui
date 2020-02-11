@@ -38,6 +38,34 @@ test('initialState', () => {
     exchangeRate: {
       exchangeRates: {}
     },
+    fioAddress: {
+      expiration: new Date('1/1/2019'),
+      fee_collected: 0,
+      fioAddressName: '',
+      fioAddresses: [],
+      selectedWallet: null,
+      fioWalletByAddress: null,
+      setPubAddressesLoading: false,
+      connectedWalletsByFioAddress: {},
+      getPubAddressesLoading: false
+    },
+    fioRequest: {
+      requests: [],
+      pendingMore: 0,
+      pendingPage: 1,
+      amounts: {
+        exchangeAmount: '',
+        nativeAmount: ''
+      },
+      fioModalData: {},
+      sentRequests: [],
+      sentMore: 0,
+      sentPage: 1,
+      fioPendingRequestSelected: {},
+      fioPendingRequestConfirmedStatus: '',
+      fioPendingRequestRejectedStatus: '',
+      fioSentRequestSelected: {}
+    },
     request: request(undefined, dummyAction),
     requestType: {
       useLegacyAddress: false,

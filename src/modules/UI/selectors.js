@@ -1,8 +1,9 @@
 // @flow
 
-import type { EdgeCurrencyInfo, EdgeDenomination } from 'edge-core-js'
+import type { EdgeCurrencyInfo, EdgeCurrencyWallet, EdgeDenomination } from 'edge-core-js'
 import _ from 'lodash'
 
+import { FIO_STR } from '../../constants/WalletAndCurrencyConstants'
 import { intl } from '../../locales/intl.js'
 import type { State } from '../../types/reduxTypes.js'
 import type { GuiDenomination, GuiWallet, TransactionListTx } from '../../types/types.js'
@@ -13,6 +14,30 @@ export const getWallets = (state: State) => {
   // returns an object with GUI Wallets as Keys Not sure how to tpye that
   const wallets = state.ui.wallets.byId
   return wallets
+}
+
+export const getFioAddressesFromWallets = async (state: State) => {
+  const wallets = getFioWallets(state)
+  const addresses = []
+  for (const wallet of wallets) {
+    let fioAddress = await wallet.otherMethods.getFioAddress()
+    if (!fioAddress) {
+      try {
+        const receiveAddress = await wallet.getReceiveAddress()
+        const data = await wallet.otherMethods.fioAction('getFioNames', { fioPublicKey: receiveAddress.publicAddress })
+        fioAddress = data.fio_addresses[0].fio_address
+      } catch (e) {
+        fioAddress = ''
+      }
+    }
+    addresses.push(fioAddress)
+  }
+
+  return addresses
+}
+
+export const getFioWallets = (state: State) => {
+  return state.ui.wallets.fioWallets
 }
 
 export const getWallet = (state: State, walletId: string) => {
@@ -78,6 +103,20 @@ export const getTransactions = (state: State): Array<TransactionListTx> => {
   return transactions
 }
 
+export const getFioSelectedRequest = (state: State): Object => {
+  const request = state.ui.scenes.fioRequest.fioPendingRequestSelected
+  return request
+}
+
+export const getFioSelectedSentRequest = (state: State): Object => {
+  const request = state.ui.scenes.fioRequest.fioSentRequestSelected
+  return request
+}
+
+export const getFioWalletByAddress = (state: State): EdgeCurrencyWallet | null => {
+  return state.ui.scenes.fioAddress.fioWalletByAddress
+}
+
 export const getDenominations = (state: State, currencyCode: string) => {
   const wallet = getSelectedWallet(state)
   const denominations = Object.values(wallet.allDenominations[currencyCode])
@@ -135,6 +174,11 @@ export const getSceneState = (state: State, sceneKey: string) => {
 }
 
 export const getExchangeRate = (state: State, fromCurrencyCode: string, toCurrencyCode: string): number => {
+  if (fromCurrencyCode === FIO_STR || toCurrencyCode === FIO_STR) {
+    // TODO: add real exchange rate
+    return 0
+  }
+
   const exchangeRates = state.exchangeRates
   const rateKey = `${fromCurrencyCode}_${toCurrencyCode}`
   const rate = exchangeRates[rateKey] ? exchangeRates[rateKey] : 0
@@ -173,4 +217,25 @@ export const calculateWalletFiatBalanceWithoutState = (wallet: GuiWallet, curren
   const cryptoAmount: number = parseFloat(convertNativeToExchange(nativeToExchangeRatio)(nativeBalance))
   fiatValue = convertCurrencyWithoutState(exchangeRates, currencyCode, wallet.isoFiatCurrencyCode, cryptoAmount)
   return intl.formatNumber(fiatValue, { toFixed: 2 }) || '0'
+}
+
+export const findWalletByFioAddress = (state: State, fioAddress: string): EdgeCurrencyWallet | null => {
+  const fioWallets: EdgeCurrencyWallet[] = getFioWallets(state)
+
+  if (fioWallets.length) {
+    for (const wallet: EdgeCurrencyWallet of fioWallets) {
+      const names = wallet.otherMethods.walletLocalData.otherData.fioNames
+      if (names.length > 0) {
+        for (const name of names) {
+          if (name.toLowerCase() === fioAddress.toLowerCase()) {
+            return wallet
+          }
+        }
+      }
+    }
+
+    return null
+  } else {
+    return null
+  }
 }

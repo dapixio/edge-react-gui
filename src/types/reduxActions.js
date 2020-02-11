@@ -3,6 +3,7 @@
 import type { DiskletFolder } from 'disklet'
 import type { EdgeContext, EdgeCurrencyWallet, EdgeLobby, EdgeParsedUri, EdgeReceiveAddress } from 'edge-core-js'
 
+import type { ExchangedFlipInputAmounts } from '../modules/UI/components/FlipInput/ExchangedFlipInput2'
 import type { AccountActivationPaymentInfo, HandleActivationInfo, HandleAvailableStatus } from '../reducers/scenes/CreateWalletReducer.js'
 import { type CustomTokenInfo, type GuiContact, type GuiCurrencyInfo, type GuiSwapInfo, type GuiWallet } from './types.js'
 
@@ -47,6 +48,17 @@ type LegacyActionName =
   | 'UPDATE_SHOW_PASSWORD_RECOVERY_REMINDER_MODAL'
   | 'UPDATE_WALLET_FIAT_BALANCE_VISIBILITY'
   | 'UPDATE_WALLET_LOADING_PROGRESS'
+  | 'FIO/FIO_REQUEST_LIST_PENDING'
+  | 'FIO/FIO_REQUEST_LIST_SENT'
+  | 'FIO/FIO_PENDING_REQUEST_SELECTED'
+  | 'FIO/FIO_SENT_REQUEST_SELECTED'
+  | 'FIO/FIO_REQUEST_LIST_REMOVE'
+  | 'FIO/FIO_PENDING_REQUEST_CONFIRMED'
+  | 'FIO/FIO_PENDING_REQUEST_REJECTED'
+  | 'FIO/FIO_ADDRESS_UPDATE_FIO_ADDRESS_NAME'
+  | 'FIO/FIO_ADDRESS_UPDATE_SELECTED_WALLET'
+  | 'FIO/FIO_REQUEST_CHANGE_AMOUNTS'
+  | 'FIO/FIO_REQUEST_SAVE_MODAL_DATA'
 
 // Actions with no payload:
 type NoDataActionName =
@@ -209,3 +221,22 @@ export type Action =
       data: { walletId: string, tokens: Array<string> }
     }
   | { type: 'WALLET_ACCOUNT_ACTIVATION_ESTIMATE_ERROR', data: string }
+  | { type: 'NETWORK/NETWORK_STATUS', data: { isConnected: boolean } }
+  | { type: 'FIO/FIO_ADDRESS_UPDATE_FIO_ADDRESS_NAME', data: { fioAddressName: string } }
+  | { type: 'FIO/FIO_ADDRESS_UPDATE_SELECTED_WALLET', data: { selectedWallet: EdgeCurrencyWallet, expiration: string, fee_collected: number } }
+  | { type: 'FIO/FIO_ADDRESS_SET_FIO_ADDRESS', data: { fioAddressName: string, expiration: string } }
+  | { type: 'FIO/FIO_WALLET_BY_ADDRESS', data: { wallet: EdgeCurrencyWallet | null } }
+  | { type: 'FIO/FIO_REQUEST_CHANGE_AMOUNTS', data: { amounts: ExchangedFlipInputAmounts } }
+  | { type: 'FIO/FIO_REQUEST_SAVE_MODAL_DATA', data: { fioModalData: any } }
+  | { type: 'FIO/FIO_REQUEST_LIST_PENDING', data: { fioRequestsPending: Object[], more: number, page: number } }
+  | { type: 'FIO/FIO_REQUEST_LIST_SENT', data: { fioRequestsSent: Object[], more: number, page: number } }
+  | { type: 'FIO/FIO_PENDING_REQUEST_SELECTED', data: { fioPendingRequestSelected: Object } }
+  | { type: 'FIO/FIO_PENDING_REQUEST_CONFIRMED', data: { fioPendingRequestConfirmed: string } }
+  | { type: 'FIO/FIO_PENDING_REQUEST_REJECTED', data: { fioPendingRequestRejected: string } }
+  | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
+  | { type: 'FIO/FIO_SENT_REQUEST_SELECTED', data: { fioSentRequestSelected: Object } }
+  | { type: 'FIO/FIO_CONNECT_WALLETS_REQUEST' }
+  | { type: 'FIO/FIO_CONNECT_WALLETS_SUCCESS' }
+  | { type: 'FIO/FIO_CONNECT_WALLETS_FAILURE' }
+  | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING' }
+  | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES', data: { fioAddress: string, pubAddresses: { [currencyCode: string]: string } } }

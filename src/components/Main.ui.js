@@ -37,6 +37,20 @@ import CurrencySettings from '../connectors/scenes/CurrencySettingsConnector'
 import DefaultFiatSettingConnector from '../connectors/scenes/DefaultFiatSettingConnector'
 import EdgeLoginSceneConnector from '../connectors/scenes/EdgeLoginSceneConnector'
 import EditToken from '../connectors/scenes/EditTokenConnector.js'
+import { FioAccountSettingsConnector } from '../connectors/scenes/FioAccountSettingsConnector'
+import { FioAddressConfirmConnector } from '../connectors/scenes/FioAddressConfirmConnector'
+import { FioAddressConnector } from '../connectors/scenes/FioAddressConnector'
+import { FioAddressDetailsConnector } from '../connectors/scenes/FioAddressDetailsConnector'
+import { FioAddressListConnector } from '../connectors/scenes/FioAddressListConnector'
+import { FioAddressRegisterConnector } from '../connectors/scenes/FioAddressRegisterConnector'
+import { FioConnectWalletConfirmConnector } from '../connectors/scenes/FioConnectWalletConfirmConnector'
+import { FioConnectWalletConnector } from '../connectors/scenes/FioConnectWalletConnector'
+import { FioDisconnectWalletsConnector } from '../connectors/scenes/FioDisconnectWalletsConnector'
+import { FioPendingRequestConnector } from '../connectors/scenes/FioPendingRequestConnector'
+import { FioRenewAddressConnector } from '../connectors/scenes/FioRenewAddressConnector'
+import { FioRequestConfirmationConnector } from '../connectors/scenes/FioRequestConfirmationConnector.js'
+import { FioRequestListConnector } from '../connectors/scenes/FioRequestListConnector'
+import { FioSentRequestConnector } from '../connectors/scenes/FioSentRequestConnector'
 import LoginConnector from '../connectors/scenes/LoginConnector'
 import ManageTokens from '../connectors/scenes/ManageTokensConnector.js'
 import OtpSettingsSceneConnector from '../connectors/scenes/OtpSettingsSceneConnector.js'
@@ -104,7 +118,17 @@ const CREATE_WALLET_SELECT_FIAT = s.strings.title_create_wallet_select_fiat
 const CREATE_WALLET = s.strings.title_create_wallet
 const CREATE_WALLET_ACCOUNT_SETUP = s.strings.create_wallet_create_account
 const CREATE_WALLET_ACCOUNT_ACTIVATE = s.strings.create_wallet_account_activate
+const FIO_ACCOUNT_SETTINGS = s.strings.title_fio_account_settings
+const FIO_RENEW_ADDRESS = s.strings.title_fio_renew_address
+const FIO_CONNECT_TO_WALLET = s.strings.title_fio_connect_to_wallet
+const FIO_DISCONNECT_WALLETS = s.strings.title_fio_disconnect_wallets
+const FIO_ADDRESS = s.strings.title_fio_address
+const FIO_ADDRESS_CONFIRMATION = s.strings.title_fio_address_confirmation
+const FIO_REQUEST = s.strings.drawer_fio_requests
+const FIO_PENDING_REQUEST_DETAILS = s.strings.title_fio_pending_request_details
+const FIO_SENT_REQUEST_DETAILS = s.strings.title_fio_sent_request_details
 const TRANSACTIONS_EXPORT = s.strings.title_export_transactions
+const REQUEST = s.strings.title_request
 const BUY = s.strings.title_buy
 const SELL = s.strings.title_sell
 const EDGE_LOGIN = s.strings.title_edge_login
@@ -531,7 +555,7 @@ export default class Main extends Component<Props> {
                   />
                 </Stack>
 
-                <Stack key={Constants.REQUEST}>
+                <Stack key={Constants.REQUEST} icon={this.icon(Constants.REQUEST)} tabBarLabel={REQUEST}>
                   <Scene
                     key={Constants.REQUEST}
                     navTransparent={true}
@@ -541,6 +565,14 @@ export default class Main extends Component<Props> {
                     renderLeftButton={this.renderBackButton()}
                     renderRightButton={this.renderRequestMenuButton()}
                     hideTabBar
+                  />
+                  <Scene
+                    key={Constants.FIO_REQUEST_CONFIRMATION}
+                    navTransparent={true}
+                    component={FioRequestConfirmationConnector}
+                    renderTitle={this.renderWalletName()}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
                   />
                 </Stack>
 
@@ -685,6 +717,154 @@ export default class Main extends Component<Props> {
                     onLeft={Actions.pop}
                   />
                 </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS}
+                    navTransparent={true}
+                    component={FioAddressConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_LIST}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_LIST}
+                    navTransparent={true}
+                    component={FioAddressListConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderHelpButton()}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_REGISTER}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_REGISTER}
+                    navTransparent={true}
+                    component={FioAddressRegisterConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_CONFIRM}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_CONFIRM}
+                    navTransparent={true}
+                    component={FioAddressConfirmConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS_CONFIRMATION)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_DETAILS}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_DETAILS}
+                    navTransparent={true}
+                    component={FioAddressDetailsConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                  />
+                  <Scene
+                    key={Constants.FIO_ACCOUNT_SETTINGS}
+                    navTransparent={true}
+                    component={FioAccountSettingsConnector}
+                    renderTitle={this.renderTitle(FIO_ACCOUNT_SETTINGS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                  <Scene
+                    key={Constants.FIO_RENEW_ADDRESS}
+                    navTransparent={true}
+                    component={FioRenewAddressConnector}
+                    renderTitle={this.renderTitle(FIO_RENEW_ADDRESS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                  <Scene
+                    key={Constants.FIO_CONNECT_TO_WALLETS}
+                    navTransparent={true}
+                    component={FioConnectWalletConnector}
+                    renderTitle={this.renderTitle(FIO_CONNECT_TO_WALLET)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                  <Scene
+                    key={Constants.FIO_ADDRESS_DISCONNECT_WALLETS}
+                    navTransparent={true}
+                    component={FioDisconnectWalletsConnector}
+                    renderTitle={this.renderTitle(FIO_DISCONNECT_WALLETS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    onLeft={Actions.pop}
+                  />
+                  <Scene
+                    key={Constants.FIO_CONNECT_TO_WALLETS_CONFIRM}
+                    navTransparent={true}
+                    component={FioConnectWalletConfirmConnector}
+                    renderTitle={this.renderTitle(FIO_CONNECT_TO_WALLET)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_ADDRESS_REGISTER_SUCCESS}>
+                  <Scene
+                    key={Constants.FIO_ADDRESS_REGISTER_SUCCESS}
+                    navTransparent={true}
+                    component={FioAddressDetailsConnector}
+                    renderTitle={this.renderTitle(FIO_ADDRESS)}
+                    renderRightButton={this.renderMenuButton()}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_REQUEST_LIST}>
+                  <Scene
+                    key={Constants.FIO_REQUEST_LIST}
+                    navTransparent={true}
+                    component={FioRequestListConnector}
+                    renderTitle={this.renderTitle(FIO_REQUEST)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_PENDING_REQUEST_DETAILS}>
+                  <Scene
+                    key={Constants.FIO_PENDING_REQUEST_DETAILS}
+                    navTransparent={true}
+                    component={FioPendingRequestConnector}
+                    renderTitle={this.renderTitle(FIO_PENDING_REQUEST_DETAILS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderEmptyButton()}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
+
+                <Stack key={Constants.FIO_SENT_REQUEST_DETAILS}>
+                  <Scene
+                    key={Constants.FIO_SENT_REQUEST_DETAILS}
+                    navTransparent={true}
+                    component={FioSentRequestConnector}
+                    renderTitle={this.renderTitle(FIO_SENT_REQUEST_DETAILS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderEmptyButton()}
+                    onLeft={Actions.pop}
+                  />
+                </Stack>
               </Scene>
             </Drawer>
           </Stack>
@@ -819,6 +999,10 @@ export default class Main extends Component<Props> {
     }
     if (this.isCurrentScene(Constants.PLUGIN_VIEW)) {
       handlePluginBack()
+      return true
+    }
+    if (this.isCurrentScene(Constants.FIO_ADDRESS)) {
+      Actions.popTo(Constants.WALLET_LIST_SCENE)
       return true
     }
     Actions.pop()

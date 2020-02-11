@@ -29,6 +29,7 @@ import { ContactsLoader } from './ContactsLoader.js'
 import EdgeAccountCallbackManager from './EdgeAccountCallbackManager.js'
 import EdgeContextCallbackManager from './EdgeContextCallbackManager.js'
 import EdgeWalletsCallbackManager from './EdgeWalletsCallbackManager.js'
+import { NetworkActivity } from './NetworkActivity.js'
 
 type Props = { context: EdgeContext }
 
@@ -89,6 +90,7 @@ export class Services extends PureComponent<Props> {
           <EdgeContextCallbackManager />
           <EdgeWalletsCallbackManager />
           <ModalProvider />
+          <NetworkActivity />
         </React.Fragment>
       </Provider>
     )
