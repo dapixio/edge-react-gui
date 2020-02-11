@@ -10,7 +10,8 @@ export type FioAddressSceneState = {
   fioAddresses: string[],
   selectedWallet: EdgeCurrencyWallet | null,
   expiration: Date,
-  fee_collected: number
+  fee_collected: number,
+  fioWalletByAddress: EdgeCurrencyWallet | null
 }
 
 const initialState: FioAddressSceneState = {
@@ -18,7 +19,8 @@ const initialState: FioAddressSceneState = {
   fioAddresses: [],
   selectedWallet: null,
   expiration: new Date('1/1/2019'),
-  fee_collected: 0
+  fee_collected: 0,
+  fioWalletByAddress: null
 }
 
 export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initialState, action: Action) => {
@@ -43,6 +45,12 @@ export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initia
         ...state,
         fioAddressName: action.data.fioAddressName,
         expiration: new Date(action.data.expiration)
+      }
+    case 'FIO/FIO_WALLET_BY_ADDRESS':
+      if (!action.data) throw new Error(`Invalid action FIO/FIO_WALLET_BY_ADDRESS`)
+      return {
+        ...state,
+        fioWalletByAddress: action.data.wallet
       }
     default:
       return state

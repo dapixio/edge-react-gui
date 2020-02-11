@@ -43,7 +43,25 @@ test('initialState', () => {
       fee_collected: 0,
       fioAddressName: '',
       fioAddresses: [],
-      selectedWallet: null
+      selectedWallet: null,
+      fioWalletByAddress: null
+    },
+    fioRequest: {
+      requests: [],
+      pendingMore: 0,
+      pendingPage: 1,
+      amounts: {
+        exchangeAmount: '',
+        nativeAmount: ''
+      },
+      fioModalData: {},
+      sentRequests: [],
+      sentMore: 0,
+      sentPage: 1,
+      fioPendingRequestSelected: {},
+      fioPendingRequestConfirmedStatus: '',
+      fioPendingRequestRejectedStatus: '',
+      fioSentRequestSelected: {}
     },
     request: request(undefined, dummyAction),
     requestType: {
