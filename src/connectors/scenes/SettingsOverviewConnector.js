@@ -19,7 +19,7 @@ import * as Constants from '../../constants/indexConstants'
 import * as CORE_SELECTORS from '../../modules/Core/selectors'
 import { resetSendLogsStatus, sendLogs } from '../../modules/Logs/action'
 import * as SETTINGS_SELECTORS from '../../modules/Settings/selectors'
-import type { Dispatch, State } from '../../types/reduxTypes.js'
+import type { Dispatch, GetState, State } from '../../types/reduxTypes.js'
 
 // settings_button_lock_settings, or //settings_button_unlock_settings
 
@@ -34,6 +34,7 @@ const mapStateToProps = (state: State) => {
   const sendLogsStatus = SETTINGS_SELECTORS.getSendLogsStatus(state)
   const pinLoginEnabled = SETTINGS_SELECTORS.getPinLoginEnabled(state)
   const developerModeOn = state.ui.settings.developerModeOn
+  const fioDemoServer = state.ui.settings.fioDemoServer
   return {
     defaultFiat: SETTINGS_SELECTORS.getDefaultFiat(state),
     autoLogoutTimeInSeconds: SETTINGS_SELECTORS.getAutoLogoutTimeInSeconds(state),
@@ -47,7 +48,8 @@ const mapStateToProps = (state: State) => {
     confirmPasswordError,
     sendLogsStatus,
     pinLoginEnabled,
-    developerModeOn
+    developerModeOn,
+    fioDemoServer
   }
 }
 const mapDispatchToProps = (dispatch: Dispatch) => ({
@@ -62,7 +64,20 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   showUnlockSettingsModal: () => dispatch(showUnlockSettingsModal()),
   showSendLogsModal: () => dispatch(showSendLogsModal()),
   showRestoreWalletsModal: () => dispatch(showRestoreWalletsModal()),
-  toggleDeveloperMode: (developerModeOn: boolean) => dispatch(setDeveloperModeOn(developerModeOn))
+  toggleDeveloperMode: (developerModeOn: boolean) => dispatch(setDeveloperModeOn(developerModeOn)),
+  onToggleFioDemoServerEnabled: (enableFioDemoServer: boolean) =>
+    dispatch((dispatch: Dispatch, getState: GetState) => {
+      const state = getState()
+      const wallets = state.ui.wallets.byId
+      for (const walletId in wallets) {
+        const edgeWallet = state.core.account.currencyWallets[walletId]
+        if (edgeWallet && edgeWallet.type === Constants.FIO_WALLET_TYPE) {
+          edgeWallet.otherMethods.changeApiUrl(enableFioDemoServer ? 'https://demo2.fio.dev:443/v1/' : 'https://testnet.fioprotocol.io:443/v1/')
+        }
+      }
+
+      dispatch({ type: 'ENABLE_FIO_DEMO_SERVER', data: { enableFioDemoServer } })
+    })
 })
 
 export default connect(

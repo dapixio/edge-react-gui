@@ -241,3 +241,4 @@ export type Action =
   | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING' }
   | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES', data: { fioAddress: string, pubAddresses: { [currencyCode: string]: string } } }
   | { type: 'FIO/SET_OBT_DATA', data: FioObtRecord[] }
+  | { type: 'ENABLE_FIO_DEMO_SERVER', data: { enableFioDemoServer: boolean } }
