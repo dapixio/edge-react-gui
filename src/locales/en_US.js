@@ -382,6 +382,8 @@ const strings = {
   title_fio_sent_request_details: 'Sent Request Details',
   title_fio_account_settings: 'Account Settings',
   title_fio_renew_address: 'Renew FIO Address',
+  title_fio_connect_to_wallet: 'Connect to Wallet',
+  title_fio_disconnect_wallets: 'Disconnect Wallets',
   title_fio_address: 'FIO Addresses',
   title_fio_address_confirmation: 'Register FIO Address',
   title_fio_requested: 'Requested',
@@ -662,6 +664,7 @@ const strings = {
   fio_address_details_screen_expires: 'Expires',
   fio_address_details_screen_manage_approved_senders: 'Manage Approved Senders',
   fio_address_details_screen_manage_account_settings: 'Account Settings',
+  fio_address_details_screen_connect_to_wallets: 'Connect to Wallets',
   fio_address_list_screen_button_register: 'Register New FIO Address',
   fio_get_fee_err_msg: 'There was an issue getting fee. Please try later.',
   fio_register_address_err_msg: 'There was an issue registering an address. Please try later.',
@@ -676,7 +679,16 @@ const strings = {
   fio_reject_request_error: 'There was an issue during request rejection',
   err_token_not_in_wallet_title: 'Token not available',
   err_token_not_in_wallet_msg: 'The requested token is not supported or not enabled in your wallet.',
-  err_no_address_title: 'No FIO Address found.'
+  err_no_address_title: 'No FIO Address found.',
+  fio_wallet_connect_add: 'Add',
+  fio_wallet_connect_remove: 'Remove',
+  fio_wallet_connect_return: 'Do not remove',
+  fio_show_connected_wallets: 'Show connected',
+  fio_connect_no_wallets: 'There are no wallets',
+  fio_connect_checkbox_text: 'I acknowledge that once connected, these wallet addresses become public',
+  fio_connect_wallets_err: 'There was an issue during operation execution. Please try later.',
+  fio_connect_wallets_success: 'Wallets connected. Your FIO Address is now connected to your wallets and ready to use.',
+  fio_disconnect_wallets_success: 'Wallets disconnected.'
 }
 
 // export default strings

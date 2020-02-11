@@ -54,6 +54,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  buttonWithLoader: {
+    position: 'relative',
+    width: '100%'
+  },
   bottomButtonText: {
     opacity: 1,
     color: THEME.COLORS.WHITE,
@@ -62,6 +66,10 @@ const styles = StyleSheet.create({
   },
   underlay: {
     color: THEME.COLORS.SECONDARY
+  },
+  loading: {
+    position: 'absolute',
+    right: scale(15)
   }
 })
 

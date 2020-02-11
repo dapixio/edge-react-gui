@@ -11,7 +11,14 @@ export type FioAddressSceneState = {
   selectedWallet: EdgeCurrencyWallet | null,
   expiration: Date,
   fee_collected: number,
-  fioWalletByAddress: EdgeCurrencyWallet | null
+  fioWalletByAddress: EdgeCurrencyWallet | null,
+  setPubAddressesLoading: boolean,
+  connectedWalletsByFioAddress: {
+    [fioAddress: string]: {
+      [currencyCode: string]: string
+    }
+  },
+  getPubAddressesLoading: boolean
 }
 
 const initialState: FioAddressSceneState = {
@@ -20,7 +27,10 @@ const initialState: FioAddressSceneState = {
   selectedWallet: null,
   expiration: new Date('1/1/2019'),
   fee_collected: 0,
-  fioWalletByAddress: null
+  fioWalletByAddress: null,
+  setPubAddressesLoading: false,
+  connectedWalletsByFioAddress: {},
+  getPubAddressesLoading: false
 }
 
 export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initialState, action: Action) => {
@@ -51,6 +61,31 @@ export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initia
       return {
         ...state,
         fioWalletByAddress: action.data.wallet
+      }
+    case 'FIO/FIO_CONNECT_WALLETS_REQUEST':
+      return {
+        ...state,
+        setPubAddressesLoading: true
+      }
+    case 'FIO/FIO_CONNECT_WALLETS_SUCCESS':
+    case 'FIO/FIO_CONNECT_WALLETS_FAILURE':
+      return {
+        ...state,
+        setPubAddressesLoading: false
+      }
+    case 'FIO/FIO_UPDATE_PUB_ADDRESSES':
+      if (!action.data) throw new Error(`Invalid action FIO_UPDATE_PUB_ADDRESSES`)
+      const { connectedWalletsByFioAddress } = state
+      connectedWalletsByFioAddress[action.data.fioAddress] = action.data.pubAddresses
+      return {
+        ...state,
+        connectedWalletsByFioAddress,
+        getPubAddressesLoading: false
+      }
+    case 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING':
+      return {
+        ...state,
+        getPubAddressesLoading: true
       }
     default:
       return state

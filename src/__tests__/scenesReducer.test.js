@@ -44,7 +44,10 @@ test('initialState', () => {
       fioAddressName: '',
       fioAddresses: [],
       selectedWallet: null,
-      fioWalletByAddress: null
+      fioWalletByAddress: null,
+      setPubAddressesLoading: false,
+      connectedWalletsByFioAddress: {},
+      getPubAddressesLoading: false
     },
     fioRequest: {
       requests: [],

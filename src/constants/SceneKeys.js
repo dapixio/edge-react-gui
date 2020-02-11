@@ -63,6 +63,9 @@ export const FIO_SENT_REQUEST_DETAILS = 'fioSentRequestDetails'
 export const FIO_REQUEST_CONFIRMATION = 'fioRequestConfirmation'
 export const FIO_ACCOUNT_SETTINGS = 'fioAccountSettings'
 export const FIO_RENEW_ADDRESS = 'fioRenewAddress'
+export const FIO_CONNECT_TO_WALLETS = 'fioConnectToWallets'
+export const FIO_CONNECT_TO_WALLETS_CONFIRM = 'fioConnectToWalletsConfirm'
+export const FIO_ADDRESS_DISCONNECT_WALLETS = 'fioAddressDisconnectWallets'
 
 export const CURRENCY_SETTINGS = {
   btcSettings: {

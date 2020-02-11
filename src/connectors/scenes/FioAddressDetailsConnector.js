@@ -2,9 +2,10 @@
 
 import { connect } from 'react-redux'
 
-import type { StateProps } from '../../components/scenes/FioAddressDetailsScene'
+import type { DispatchProps, StateProps } from '../../components/scenes/FioAddressDetailsScene'
 import { FioAddressDetailsScene } from '../../components/scenes/FioAddressDetailsScene'
-import type { State } from '../../types/reduxTypes'
+import { refreshPubAddresses } from '../../modules/FioAddress/action'
+import type { Dispatch, State } from '../../types/reduxTypes'
 
 const mapStateToProps = (state: State) => {
   const { fioAddress } = state.ui.scenes
@@ -12,12 +13,19 @@ const mapStateToProps = (state: State) => {
   const out: StateProps = {
     fioAddressName: fioAddress.fioAddressName,
     expiration: fioAddress.expiration,
-    fee_collected: fioAddress.fee_collected
+    fee_collected: fioAddress.fee_collected,
+    getPubAddressesLoading: fioAddress.getPubAddressesLoading
   }
   return out
 }
 
+const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
+  refreshPubAddresses: (fioAddressName: string) => {
+    dispatch(refreshPubAddresses(fioAddressName))
+  }
+})
+
 export const FioAddressDetailsConnector = connect(
   mapStateToProps,
-  {}
+  mapDispatchToProps
 )(FioAddressDetailsScene)

@@ -43,6 +43,9 @@ import { FioAddressConnector } from '../connectors/scenes/FioAddressConnector'
 import { FioAddressDetailsConnector } from '../connectors/scenes/FioAddressDetailsConnector'
 import { FioAddressListConnector } from '../connectors/scenes/FioAddressListConnector'
 import { FioAddressRegisterConnector } from '../connectors/scenes/FioAddressRegisterConnector'
+import { FioConnectWalletConfirmConnector } from '../connectors/scenes/FioConnectWalletConfirmConnector'
+import { FioConnectWalletConnector } from '../connectors/scenes/FioConnectWalletConnector'
+import { FioDisconnectWalletsConnector } from '../connectors/scenes/FioDisconnectWalletsConnector'
 import { FioPendingRequestConnector } from '../connectors/scenes/FioPendingRequestConnector'
 import { FioRenewAddressConnector } from '../connectors/scenes/FioRenewAddressConnector'
 import { FioRequestConfirmationConnector } from '../connectors/scenes/FioRequestConfirmationConnector.js'
@@ -117,6 +120,8 @@ const CREATE_WALLET_ACCOUNT_SETUP = s.strings.create_wallet_create_account
 const CREATE_WALLET_ACCOUNT_ACTIVATE = s.strings.create_wallet_account_activate
 const FIO_ACCOUNT_SETTINGS = s.strings.title_fio_account_settings
 const FIO_RENEW_ADDRESS = s.strings.title_fio_renew_address
+const FIO_CONNECT_TO_WALLET = s.strings.title_fio_connect_to_wallet
+const FIO_DISCONNECT_WALLETS = s.strings.title_fio_disconnect_wallets
 const FIO_ADDRESS = s.strings.title_fio_address
 const FIO_ADDRESS_CONFIRMATION = s.strings.title_fio_address_confirmation
 const FIO_REQUEST = s.strings.drawer_fio_requests
@@ -786,6 +791,31 @@ export default class Main extends Component<Props> {
                     renderTitle={this.renderTitle(FIO_RENEW_ADDRESS)}
                     renderLeftButton={this.renderBackButton(BACK)}
                     renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                  <Scene
+                    key={Constants.FIO_CONNECT_TO_WALLETS}
+                    navTransparent={true}
+                    component={FioConnectWalletConnector}
+                    renderTitle={this.renderTitle(FIO_CONNECT_TO_WALLET)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    renderRightButton={this.renderMenuButton()}
+                    onLeft={Actions.pop}
+                  />
+                  <Scene
+                    key={Constants.FIO_ADDRESS_DISCONNECT_WALLETS}
+                    navTransparent={true}
+                    component={FioDisconnectWalletsConnector}
+                    renderTitle={this.renderTitle(FIO_DISCONNECT_WALLETS)}
+                    renderLeftButton={this.renderBackButton(BACK)}
+                    onLeft={Actions.pop}
+                  />
+                  <Scene
+                    key={Constants.FIO_CONNECT_TO_WALLETS_CONFIRM}
+                    navTransparent={true}
+                    component={FioConnectWalletConfirmConnector}
+                    renderTitle={this.renderTitle(FIO_CONNECT_TO_WALLET)}
+                    renderLeftButton={this.renderBackButton(BACK)}
                     onLeft={Actions.pop}
                   />
                 </Stack>

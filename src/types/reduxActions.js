@@ -243,3 +243,8 @@ export type Action =
   | { type: 'FIO/FIO_PENDING_REQUEST_REJECTED', data: { fioPendingRequestRejected: string } }
   | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
   | { type: 'FIO/FIO_SENT_REQUEST_SELECTED', data: { fioSentRequestSelected: Object } }
+  | { type: 'FIO/FIO_CONNECT_WALLETS_REQUEST' }
+  | { type: 'FIO/FIO_CONNECT_WALLETS_SUCCESS' }
+  | { type: 'FIO/FIO_CONNECT_WALLETS_FAILURE' }
+  | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING' }
+  | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES', data: { fioAddress: string, pubAddresses: { [currencyCode: string]: string } } }
