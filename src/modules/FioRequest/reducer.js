@@ -3,6 +3,7 @@
 import { type Reducer } from 'redux'
 
 import type { Action } from '../../types/reduxTypes.js'
+import type { FioObtRecord } from '../../types/types'
 import type { ExchangedFlipInputAmounts } from '../UI/components/FlipInput/ExchangedFlipInput2.js'
 
 export type FioRequestState = {
@@ -17,7 +18,8 @@ export type FioRequestState = {
   fioPendingRequestSelected: Object,
   fioPendingRequestConfirmedStatus: string,
   fioPendingRequestRejectedStatus: string,
-  fioSentRequestSelected: Object
+  fioSentRequestSelected: Object,
+  obtRecords: FioObtRecord[]
 }
 
 const initialState: FioRequestState = {
@@ -35,7 +37,8 @@ const initialState: FioRequestState = {
   fioPendingRequestSelected: {},
   fioPendingRequestConfirmedStatus: '',
   fioPendingRequestRejectedStatus: '',
-  fioSentRequestSelected: {}
+  fioSentRequestSelected: {},
+  obtRecords: []
 }
 
 export const fioRequest: Reducer<FioRequestState, Action> = (state = initialState, action: Action) => {
@@ -102,6 +105,13 @@ export const fioRequest: Reducer<FioRequestState, Action> = (state = initialStat
       return {
         ...state,
         requests: state.requests.filter(item => parseInt(item.fio_request_id) !== parseInt(requestId))
+      }
+    case 'FIO/SET_OBT_DATA':
+      if (!action.data) throw new Error('Invalid action SET_OBT_DATA')
+      console.log(action.data)
+      return {
+        ...state,
+        obtRecords: action.data
       }
     default:
       return state

@@ -2,7 +2,7 @@
 
 import { bns } from 'biggystring'
 import dateformat from 'dateformat'
-import type { EdgeCurrencyInfo, EdgeDenomination, EdgeMetadata, EdgeTransaction } from 'edge-core-js'
+import type { EdgeCurrencyInfo, EdgeCurrencyWallet, EdgeDenomination, EdgeMetadata, EdgeTransaction } from 'edge-core-js'
 import React, { Component, Fragment } from 'react'
 import { Animated, Easing, Keyboard, ScrollView, TextInput, TouchableOpacity, View } from 'react-native'
 import slowlog from 'react-native-slowlog'
@@ -14,7 +14,7 @@ import FormattedText from '../../modules/UI/components/FormattedText/index'
 import { PayeeIcon } from '../../modules/UI/components/PayeeIcon/PayeeIcon.ui.js'
 import styles, { styles as styleRaw } from '../../styles/scenes/TransactionDetailsStyle'
 import THEME from '../../theme/variables/airbitz'
-import type { GuiContact, GuiWallet } from '../../types/types.js'
+import type { FioObtRecord, GuiContact, GuiWallet } from '../../types/types.js'
 import { scale } from '../../util/scaling.js'
 import { autoCorrectDate, getFiatSymbol, getWalletDefaultDenomProps, inputBottomPadding, isCryptoParentCurrency } from '../../util/utils'
 import ContactSearchResults from '../common/ContactSearchResults.js'
@@ -61,14 +61,16 @@ export type TransactionDetailsOwnProps = {
   thumbnailPath: string,
   currencyInfo: EdgeCurrencyInfo | null,
   currencyCode: string,
-  wallets: { [walletId: string]: GuiWallet }
+  wallets: { [walletId: string]: GuiWallet },
+  fioObtData: FioObtRecord | null
 }
 
 export type TransactionDetailsDispatchProps = {
   setNewSubcategory: (string, Array<string>) => void,
   openHelpModal: () => void,
   setTransactionDetails: (transaction: EdgeTransaction, edgeMetadata: EdgeMetadata) => void,
-  getSubcategories: () => void
+  getSubcategories: () => void,
+  refreshFioObtData: (wallet: EdgeCurrencyWallet) => void
 }
 
 type State = {
@@ -430,6 +432,7 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
 
   componentDidMount () {
     this.props.getSubcategories()
+    if (this.props.edgeTransaction && this.props.edgeTransaction.wallet) this.props.refreshFioObtData(this.props.edgeTransaction.wallet)
   }
 
   UNSAFE_componentWillMount () {
@@ -522,6 +525,31 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
     )
   }
 
+  renderFioData () {
+    const { fioObtData } = this.props
+    if (!fioObtData) return
+
+    return (
+      <View style={styles.fioObtData}>
+        <FormattedText style={styles.fioObtValue}>
+          <FormattedText style={styles.fioObtLabel}>
+            {s.strings.transaction_details_payer} {s.strings.fio_address_label}
+          </FormattedText>
+          : {fioObtData.payer_fio_address}
+        </FormattedText>
+        <FormattedText style={styles.fioObtValue}>
+          <FormattedText style={styles.fioObtLabel}>
+            {s.strings.transaction_details_payee} {s.strings.fio_address_label}
+          </FormattedText>
+          : {fioObtData.payee_fio_address}
+        </FormattedText>
+        <FormattedText style={styles.fioObtValue}>
+          <FormattedText style={styles.fioObtLabel}>{s.strings.unique_identifier_memo}</FormattedText>: {fioObtData.content.memo || '-'}
+        </FormattedText>
+      </View>
+    )
+  }
+
   render () {
     const categoryColor = categories[this.state.category].color
     let txExplorerLink = null
@@ -559,6 +587,7 @@ export class TransactionDetails extends Component<TransactionDetailsProps, State
               <View style={styles.dateWrap}>
                 <FormattedText style={styles.date}>{this.state.displayDate}</FormattedText>
               </View>
+              {this.renderFioData()}
               <AmountArea
                 edgeTransaction={this.props.edgeTransaction}
                 onChangeNotesFxn={this.onChangeNotes}

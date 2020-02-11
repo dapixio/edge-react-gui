@@ -45,11 +45,13 @@ describe('TransactionDetails.ui', () => {
       currencyInfo: null,
       currencyCode: 'BTC',
       wallets: { [fakeWallet.id]: fakeWallet },
+      fioObtData: null,
       setNewSubcategory: jest.fn(),
       openHelpModal: jest.fn(),
       setTransactionDetails: jest.fn(),
       getSubcategories: jest.fn(),
-      displayDropdownAlert: jest.fn()
+      displayDropdownAlert: jest.fn(),
+      refreshFioObtData: jest.fn()
     }
     const actual = renderer.render(<TransactionDetails {...props} />)
 
@@ -94,11 +96,13 @@ describe('TransactionDetails.ui', () => {
       currencyInfo: null,
       currencyCode: 'BTC',
       wallets: { [fakeWallet.id]: fakeWallet },
+      fioObtData: null,
       setNewSubcategory: jest.fn(),
       openHelpModal: jest.fn(),
       setTransactionDetails: jest.fn(),
       getSubcategories: jest.fn(),
-      displayDropdownAlert: jest.fn()
+      displayDropdownAlert: jest.fn(),
+      refreshFioObtData: jest.fn()
     }
     const actual = renderer.render(<TransactionDetails {...props} />)
 
@@ -143,11 +147,13 @@ describe('TransactionDetails.ui', () => {
       currencyInfo: null,
       currencyCode: 'BTC',
       wallets: { [fakeWallet.id]: fakeWallet },
+      fioObtData: null,
       setNewSubcategory: jest.fn(),
       openHelpModal: jest.fn(),
       setTransactionDetails: jest.fn(),
       getSubcategories: jest.fn(),
-      displayDropdownAlert: jest.fn()
+      displayDropdownAlert: jest.fn(),
+      refreshFioObtData: jest.fn()
     }
     const actual = renderer.render(<TransactionDetails {...props} />)
 
@@ -195,11 +201,13 @@ describe('TransactionDetails.ui', () => {
       currencyInfo: null,
       currencyCode: 'BTC',
       wallets: { [fakeWallet.id]: fakeWallet },
+      fioObtData: null,
       setNewSubcategory: jest.fn(),
       openHelpModal: jest.fn(),
       setTransactionDetails: jest.fn(),
       getSubcategories: jest.fn(),
-      displayDropdownAlert: jest.fn()
+      displayDropdownAlert: jest.fn(),
+      refreshFioObtData: jest.fn()
     }
     const actual = renderer.render(<TransactionDetails {...props} />)
 

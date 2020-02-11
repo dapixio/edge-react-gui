@@ -64,7 +64,8 @@ test('initialState', () => {
       fioPendingRequestSelected: {},
       fioPendingRequestConfirmedStatus: '',
       fioPendingRequestRejectedStatus: '',
-      fioSentRequestSelected: {}
+      fioSentRequestSelected: {},
+      obtRecords: []
     },
     request: request(undefined, dummyAction),
     requestType: {

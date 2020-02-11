@@ -2,7 +2,7 @@
 import type { EdgeCurrencyWallet } from 'edge-core-js'
 
 import { showError } from '../../components/services/AirshipInstance'
-import { LIMIT } from '../../constants/indexConstants'
+import { FIO_STR, LIMIT } from '../../constants/indexConstants'
 import s from '../../locales/strings'
 import type { Dispatch, GetState } from '../../types/reduxTypes.js'
 import { findWalletByFioAddress, getFioWallets } from '../UI/selectors'
@@ -155,5 +155,19 @@ export const rejectRequest = (fioRequestId: string, payerFioAddress: string, pay
   } else {
     showError(s.strings.err_no_address_title)
     cb(s.strings.err_no_address_title)
+  }
+}
+
+export const refreshFioObtData = (wallet: EdgeCurrencyWallet) => async (dispatch: Dispatch) => {
+  if (wallet != null && wallet.currencyInfo.currencyCode === FIO_STR) {
+    try {
+      const res = await wallet.otherMethods.fioAction('getObtData', {})
+      dispatch({
+        type: 'FIO/SET_OBT_DATA',
+        data: res.obt_data_records
+      })
+    } catch (e) {
+      //
+    }
   }
 }

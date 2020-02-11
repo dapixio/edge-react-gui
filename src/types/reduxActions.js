@@ -5,7 +5,7 @@ import type { EdgeContext, EdgeCurrencyWallet, EdgeLobby, EdgeParsedUri, EdgeRec
 
 import type { ExchangedFlipInputAmounts } from '../modules/UI/components/FlipInput/ExchangedFlipInput2'
 import type { AccountActivationPaymentInfo, HandleActivationInfo, HandleAvailableStatus } from '../reducers/scenes/CreateWalletReducer.js'
-import { type CustomTokenInfo, type GuiContact, type GuiCurrencyInfo, type GuiSwapInfo, type GuiWallet } from './types.js'
+import { type CustomTokenInfo, type FioObtRecord, type GuiContact, type GuiCurrencyInfo, type GuiSwapInfo, type GuiWallet } from './types.js'
 
 type LegacyActionName =
   | 'ACCOUNT_INIT_COMPLETE'
@@ -240,3 +240,4 @@ export type Action =
   | { type: 'FIO/FIO_CONNECT_WALLETS_FAILURE' }
   | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING' }
   | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES', data: { fioAddress: string, pubAddresses: { [currencyCode: string]: string } } }
+  | { type: 'FIO/SET_OBT_DATA', data: FioObtRecord[] }

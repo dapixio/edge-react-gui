@@ -368,6 +368,17 @@ export const styles = {
   },
   txIDIcon: {
     color: THEME.COLORS.SECONDARY
+  },
+
+  fioObtData: {
+    padding: scale(15),
+    paddingBottom: 0
+  },
+  fioObtValue: {
+    color: THEME.COLORS.BLACK
+  },
+  fioObtLabel: {
+    color: THEME.COLORS.GRAY_2
   }
 }
 

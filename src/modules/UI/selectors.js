@@ -239,3 +239,8 @@ export const findWalletByFioAddress = (state: State, fioAddress: string): EdgeCu
     return null
   }
 }
+
+export const getFioObtData = (state: State, txId: string): any | null => {
+  const { obtRecords } = state.ui.scenes.fioRequest
+  return obtRecords.find(obtRecord => obtRecord.content.obt_id === txId)
+}
