@@ -18,7 +18,11 @@ export type FioAddressSceneState = {
       [currencyCode: string]: string
     }
   },
-  getPubAddressesLoading: boolean
+  getPubAddressesLoading: boolean,
+  senderFioAddress: string,
+  senderWallet: EdgeCurrencyWallet | null,
+  senderMsgRecipient: string,
+  senderFioError: string
 }
 
 const initialState: FioAddressSceneState = {
@@ -30,7 +34,11 @@ const initialState: FioAddressSceneState = {
   fioWalletByAddress: null,
   setPubAddressesLoading: false,
   connectedWalletsByFioAddress: {},
-  getPubAddressesLoading: false
+  getPubAddressesLoading: false,
+  senderFioAddress: '',
+  senderWallet: null,
+  senderMsgRecipient: '',
+  senderFioError: ''
 }
 
 export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initialState, action: Action) => {
@@ -86,6 +94,20 @@ export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initia
       return {
         ...state,
         getPubAddressesLoading: true
+      }
+    case 'FIO/FIO_SET_SENDER_FIO_ADDRESS':
+      if (!action.data) throw new Error(`Invalid action FIO_SET_SENDER_FIO_ADDRESS`)
+      return {
+        ...state,
+        senderFioAddress: action.data.fioAddress,
+        senderWallet: action.data.fioWallet,
+        senderFioError: action.data.error
+      }
+    case 'FIO/FIO_SET_SENDER_MSG_TO_RECIPIENT':
+      if (!action.data) throw new Error(`Invalid action FIO_SET_SENDER_MSG_TO_RECIPIENT`)
+      return {
+        ...state,
+        senderMsgRecipient: action.data.msg
       }
     default:
       return state

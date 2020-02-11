@@ -109,3 +109,77 @@ export const refreshPubAddresses = (fioAddress: string) => async (dispatch: Disp
     }
   })
 }
+
+export const setSenderFioAddress = (fioAddress: string) => async (dispatch: Dispatch, getState: GetState) => {
+  const fioWallet = findWalletByFioAddress(getState(), fioAddress)
+  let error = ''
+
+  if (!fioWallet) {
+    error = s.strings.fio_select_address_no_wallet_err
+    showError(error)
+    return dispatch({
+      type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS',
+      data: {
+        fioAddress,
+        fioWallet,
+        error
+      }
+    })
+  }
+
+  try {
+    const getFeeResult = await fioWallet.otherMethods.fioAction('getFee', {
+      endPoint: 'record_obt_data',
+      fioAddress: fioAddress
+    })
+    if (getFeeResult.fee) {
+      error = s.strings.fio_no_bundled_err_msg
+    }
+  } catch (e) {
+    showError(s.strings.fio_get_fee_err_msg)
+  }
+
+  dispatch({
+    type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS',
+    data: {
+      fioAddress,
+      fioWallet,
+      error
+    }
+  })
+}
+
+export const recordSend = (params: any) => async (dispatch: Dispatch, getState: GetState) => {
+  const state = getState()
+  const { senderFioAddress, senderMsgRecipient, senderWallet } = state.ui.scenes.fioAddress
+  if (senderFioAddress && senderMsgRecipient && senderWallet) {
+    const { payeeFIOAddress, payerPublicAddress, payeePublicAddress, amount, currencyCode, txid, memo } = params
+    await senderWallet.otherMethods.fioAction('recordObtData', {
+      payerFIOAddress: senderFioAddress,
+      payeeFIOAddress,
+      payerPublicAddress,
+      payeePublicAddress,
+      amount,
+      tokenCode: currencyCode,
+      obtId: txid,
+      memo,
+      maxFee: 0,
+      tpid: '',
+      status: 'sent_to_blockchain'
+    })
+    dispatch({
+      type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS',
+      data: {
+        fioAddress: '',
+        fioWallet: null,
+        error: ''
+      }
+    })
+    dispatch({
+      type: 'FIO/FIO_SET_SENDER_MSG_TO_RECIPIENT',
+      data: {
+        msg: ''
+      }
+    })
+  }
+}

@@ -10,6 +10,7 @@ import { sprintf } from 'sprintf-js'
 import { selectWalletForExchange } from '../actions/CryptoExchangeActions.js'
 import { launchModal } from '../components/common/ModalProvider.js'
 import { createAddressModal } from '../components/modals/AddressModal.js'
+import { showError } from '../components/services/AirshipInstance'
 import {
   ADD_TOKEN,
   EDGE_LOGIN,
@@ -22,10 +23,12 @@ import {
   PLUGIN_BUY,
   SEND_CONFIRMATION,
   SHOPPING_CART,
+  TRANSACTION_DETAILS,
   WARNING
 } from '../constants/indexConstants.js'
 import s from '../locales/strings.js'
 import * as CORE_SELECTORS from '../modules/Core/selectors.js'
+import { recordSend } from '../modules/FioAddress/action'
 import Text from '../modules/UI/components/FormattedText'
 import { Icon } from '../modules/UI/components/Icon/Icon.ui.js'
 import OptionIcon from '../modules/UI/components/OptionIcon/OptionIcon.ui.js'
@@ -93,7 +96,7 @@ const doRequestAddress = (dispatch: Dispatch, edgeWallet: EdgeCurrencyWallet, gu
   }
 }
 
-export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: GetState) => {
+export const parseScannedUri = (data: string, fioAddress: string = '', memo: string = '') => (dispatch: Dispatch, getState: GetState) => {
   if (!data) return
   const state = getState()
   const selectedWalletId = state.ui.wallets.selectedWalletId
@@ -173,6 +176,64 @@ export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: 
         uniqueIdentifier: parsedUri.uniqueIdentifier,
         nativeAmount
       }
+
+      if (fioAddress) {
+        guiMakeSpendInfo.fioAddress = fioAddress
+        guiMakeSpendInfo.isSendToFioAddress = true
+        guiMakeSpendInfo.memo = memo
+        guiMakeSpendInfo.beforeTransaction = async () => {
+          const { senderFioAddress, senderWallet, senderFioError } = state.ui.scenes.fioAddress
+          console.log(state.ui.scenes.fioAddress)
+          console.log(senderFioAddress, senderWallet)
+          if (senderWallet && senderFioAddress && !senderFioError) {
+            try {
+              const getFeeResult = await senderWallet.otherMethods.fioAction('getFee', {
+                endPoint: 'record_obt_data',
+                fioAddress: senderFioAddress
+              })
+              if (getFeeResult.fee) {
+                showError(s.strings.fio_no_bundled_err_msg)
+                throw new Error(s.strings.fio_no_bundled_err_msg)
+              }
+            } catch (e) {
+              showError(s.strings.fio_get_fee_err_msg)
+              throw e
+            }
+          }
+        }
+        guiMakeSpendInfo.onDone = (error: Error | null, edgeTransaction?: EdgeTransaction) => {
+          if (error) {
+            setTimeout(() => {
+              showError(s.strings.create_wallet_account_error_sending_transaction)
+            }, 750)
+          } else if (edgeTransaction) {
+            console.log(edgeTransaction)
+            let payerPublicAddress, payeePublicAddress, amount
+            if (
+              edgeTransaction.otherParams &&
+              edgeTransaction.otherParams.transactionJson &&
+              edgeTransaction.otherParams.transactionJson.actions &&
+              edgeTransaction.otherParams.transactionJson.actions.length
+            ) {
+              payerPublicAddress = edgeTransaction.otherParams.transactionJson.actions[0].data.from
+              payeePublicAddress = edgeTransaction.otherParams.transactionJson.actions[0].data.to
+              amount = edgeTransaction.otherParams.transactionJson.actions[0].data.quantity
+            }
+            dispatch(
+              recordSend({
+                payeeFIOAddress: fioAddress,
+                payerPublicAddress,
+                payeePublicAddress,
+                amount,
+                currencyCode: edgeTransaction.currencyCode,
+                txid: edgeTransaction.txid,
+                memo
+              })
+            )
+            Actions.replace(TRANSACTION_DETAILS, { edgeTransaction })
+          }
+        }
+      }
       Actions[SEND_CONFIRMATION]({ guiMakeSpendInfo })
       // dispatch(sendConfirmationUpdateTx(parsedUri))
     },
@@ -229,9 +290,9 @@ export const toggleAddressModal = () => async (dispatch: Dispatch, getState: Get
     coreWallet,
     currencyCode
   })
-  const uri = await launchModal(addressModal)
+  const { uri, fioAddress, memo } = await launchModal(addressModal)
   if (uri) {
-    dispatch(parseScannedUri(uri))
+    dispatch(parseScannedUri(uri, fioAddress, memo))
   }
 }
 

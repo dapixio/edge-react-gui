@@ -25,6 +25,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  selectFullWidth: {
+    width: '100%',
+    paddingHorizontal: scale(30),
+    paddingVertical: scale(10)
+  },
   view: {
     flex: 2,
     flexDirection: 'column',

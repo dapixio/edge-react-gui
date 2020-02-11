@@ -186,6 +186,7 @@ export const signBroadcastAndSave = () => async (dispatch: Dispatch, getState: G
   const currencyCode = getSelectedCurrencyCode(state)
   const isoFiatCurrencyCode = guiWallet.isoFiatCurrencyCode
   const exchangeDenomination = settingsGetExchangeDenomination(state, currencyCode)
+  const { senderMsgRecipient } = state.ui.scenes.fioAddress
 
   const exchangeAmount = convertNativeToExchange(exchangeDenomination.multiplier)(edgeUnsignedTransaction.nativeAmount)
   const fiatPerCrypto = getExchangeRate(state, currencyCode, isoFiatCurrencyCode).toString()
@@ -247,6 +248,10 @@ export const signBroadcastAndSave = () => async (dispatch: Dispatch, getState: G
     }
     if (!edgeMetadata.amountFiat) {
       edgeMetadata.amountFiat = amountFiat
+    }
+    if (guiMakeSpendInfo.memo || senderMsgRecipient) {
+      const fioNotes = `${guiMakeSpendInfo.memo ? `${guiMakeSpendInfo.memo}\n` : ''}${s.strings.fio_sender_msg_to_recipient}: ${senderMsgRecipient}`
+      edgeMetadata.notes += edgeMetadata.notes ? `\n${fioNotes}` : `${fioNotes}`
     }
     if (getSpecialCurrencyInfo(currencyCode).uniqueIdentifierToNotes && edgeSignedTransaction.otherParams != null) {
       const newNotesSyntax = sprintf(

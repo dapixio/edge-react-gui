@@ -14,13 +14,17 @@ import { colors as COLORS } from '../../theme/variables/airbitz.js'
 
 // INTERACTIVE_MODAL /////////////////////////////////////////////////////////////////////////////
 type AddressModalProps = {
+  currencyCode: string,
   onDone: any => void,
   coreWallet: EdgeCurrencyWallet
 }
 
 type AddressModalState = {
   clipboard: string,
-  uri: string
+  uri: string,
+  memo: string,
+  fieldError: string,
+  memoError: string
 }
 export class AddressModal extends Component<AddressModalProps, AddressModalState> {
   /* static Icon = Icon
@@ -35,7 +39,10 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
     super(props)
     this.state = {
       clipboard: '',
-      uri: ''
+      uri: '',
+      memo: '',
+      fieldError: '',
+      memoError: ''
     }
   }
 
@@ -60,20 +67,69 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
     }
   }
 
+  async _onDone () {
+    const { currencyCode, onDone } = this.props
+    const { uri, memo, memoError } = this.state
+    this.setState({ fieldError: '' })
+
+    if (memoError) return
+
+    if (this.fioAddressCheck(uri)) {
+      try {
+        const res = await window.fetch('https://testnet.fioprotocol.io:443/v1/chain/get_pub_address', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fio_address: uri,
+            token_code: currencyCode
+          })
+        })
+        const { public_address } = await res.json()
+        if (public_address && public_address.length > 1) return onDone({ uri: public_address, memo, fioAddress: uri })
+      } catch (e) {
+        console.log(e)
+        console.log(e.json)
+        return this.setState({ fieldError: s.strings.err_no_address_title })
+      }
+    }
+
+    onDone({ uri, memo })
+  }
+
+  fioAddressCheck (fioAddress: string) {
+    return new RegExp(`^(([a-z0-9]+)(-?[a-z0-9]+)*${Constants.FIO_DOMAIN_DEFAULT}{1})$`, 'gim').test(fioAddress)
+  }
+
   updateUri = (uri: string) => {
     this.setState({
       uri
     })
   }
 
+  updateMemo = (memo: string) => {
+    let memoError = ''
+    if (memo && (!/^[\x20-\x7E]*$/.test(memo) || memo.length > 64)) {
+      memoError = s.strings.fragment_send_send_to_fio_error_memo_inline
+    }
+    this.setState({
+      memo,
+      memoError
+    })
+  }
+
   onPasteFromClipboard = () => {
     const { clipboard } = this.state
-    this.props.onDone(clipboard)
+    this.setState({ uri: clipboard }, () => {
+      this._onDone()
+    })
   }
 
   render () {
     const copyMessage = this.state.clipboard ? sprintf(s.strings.string_paste_address, this.state.clipboard) : null
-    const { uri } = this.state
+    const { uri, memo, fieldError, memoError } = this.state
     return (
       <View style={ModalStyle.modal}>
         <Modal.Icon>
@@ -82,7 +138,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
         <Modal.Container>
           <Modal.Icon.AndroidHackSpacer />
           <Modal.Title style={{ textAlign: 'center' }}>
-            <Text>{s.strings.fragment_send_address_dialog_title}</Text>
+            <Text>{s.strings.fragment_send_address_dialog_title_short}</Text>
           </Modal.Title>
           <Modal.Body>
             <View>
@@ -90,10 +146,20 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
                 style={MaterialInputStyle}
                 value={uri}
                 onChangeText={this.updateUri}
-                error={''}
-                placeholder={s.strings.fragment_send_send_to_hint}
-                label={s.strings.fragment_send_send_to_hint}
-                onSubmit={() => this.props.onDone(uri)}
+                error={fieldError}
+                placeholder={s.strings.fragment_send_send_to_hint_fio}
+                label={s.strings.fragment_send_send_to_hint_fio}
+                onSubmit={() => this._onDone()}
+              />
+            </View>
+            <View>
+              <FormField
+                style={MaterialInputStyle}
+                value={memo}
+                onChangeText={this.updateMemo}
+                error={memoError}
+                placeholder={s.strings.unique_identifier_memo}
+                label={s.strings.unique_identifier_memo}
               />
             </View>
           </Modal.Body>
@@ -106,10 +172,10 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
               </Modal.Row>
             )}
             <Modal.Row style={[InputAndButtonStyle.row]}>
-              <SecondaryButton onPress={() => this.props.onDone(null)} style={[InputAndButtonStyle.noButton]}>
+              <SecondaryButton onPress={() => this.props.onDone({})} style={[InputAndButtonStyle.noButton]}>
                 <SecondaryButton.Text style={[InputAndButtonStyle.buttonText]}>{s.strings.string_cancel_cap}</SecondaryButton.Text>
               </SecondaryButton>
-              <PrimaryButton onPress={() => this.props.onDone(this.state.uri)} style={[InputAndButtonStyle.yesButton]}>
+              <PrimaryButton onPress={() => this._onDone()} style={[InputAndButtonStyle.yesButton]}>
                 <PrimaryButton.Text style={[InputAndButtonStyle.buttonText]}>{s.strings.string_done_cap}</PrimaryButton.Text>
               </PrimaryButton>
             </Modal.Row>

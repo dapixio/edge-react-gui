@@ -241,3 +241,6 @@ export type Action =
   | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING' }
   | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES', data: { fioAddress: string, pubAddresses: { [currencyCode: string]: string } } }
   | { type: 'FIO/SET_OBT_DATA', data: FioObtRecord[] }
+  | { type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS', data: { fioAddress: string, fioWallet: EdgeCurrencyWallet | null, error: string } }
+  | { type: 'FIO/FIO_SET_SENDER_MSG_TO_RECIPIENT', data: { msg: string } }
+  | { type: 'ENABLE_FIO_DEMO_SERVER', data: { enableFioDemoServer: boolean } }

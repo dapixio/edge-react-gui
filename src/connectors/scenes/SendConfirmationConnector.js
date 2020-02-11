@@ -59,6 +59,7 @@ const mapStateToProps = (state: State): SendConfirmationStateProps => {
   const transaction = getTransaction(state)
   const pending = getPending(state)
   const nativeAmount = sceneState.nativeAmount
+  const { senderFioError } = state.ui.scenes.fioAddress
   // const nativeAmount = getNativeAmount(state)
   let error = getError(state)
 
@@ -113,7 +114,8 @@ const mapStateToProps = (state: State): SendConfirmationStateProps => {
     coreWallet,
     spendingLimits,
     toggleCryptoOnTop,
-    isConnected: isConnectedState(state)
+    isConnected: isConnectedState(state),
+    senderFioError
   }
   return out
 }

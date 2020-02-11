@@ -96,6 +96,7 @@ const strings = {
   request_xlm_minimum_notification_body:
     'Stellar (XLM) wallets require a 1 XLM minimum balance. You must deposit at least 1 XLM to this address before this wallet will show a balance or transactions. 1 XLM will be unspendable for the lifetime of this wallet address.',
   fragment_send_address_dialog_title: 'Send to Public Address',
+  fragment_send_address_dialog_title_short: 'Send to Address',
   fragment_send_address: 'Address',
   fragment_send_flash: 'Flash',
   fragment_send_other_wallet_header_title: 'Choose a wallet to transfer funds to:',
@@ -104,6 +105,7 @@ const strings = {
   scan_invalid_address_error_description: 'Not a valid public address',
   fragment_send_fio_address_dialog_title: 'Request by FIO Address',
   fragment_send_send_to_hint: 'Public Address or Private Key',
+  fragment_send_send_to_hint_fio: 'Public Address, Private Key or FIO Address',
   fragment_send_send_to_fio_error: 'Invalid FIO Address',
   fragment_send_send_to_fio_error_inline: 'The provided FIO address is not valid',
   fragment_send_send_to_fio_memo_error: 'Invalid Memo',
@@ -689,7 +691,10 @@ const strings = {
   fio_connect_checkbox_text: 'I acknowledge that once connected, these wallet addresses become public',
   fio_connect_wallets_err: 'There was an issue during operation execution. Please try later.',
   fio_connect_wallets_success: 'Wallets connected. Your FIO Address is now connected to your wallets and ready to use.',
-  fio_disconnect_wallets_success: 'Wallets disconnected.'
+  fio_disconnect_wallets_success: 'Wallets disconnected.',
+  fio_select_address: 'Select FIO Address',
+  fio_select_address_no_wallet_err: 'There is no fio wallet found for selected fio address',
+  fio_sender_msg_to_recipient: 'Message to recipient'
 }
 
 // export default strings
