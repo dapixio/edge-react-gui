@@ -59,6 +59,7 @@ export const updatePubAddressesToFioAddress = (fioAddress: string, wallets: { to
       fioAddress,
       publicAddresses: wallets.map(({ tokenCode, publicAddress }) => ({
         token_code: tokenCode,
+        chain_code: tokenCode,
         public_address: publicAddress
       })),
       maxFee
@@ -92,7 +93,8 @@ export const refreshPubAddresses = (fioAddress: string) => async (dispatch: Disp
     try {
       const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
         fioAddress,
-        tokenCode: wallets[walletKey].currencyCode
+        tokenCode: wallets[walletKey].currencyCode,
+        chainCode: wallets[walletKey].currencyCode
       })
       pubAddresses[wallets[walletKey].currencyCode] = public_address
     } catch (e) {
