@@ -163,6 +163,7 @@ export const recordSend = (params: any) => async (dispatch: Dispatch, getState: 
       payeePublicAddress,
       amount,
       tokenCode: currencyCode,
+      chainCode: currencyCode,
       obtId: txid,
       memo,
       maxFee: 0,
