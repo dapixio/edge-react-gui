@@ -105,6 +105,7 @@ export const confirmRequest = (
       payeePublicAddress: pendingRequest.content.payee_public_address,
       amount: pendingRequest.content.amount,
       tokenCode: pendingRequest.content.token_code,
+      chainCode: pendingRequest.content.chain_code,
       obtId: txId,
       memo: pendingRequest.content.memo,
       maxFee: fee,

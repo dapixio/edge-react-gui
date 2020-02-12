@@ -105,6 +105,7 @@ export class FioRequestConfirmationComponent extends Component<Props, LocalState
           payeeTokenPublicAddress: this.props.publicAddress,
           amount: val,
           tokenCode: this.props.primaryCurrencyInfo.exchangeCurrencyCode,
+          chainCode: this.props.primaryCurrencyInfo.exchangeCurrencyCode,
           memo: this.props.fioModalData.memo,
           maxFee: 0
         })
