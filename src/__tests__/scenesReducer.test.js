@@ -66,8 +66,6 @@ test('initialState', () => {
       sentMore: 0,
       sentPage: 1,
       fioPendingRequestSelected: {},
-      fioPendingRequestConfirmedStatus: '',
-      fioPendingRequestRejectedStatus: '',
       fioSentRequestSelected: {},
       obtRecords: []
     },

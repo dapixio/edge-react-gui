@@ -53,8 +53,6 @@ type LegacyActionName =
   | 'FIO/FIO_PENDING_REQUEST_SELECTED'
   | 'FIO/FIO_SENT_REQUEST_SELECTED'
   | 'FIO/FIO_REQUEST_LIST_REMOVE'
-  | 'FIO/FIO_PENDING_REQUEST_CONFIRMED'
-  | 'FIO/FIO_PENDING_REQUEST_REJECTED'
   | 'FIO/FIO_ADDRESS_UPDATE_FIO_ADDRESS_NAME'
   | 'FIO/FIO_ADDRESS_UPDATE_SELECTED_WALLET'
   | 'FIO/FIO_REQUEST_CHANGE_AMOUNTS'
@@ -231,8 +229,6 @@ export type Action =
   | { type: 'FIO/FIO_REQUEST_LIST_PENDING', data: { fioRequestsPending: Object[], more: number, page: number } }
   | { type: 'FIO/FIO_REQUEST_LIST_SENT', data: { fioRequestsSent: Object[], more: number, page: number } }
   | { type: 'FIO/FIO_PENDING_REQUEST_SELECTED', data: { fioPendingRequestSelected: Object } }
-  | { type: 'FIO/FIO_PENDING_REQUEST_CONFIRMED', data: { fioPendingRequestConfirmed: string } }
-  | { type: 'FIO/FIO_PENDING_REQUEST_REJECTED', data: { fioPendingRequestRejected: string } }
   | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
   | { type: 'FIO/FIO_SENT_REQUEST_SELECTED', data: { fioSentRequestSelected: Object } }
   | { type: 'FIO/FIO_CONNECT_WALLETS_REQUEST' }

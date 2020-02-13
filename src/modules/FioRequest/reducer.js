@@ -16,8 +16,6 @@ export type FioRequestState = {
   sentMore: number,
   sentPage: number,
   fioPendingRequestSelected: Object,
-  fioPendingRequestConfirmedStatus: string,
-  fioPendingRequestRejectedStatus: string,
   fioSentRequestSelected: Object,
   obtRecords: FioObtRecord[]
 }
@@ -35,8 +33,6 @@ const initialState: FioRequestState = {
   sentMore: 0,
   sentPage: 1,
   fioPendingRequestSelected: {},
-  fioPendingRequestConfirmedStatus: '',
-  fioPendingRequestRejectedStatus: '',
   fioSentRequestSelected: {},
   obtRecords: []
 }
@@ -78,18 +74,6 @@ export const fioRequest: Reducer<FioRequestState, Action> = (state = initialStat
       return {
         ...state,
         fioPendingRequestSelected: action.data.fioPendingRequestSelected
-      }
-    case 'FIO/FIO_PENDING_REQUEST_CONFIRMED':
-      if (!action.data) throw new Error('Invalid action FIO_PENDING_REQUEST_CONFIRMED')
-      return {
-        ...state,
-        fioPendingRequestConfirmedStatus: action.data.fioPendingRequestConfirmed
-      }
-    case 'FIO/FIO_PENDING_REQUEST_REJECTED':
-      if (!action.data) throw new Error('Invalid action FIO_PENDING_REQUEST_REJECTED')
-      return {
-        ...state,
-        fioPendingRequestRejectedStatus: action.data.fioPendingRequestRejected
       }
     case 'FIO/FIO_SENT_REQUEST_SELECTED':
       if (!action.data) throw new Error('Invalid action FIO_SENT_REQUEST_SELECTED')

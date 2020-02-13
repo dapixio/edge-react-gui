@@ -17,16 +17,6 @@ const requestListSent = (fioRequestsSent: any, more = 0, page = 1) => ({
   data: { fioRequestsSent, more, page }
 })
 
-const requestPendingConfirmed = (fioPendingRequestConfirmed: any) => ({
-  type: 'FIO/FIO_PENDING_REQUEST_CONFIRMED',
-  data: { fioPendingRequestConfirmed }
-})
-
-const requestPendingRejected = (fioPendingRequestConfirmed: any) => ({
-  type: 'FIO/FIO_PENDING_REQUEST_REJECTED',
-  data: { fioPendingRequestConfirmed }
-})
-
 export const getFioRequestsPending = (page: number = 1) => (dispatch: Dispatch, getState: GetState) => {
   const wallets = getFioWallets(getState())
   dispatch(requestListPending([]))
@@ -95,9 +85,9 @@ export const confirmRequest = (
   notes?: string = '',
   fee: number = 0,
   cb: Function
-) => async (dispatch: Dispatch) => {
-  fioWalletByAddress.otherMethods
-    .fioAction('recordObtData', {
+) => async () => {
+  try {
+    await fioWalletByAddress.otherMethods.fioAction('recordObtData', {
       fioRequestId: pendingRequest.fio_request_id,
       payerFIOAddress: pendingRequest.payer_fio_address,
       payeeFIOAddress: pendingRequest.payee_fio_address,
@@ -112,47 +102,29 @@ export const confirmRequest = (
       tpid: '',
       status: 'sent_to_blockchain'
     })
-    .then(() => {
-      dispatch(requestPendingConfirmed('SUCCESS'))
-      cb()
-    })
-    .catch(() => {
-      showError(s.strings.fio_confirm_request_error)
-      dispatch(requestPendingConfirmed('FAILURE'))
-    })
+    cb()
+  } catch (e) {
+    showError(s.strings.fio_confirm_request_error)
+  }
 }
 
 export const rejectRequest = (fioRequestId: string, payerFioAddress: string, payeeFioAddress: string, cb: Function) => async (
   dispatch: Dispatch,
   getState: GetState
 ) => {
-  const wallet = findWalletByFioAddress(getState(), payerFioAddress)
+  const wallet = await findWalletByFioAddress(getState(), payerFioAddress)
   if (wallet != null) {
-    wallet.otherMethods
-      .fioAction('getFeeForRejectFundsRequest', {
-        payeeFioAddress
-      })
-      .then(({ fee }) => {
-        if (fee) throw new Error(s.strings.fio_no_bundled_err_msg)
-        wallet.otherMethods
-          .fioAction('rejectFundsRequest', {
-            fioRequestId: fioRequestId,
-            maxFee: fee
-          })
-          .then(() => {
-            dispatch(requestPendingRejected('SUCCESS'))
-            cb()
-          })
-          .catch(error => {
-            showError(s.strings.fio_reject_request_message)
-            dispatch(requestPendingRejected('FAILURE'))
-            cb(error)
-          })
-      })
-      .catch(e => {
-        showError(s.strings.fio_no_bundled_err_msg)
-        cb(e)
-      })
+    try {
+      const { fee } = await wallet.otherMethods.fioAction('getFeeForRejectFundsRequest', { payeeFioAddress })
+      if (fee) {
+        return showError(s.strings.fio_no_bundled_err_msg)
+      }
+      await wallet.otherMethods.fioAction('rejectFundsRequest', { fioRequestId: fioRequestId, maxFee: fee })
+      cb()
+    } catch (e) {
+      showError(s.strings.fio_reject_request_error)
+      cb(e)
+    }
   } else {
     showError(s.strings.err_no_address_title)
     cb(s.strings.err_no_address_title)

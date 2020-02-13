@@ -219,12 +219,12 @@ export const calculateWalletFiatBalanceWithoutState = (wallet: GuiWallet, curren
   return intl.formatNumber(fiatValue, { toFixed: 2 }) || '0'
 }
 
-export const findWalletByFioAddress = (state: State, fioAddress: string): EdgeCurrencyWallet | null => {
+export const findWalletByFioAddress = async (state: State, fioAddress: string): Promise<EdgeCurrencyWallet | null> => {
   const fioWallets: EdgeCurrencyWallet[] = getFioWallets(state)
 
   if (fioWallets.length) {
     for (const wallet: EdgeCurrencyWallet of fioWallets) {
-      const names = wallet.otherMethods.walletLocalData.otherData.fioNames
+      const names = await wallet.otherMethods.getFioAddress()
       if (names.length > 0) {
         for (const name of names) {
           if (name.toLowerCase() === fioAddress.toLowerCase()) {
