@@ -82,7 +82,7 @@ export const updatePubAddressesToFioAddress = (fioAddress: string, wallets: { to
 
 export const refreshPubAddresses = (fioAddress: string) => async (dispatch: Dispatch, getState: GetState) => {
   const wallets = getWallets(getState())
-  const fioWallet = findWalletByFioAddress(getState(), fioAddress)
+  const fioWallet = await findWalletByFioAddress(getState(), fioAddress)
 
   const pubAddresses = {}
   dispatch({
