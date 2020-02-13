@@ -288,7 +288,8 @@ export const toggleAddressModal = () => async (dispatch: Dispatch, getState: Get
   const addressModal = createAddressModal({
     walletId,
     coreWallet,
-    currencyCode
+    currencyCode,
+    fioDemoServer: state.ui.settings.fioDemoServer
   })
   const { uri, fioAddress, memo } = await launchModal(addressModal)
   if (uri) {

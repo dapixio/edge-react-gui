@@ -68,7 +68,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
   }
 
   async _onDone () {
-    const { currencyCode, onDone } = this.props
+    const { currencyCode, onDone, fioDemoServer } = this.props
     const { uri, memo, memoError } = this.state
     this.setState({ fieldError: '' })
 
@@ -76,7 +76,8 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
 
     if (this.fioAddressCheck(uri)) {
       try {
-        const res = await window.fetch('https://testnet.fioprotocol.io:443/v1/chain/get_pub_address', {
+        const apiUrl = fioDemoServer ? 'https://testnet.fioprotocol.io:443/v1/' : 'https://dev2.fio.dev:443/v1/'
+        const res = await window.fetch(apiUrl + 'chain/get_pub_address', {
           method: 'POST',
           headers: {
             Accept: 'application/json',
@@ -189,7 +190,8 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
 export type AddressModalOpts = {
   walletId: string,
   coreWallet: EdgeCurrencyWallet,
-  currencyCode: string
+  currencyCode: string,
+  fioDemoServer: boolean
 }
 
 export const createAddressModal = (opts: AddressModalOpts) => {
