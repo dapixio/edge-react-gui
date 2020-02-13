@@ -113,7 +113,7 @@ export const refreshPubAddresses = (fioAddress: string) => async (dispatch: Disp
 }
 
 export const setSenderFioAddress = (fioAddress: string) => async (dispatch: Dispatch, getState: GetState) => {
-  const fioWallet = findWalletByFioAddress(getState(), fioAddress)
+  const fioWallet = await findWalletByFioAddress(getState(), fioAddress)
   let error = ''
 
   if (!fioWallet) {
