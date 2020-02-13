@@ -42,7 +42,7 @@ export class FioAddressDetailsScene extends Component<Props, State> {
       ])
     }
 
-    this.props.refreshPubAddresses(fioAddress)
+    if (!this.props.registerSuccess) this.props.refreshPubAddresses(fioAddress)
   }
 
   _onToggleConnectWallets = (fioAddressName: string) => {
