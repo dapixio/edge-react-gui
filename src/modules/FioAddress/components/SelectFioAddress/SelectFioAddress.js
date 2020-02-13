@@ -46,18 +46,7 @@ export class SelectFioAddress extends Component<Props, LocalState> {
   }
 
   componentDidMount () {
-    const { fioWallets, selectedWallet } = this.props
-    if (selectedWallet && selectedWallet.currencyCode === Constants.FIO_STR) {
-      const fioWallet = fioWallets.find((fioWalletItem: EdgeCurrencyWallet) => fioWalletItem.id === selectedWallet.id)
-      if (fioWallet) {
-        const fioNames = fioWallet.otherMethods.walletLocalData.otherData.fioNames.map((name: string) => ({ value: name }))
-        this.setState({ fioAddresses: fioNames }, () => {
-          this.handleFioAddressChange('', 0)
-        })
-      }
-    } else {
-      this.checkForPubAddresses()
-    }
+    this.checkForPubAddresses()
 
     const materialStyle = { ...MaterialInput }
     materialStyle.tintColor = styles.text.color
@@ -73,27 +62,37 @@ export class SelectFioAddress extends Component<Props, LocalState> {
   }
 
   async checkForPubAddresses () {
-    const { fioWallets, currencyCode } = this.props
-    const fioAddresses = []
-    this.setState({ loading: true })
-    for (const fioWallet: EdgeCurrencyWallet of fioWallets) {
-      const fioNames = fioWallet.otherMethods.walletLocalData.otherData.fioNames
-      for (const fioAddress: string of fioNames) {
-        try {
-          const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
-            fioAddress,
-            tokenCode: currencyCode,
-            chainCode: currencyCode
-          })
-          if (public_address && public_address.length > 1) fioAddresses.push({ value: fioAddress })
-        } catch (e) {
-          continue
+    const { fioWallets, selectedWallet, currencyCode } = this.props
+    if (selectedWallet && selectedWallet.currencyCode === Constants.FIO_STR) {
+      const fioWallet = fioWallets.find((fioWalletItem: EdgeCurrencyWallet) => fioWalletItem.id === selectedWallet.id)
+      if (fioWallet) {
+        const fioNames = await fioWallet.otherMethods.getFioAddress()
+        this.setState({ fioAddresses: fioNames.map((name: string) => ({ value: name })) }, () => {
+          this.handleFioAddressChange('', 0)
+        })
+      }
+    } else {
+      const fioAddresses = []
+      this.setState({ loading: true })
+      for (const fioWallet: EdgeCurrencyWallet of fioWallets) {
+        const fioNames = await fioWallet.otherMethods.getFioAddress()
+        for (const fioAddress: string of fioNames) {
+          try {
+            const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
+              fioAddress,
+              chainCode: currencyCode,
+              tokenCode: currencyCode
+            })
+            if (public_address && public_address.length > 1) fioAddresses.push({ value: fioAddress })
+          } catch (e) {
+            continue
+          }
         }
       }
+      this.setState({ fioAddresses, loading: false }, () => {
+        this.handleFioAddressChange('', 0)
+      })
     }
-    this.setState({ fioAddresses, loading: false }, () => {
-      this.handleFioAddressChange('', 0)
-    })
   }
 
   handleFioAddressChange = (something: string, index: number) => {

@@ -85,6 +85,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
           },
           body: JSON.stringify({
             fio_address: uri,
+            chain_code: currencyCode,
             token_code: currencyCode
           })
         })
