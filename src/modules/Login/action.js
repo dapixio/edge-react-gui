@@ -221,7 +221,7 @@ export const mergeSettings = (
       finalSettings[key] = loadedSettings[key]
     }
 
-    if (account && loadedSettings[key] != null) {
+    if (account && loadedSettings[key] != null && key !== 'ETH') {
       const currencyName = Constants.CURRENCY_PLUGIN_NAMES[key]
       const doesHaveDenominations = loadedSettings[key].denominations
       const doesHavePlugin = account.currencyConfig[currencyName]
