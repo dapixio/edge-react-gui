@@ -76,7 +76,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
 
     if (this.fioAddressCheck(uri)) {
       try {
-        const apiUrl = fioDemoServer ? 'https://testnet.fioprotocol.io:443/v1/' : 'https://dev2.fio.dev:443/v1/'
+        const apiUrl = fioDemoServer ? 'https://demo2.fio.dev:443/v1/' : 'https://testnet.fioprotocol.io:443/v1/'
         const res = await window.fetch(apiUrl + 'chain/get_pub_address', {
           method: 'POST',
           headers: {
@@ -102,6 +102,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
   }
 
   fioAddressCheck (fioAddress: string) {
+    if (fioAddress.indexOf(Constants.FIO_DOMAIN_DEFAULT) < 0) return false
     return new RegExp(`^(([a-z0-9]+)(-?[a-z0-9]+)*${Constants.FIO_DOMAIN_DEFAULT}{1})$`, 'gim').test(fioAddress)
   }
 
