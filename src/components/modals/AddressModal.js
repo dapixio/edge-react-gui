@@ -24,7 +24,8 @@ type AddressModalState = {
   uri: string,
   memo: string,
   fieldError: string,
-  memoError: string
+  memoError: string,
+  addressLabel: string
 }
 export class AddressModal extends Component<AddressModalProps, AddressModalState> {
   /* static Icon = Icon
@@ -42,7 +43,8 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
       uri: '',
       memo: '',
       fieldError: '',
-      memoError: ''
+      memoError: '',
+      addressLabel: s.strings.fragment_send_address
     }
   }
 
@@ -64,6 +66,16 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
       })
     } catch (e) {
       // Failure is acceptable
+    }
+  }
+
+  _onAddressFocus (isBlur: boolean = false) {
+    if (isBlur) {
+      if (!this.state.uri) {
+        this.setState({ addressLabel: s.strings.fragment_send_address })
+      }
+    } else {
+      this.setState({ addressLabel: s.strings.fragment_send_send_to_hint_fio })
     }
   }
 
@@ -132,7 +144,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
 
   render () {
     const copyMessage = this.state.clipboard ? sprintf(s.strings.string_paste_address, this.state.clipboard) : null
-    const { uri, memo, fieldError, memoError } = this.state
+    const { uri, memo, fieldError, memoError, addressLabel } = this.state
     return (
       <View style={ModalStyle.modal}>
         <Modal.Icon>
@@ -150,9 +162,10 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
                 value={uri}
                 onChangeText={this.updateUri}
                 error={fieldError}
-                placeholder={s.strings.fragment_send_send_to_hint_fio}
-                label={s.strings.fragment_send_send_to_hint_fio}
+                label={addressLabel}
                 onSubmit={() => this._onDone()}
+                onFocus={() => this._onAddressFocus()}
+                onBlur={() => this._onAddressFocus(true)}
               />
             </View>
             <View>
