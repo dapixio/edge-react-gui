@@ -2,7 +2,7 @@
 
 import { type EdgeCurrencyWallet } from 'edge-core-js'
 import React, { Component } from 'react'
-import { ScrollView, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 
 import FioAddressItem from '../../components/common/FioAddressItem'
@@ -21,7 +21,8 @@ type WalletAddress = {
   addresses: FioAddress[]
 }
 export type State = {
-  walletAddresses: WalletAddress[]
+  walletAddresses: WalletAddress[],
+  loading: boolean
 }
 
 export type StateProps = {
@@ -42,7 +43,8 @@ type Props = StateProps & DispatchProps & NavigationProps
 export class FioAddressListScene extends Component<Props, State> {
   willFocusSubscription = null
   state: State = {
-    walletAddresses: []
+    walletAddresses: [],
+    loading: false
   }
 
   async fetchData () {
@@ -51,6 +53,10 @@ export class FioAddressListScene extends Component<Props, State> {
     if (!this.props.isConnected) {
       showError(s.strings.fio_network_alert_text)
     }
+
+    this.setState({
+      loading: true
+    })
     for (const fioWallet of fioWallets) {
       const addresses = await this.getAddressFromWallet(fioWallet)
       if (addresses) {
@@ -60,6 +66,9 @@ export class FioAddressListScene extends Component<Props, State> {
         })
       }
     }
+    this.setState({
+      loading: false
+    })
 
     if (walletAddresses.length === 0 && isConnected) {
       Actions[Constants.FIO_ADDRESS]()
@@ -102,7 +111,7 @@ export class FioAddressListScene extends Component<Props, State> {
   }
 
   render () {
-    const { walletAddresses } = this.state
+    const { walletAddresses, loading } = this.state
 
     return (
       <SafeAreaView>
@@ -115,6 +124,7 @@ export class FioAddressListScene extends Component<Props, State> {
                 <FioAddressItem key={`${wallet.id}-${address.fio_address}`} wallet={wallet} address={address} onFioAddressPress={this.onPress} />
               ))
             })}
+          {loading && <ActivityIndicator style={styles.loading} size={'large'} />}
         </ScrollView>
         <View style={styles.view}>
           <T>{s.strings.fio_address_first_screen_end}</T>
