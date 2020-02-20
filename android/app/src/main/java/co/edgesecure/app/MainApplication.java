@@ -13,6 +13,7 @@ import com.bitgo.randombytes.RandomBytesPackage;
 import com.bugsnag.BugsnagReactNative;
 import com.chirag.RNMail.RNMail;
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.modules.i18nmanager.I18nUtil;
@@ -27,7 +28,6 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.peel.react.TcpSocketsModule;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import com.reactlibrary.DiskletPackage;
-import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.reactnativecommunity.art.ARTPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -56,6 +56,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
           return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
+            new NetInfoPackage(),
               new NetInfoPackage(),
               new ARTPackage(),
               new AsyncStoragePackage(),
