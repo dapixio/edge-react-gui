@@ -167,6 +167,7 @@ export const newTransactionsRequest = (walletId: string, edgeTransactions: Array
   let numberOfRelevantTransactions = 0
   let isTransactionForSelectedWallet = false
   for (const transaction of edgeTransactions) {
+    // todo: add meta data from obtData
     if (transaction.currencyCode === selectedCurrencyCode && transaction.wallet && transaction.wallet.id === selectedWalletId) {
       isTransactionForSelectedWallet = true
       // this next part may be unnecessary
