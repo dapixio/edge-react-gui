@@ -1,5 +1,6 @@
 // @flow
 
+import { bns } from 'biggystring'
 import { createThreeButtonModal, createYesNoModal } from 'edge-components'
 import type { EdgeCurrencyWallet, EdgeParsedUri, EdgeSpendInfo, EdgeSpendTarget, EdgeTransaction } from 'edge-core-js'
 import React from 'react'
@@ -178,6 +179,7 @@ export const parseScannedUri = (data: string, fioAddress: string = '', memo: str
       }
 
       if (fioAddress) {
+        const exchangeDenomination = UI_SELECTORS.getExchangeDenomination(state, currencyCode)
         guiMakeSpendInfo.fioAddress = fioAddress
         guiMakeSpendInfo.isSendToFioAddress = true
         guiMakeSpendInfo.memo = memo
@@ -207,7 +209,6 @@ export const parseScannedUri = (data: string, fioAddress: string = '', memo: str
               showError(s.strings.create_wallet_account_error_sending_transaction)
             }, 750)
           } else if (edgeTransaction) {
-            console.log(edgeTransaction)
             let payerPublicAddress, payeePublicAddress, amount
             if (
               edgeTransaction.otherParams &&
@@ -224,7 +225,7 @@ export const parseScannedUri = (data: string, fioAddress: string = '', memo: str
                 payeeFIOAddress: fioAddress,
                 payerPublicAddress,
                 payeePublicAddress,
-                amount,
+                amount: amount && bns.div(amount, exchangeDenomination.multiplier, 18),
                 currencyCode: edgeTransaction.currencyCode,
                 txid: edgeTransaction.txid,
                 memo
