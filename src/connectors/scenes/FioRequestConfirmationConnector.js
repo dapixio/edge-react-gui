@@ -25,6 +25,7 @@ const mapStateToProps = (state: State): FioRequestConfirmationProps => {
     return {
       exchangeSecondaryToPrimaryRatio: 0,
       loading: true,
+      chainCode: '',
       primaryCurrencyInfo: emptyCurrencyInfo,
       secondaryCurrencyInfo: emptyCurrencyInfo,
       publicAddress: '',
@@ -62,6 +63,7 @@ const mapStateToProps = (state: State): FioRequestConfirmationProps => {
     exchangeSecondaryToPrimaryRatio,
     publicAddress: guiWallet.receiveAddress.publicAddress || '',
     loading: false,
+    chainCode: guiWallet.currencyCode,
     primaryCurrencyInfo,
     secondaryCurrencyInfo,
     amounts,

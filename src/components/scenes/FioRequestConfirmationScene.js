@@ -25,6 +25,7 @@ export type FioRequestConfirmationProps = {
   exchangeSecondaryToPrimaryRatio: number,
   publicAddress: string,
   loading: boolean,
+  chainCode: string,
   primaryCurrencyInfo: GuiCurrencyInfo,
   secondaryCurrencyInfo: GuiCurrencyInfo,
   amounts: ExchangedFlipInputAmounts,
@@ -105,7 +106,7 @@ export class FioRequestConfirmationComponent extends Component<Props, LocalState
           payeeTokenPublicAddress: this.props.publicAddress,
           amount: val,
           tokenCode: this.props.primaryCurrencyInfo.exchangeCurrencyCode,
-          chainCode: this.props.primaryCurrencyInfo.exchangeCurrencyCode,
+          chainCode: this.props.chainCode || this.props.primaryCurrencyInfo.exchangeCurrencyCode,
           memo: this.props.fioModalData.memo,
           maxFee: 0
         })

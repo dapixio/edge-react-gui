@@ -264,8 +264,8 @@ export class FioRequestList extends Component<Props, State> {
       return
     }
     const { wallets, setFioPendingRequestSelected } = this.props
-    for (const walletKey: string of Object.keys(this.props.wallets)) {
-      if (wallets[walletKey].currencyCode.toLowerCase() === tx.content.token_code.toLowerCase()) {
+    for (const walletKey: string of Object.keys(wallets)) {
+      if (wallets[walletKey].currencyCode.toLowerCase() === tx.content.chain_code.toLowerCase()) {
         setFioPendingRequestSelected(tx)
         Actions[Constants.FIO_PENDING_REQUEST_DETAILS]()
         return

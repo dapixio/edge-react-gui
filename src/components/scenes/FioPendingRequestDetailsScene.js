@@ -62,7 +62,6 @@ export type FioPendingRequestDetailsDispatchProps = {
 type Props = FioPendingRequestDetailsStateProps & FioPendingRequestDetailsDispatchProps
 
 type LocalState = {
-  whichWallet: string, // Which wallet selector dropdown was tapped
   memo: string
 }
 
@@ -70,7 +69,6 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
   constructor (props: Props) {
     super(props)
     const newState: LocalState = {
-      whichWallet: Constants.TO,
       memo: this.props.selectedFioPendingRequest.content.memo
     }
     this.state = newState
@@ -125,10 +123,7 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
 
   launchFromWalletSelector = () => {
     this.props.openModal('from')
-    this.renderDropUp(Constants.FROM)
-    this.setState({
-      whichWallet: Constants.FROM
-    })
+    this.renderDropUp()
   }
 
   sendCrypto = async () => {
@@ -201,39 +196,27 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
     return null
   }
 
-  renderDropUp = (whichWallet: string) => {
-    const { onSelectWallet, fromCurrencyCode, fromWallet, toCurrencyCode, toWallet, wallets } = this.props
-
+  renderDropUp = () => {
+    const { onSelectWallet, toCurrencyCode, toWallet, wallets } = this.props
     let excludedCurrencyCode = '' // should allow for multiple excluded currencyCodes
     // some complex logic because 'toCurrencyCode/fromCurrencyCode'
     // can be denomination (needs to change to actual currencyCode)
-    if (whichWallet === Constants.TO) {
-      if (fromWallet) {
-        if (fromWallet.enabledTokens.length > 1) {
-          // could be token
-          excludedCurrencyCode = fromCurrencyCode
-        } else {
-          excludedCurrencyCode = fromWallet.currencyCode
-        }
-      }
-    } else {
-      if (toWallet) {
-        if (toWallet.enabledTokens.length > 1) {
-          // could be token
-          excludedCurrencyCode = toCurrencyCode
-        } else {
-          excludedCurrencyCode = toWallet.currencyCode
-        }
+    if (toWallet) {
+      if (toWallet.enabledTokens.length > 1) {
+        // could be token
+        excludedCurrencyCode = toCurrencyCode
+      } else {
+        excludedCurrencyCode = toWallet.currencyCode
       }
     }
     const walletCurrencyCodes = []
     const allowedWallets = []
     for (const id in wallets) {
       const wallet = wallets[id]
-      if (excludedCurrencyCode === wallet.currencyCode && excludedCurrencyCode === 'ETH' && wallet.enabledTokens.length > 0) {
+      if (wallet.currencyCode === 'ETH' && wallet.enabledTokens.length > 0) {
         walletCurrencyCodes.push(wallet.currencyCode)
         if (wallet.receiveAddress && wallet.receiveAddress.publicAddress) {
-          if (wallet.currencyCode === this.props.selectedFioPendingRequest.content.token_code) {
+          if (wallet.currencyCode === this.props.selectedFioPendingRequest.content.chain_code) {
             allowedWallets.push(wallets[id])
           }
         }
@@ -241,7 +224,7 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
       if (excludedCurrencyCode !== wallet.currencyCode) {
         walletCurrencyCodes.push(wallet.currencyCode)
         if (wallet.receiveAddress && wallet.receiveAddress.publicAddress) {
-          if (wallet.currencyCode === this.props.selectedFioPendingRequest.content.token_code) {
+          if (wallet.currencyCode === this.props.selectedFioPendingRequest.content.chain_code) {
             allowedWallets.push(wallets[id])
           }
         }
@@ -255,20 +238,18 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
       }
     }
 
-    const filterWalletId = whichWallet === Constants.TO ? fromWallet.id : toWallet.id
-    const filterWalletCurrencyCode = whichWallet === Constants.TO ? fromCurrencyCode : toCurrencyCode
     Airship.show(bridge => (
       <WalletListModal
         bridge={bridge}
         wallets={allowedWallets}
-        type={whichWallet}
-        existingWalletToFilterId={filterWalletId}
-        existingWalletToFilterCurrencyCode={filterWalletCurrencyCode}
+        type={Constants.FROM}
+        existingWalletToFilterId={toWallet.id}
+        existingWalletToFilterCurrencyCode={toCurrencyCode}
         supportedWalletTypes={supportedWalletTypes}
         excludedCurrencyCode={[]}
-        showWalletCreators={whichWallet === Constants.TO}
+        showWalletCreators={false}
         state={this.props.state}
-        headerTitle={whichWallet === Constants.TO ? s.strings.select_recv_wallet : s.strings.fio_src_wallet}
+        headerTitle={s.strings.fio_src_wallet}
         excludedTokens={[]}
         noWalletCodes={[]}
         disableZeroBalance={false}
