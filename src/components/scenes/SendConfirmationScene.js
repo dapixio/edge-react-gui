@@ -315,9 +315,7 @@ export class SendConfirmation extends Component<Props, State> {
 
                   {!!memo && (
                     <Scene.Row style={{ paddingTop: 0, paddingBottom: 10 }}>
-                      <Recipient.Text style={{}}>
-                        <Text>{MEMO_TEXT}</Text>
-                      </Recipient.Text>
+                      <Text style={styles.rowText}>{MEMO_TEXT}</Text>
                     </Scene.Row>
                   )}
 

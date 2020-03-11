@@ -1,7 +1,6 @@
 // @flow
 
 import { bns } from 'biggystring'
-import { FormField } from 'edge-components'
 import type { EdgeCurrencyWallet, EdgeDenomination, EdgeTransaction } from 'edge-core-js'
 import React, { Component } from 'react'
 import { View } from 'react-native'
@@ -20,6 +19,7 @@ import { styles as CryptoExchangeSceneStyle } from '../../styles/scenes/CryptoEx
 import styles from '../../styles/scenes/FioPendingRequestDetailsStyle.js'
 import type { State } from '../../types/reduxTypes'
 import type { GuiWallet } from '../../types/types'
+import { FormField } from '../common/FormField'
 import { SceneWrapper } from '../common/SceneWrapper'
 import { Airship, showError } from '../services/AirshipInstance'
 
@@ -285,7 +285,14 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
           <View>{this.requestedField(this.props.selectedFioPendingRequest.payee_fio_address)}</View>
           <View>{this.dateField(new Date(this.props.selectedFioPendingRequest.time_stamp))}</View>
           <View style={styles.memostyle}>
-            <FormField style={materialStyle} label="Memo" onChangeText={text => this.setState({ memo: text })} value={this.state.memo} placeholder="Memo" />
+            <FormField
+              style={materialStyle}
+              label="Memo"
+              onChangeText={text => this.setState({ memo: text })}
+              value={this.state.memo}
+              placeholder="Memo"
+              multiline={true}
+            />
           </View>
           <View style={styles.row2}>
             <View style={styles.line} />
