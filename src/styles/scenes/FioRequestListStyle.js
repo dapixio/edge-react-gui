@@ -24,6 +24,7 @@ export const styles = {
     flex: 1
   },
   androidTransactionsWrap: {
+    flex: 1,
     height: PLATFORM.usableHeight - SOFT_MENU_BAR_HEIGHT + THEME.HEADER
   },
   scrollView: {
