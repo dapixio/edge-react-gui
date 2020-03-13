@@ -274,3 +274,13 @@ export type FioObtRecord = {
   status: string,
   time_stamp: string
 }
+
+export type FioConnectionWalletItem = {
+  key: string,
+  id: string,
+  publicAddress: string,
+  symbolImage: string,
+  name: string,
+  currencyCode: string,
+  chainCode: string
+}

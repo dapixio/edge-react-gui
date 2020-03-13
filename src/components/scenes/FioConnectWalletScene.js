@@ -9,15 +9,17 @@ import s from '../../locales/strings.js'
 import T from '../../modules/UI/components/FormattedText/index'
 import { CryptoExchangeWalletListRowStyle as walletStyles } from '../../styles/indexStyles'
 import styles from '../../styles/scenes/FioConnectWalletStyle'
-import type { GuiWallet } from '../../types/types'
+import type { FioConnectionWalletItem } from '../../types/types'
 import { SceneWrapper } from '../common/SceneWrapper'
 
 export type State = {
-  selectedWallets: { [walletId: string]: GuiWallet }
+  selectedWallets: { [walletId: string]: FioConnectionWalletItem }
 }
 
 export type FioConnectWalletStateProps = {
-  wallets: { [walletId: string]: GuiWallet }
+  wallets: {
+    [publicAddressCurrencyCode: string]: FioConnectionWalletItem
+  }
 }
 
 export type FioConnectWalletRouteProps = {
@@ -42,12 +44,12 @@ export class FioConnectWalletScene extends Component<Props, State> {
     Actions[Constants.FIO_ADDRESS_DISCONNECT_WALLETS]({ fioAddressName })
   }
 
-  selectWallet (wallet: GuiWallet) {
+  selectWallet (wallet: FioConnectionWalletItem) {
     const { selectedWallets } = this.state
-    if (selectedWallets[wallet.id]) {
-      delete selectedWallets[wallet.id]
+    if (selectedWallets[wallet.key]) {
+      delete selectedWallets[wallet.key]
     } else {
-      selectedWallets[wallet.id] = wallet
+      selectedWallets[wallet.key] = wallet
     }
 
     this.setState({ selectedWallets })
@@ -55,10 +57,10 @@ export class FioConnectWalletScene extends Component<Props, State> {
 
   keyExtractor = (item: {}, index: number) => index.toString()
 
-  renderWalletItem = ({ item: wallet }: { item: GuiWallet }) => {
+  renderFioConnectionWalletItem = ({ item: wallet }: { item: FioConnectionWalletItem }) => {
     const { selectedWallets } = this.state
     if (wallet) {
-      const isSelected = !!selectedWallets[wallet.id]
+      const isSelected = !!selectedWallets[wallet.key]
       const disabled =
         !isSelected && !!Object.keys(selectedWallets).find((walletItemKey: string) => selectedWallets[walletItemKey].currencyCode === wallet.currencyCode)
 
@@ -106,7 +108,7 @@ export class FioConnectWalletScene extends Component<Props, State> {
               initialNumToRender={24}
               keyboardShouldPersistTaps="handled"
               keyExtractor={this.keyExtractor}
-              renderItem={this.renderWalletItem}
+              renderItem={this.renderFioConnectionWalletItem}
             />
           ) : (
             <T style={styles.no_wallets_text}>{s.strings.fio_connect_no_wallets}</T>

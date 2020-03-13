@@ -22,7 +22,7 @@ const mapStateToProps = (state: State) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
-  connectToWallets: (fioAddress: string, wallets: { tokenCode: string, publicAddress: string }[]) => {
+  connectToWallets: (fioAddress: string, wallets: { chainCode: string, tokenCode: string, publicAddress: string }[]) => {
     dispatch(updatePubAddressesToFioAddress(fioAddress, wallets))
   },
   setFioWalletByFioAddress: (fioAddress: string) => {

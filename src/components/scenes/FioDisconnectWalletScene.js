@@ -8,20 +8,20 @@ import T from '../../modules/UI/components/FormattedText/index'
 import ABSlider from '../../modules/UI/components/Slider/index.js'
 import { CryptoExchangeWalletListRowStyle as walletStyles } from '../../styles/indexStyles'
 import styles from '../../styles/scenes/FioConnectWalletStyle'
-import type { GuiWallet } from '../../types/types'
+import type { FioConnectionWalletItem } from '../../types/types'
 import { SceneWrapper } from '../common/SceneWrapper'
 
 export type State = {
-  selectedToRemove: { [walletId: string]: GuiWallet }
+  selectedToRemove: { [walletId: string]: FioConnectionWalletItem }
 }
 
 export type FioDisconnectWalletsStateProps = {
-  connectedWallets: { [walletId: string]: GuiWallet },
+  connectedWallets: { [walletId: string]: FioConnectionWalletItem },
   disconnectWalletsLoading: boolean
 }
 
 export type FioDisconnectWalletsDispatchProps = {
-  disconnectWallets: (fioAddressName: string, selectedToRemove: { tokenCode: string, publicAddress: string }[]) => void,
+  disconnectWallets: (fioAddressName: string, selectedToRemove: { chainCode: string, tokenCode: string, publicAddress: string }[]) => void,
   setFioWalletByFioAddress: (fioAddressName: string) => void
 }
 
@@ -45,16 +45,20 @@ export class FioDisconnectWalletScene extends Component<Props, State> {
     const { fioAddressName, disconnectWallets } = this.props
     disconnectWallets(
       fioAddressName,
-      Object.keys(selectedToRemove).map((walletKey: string) => ({ tokenCode: selectedToRemove[walletKey].currencyCode, publicAddress: '0' }))
+      Object.keys(selectedToRemove).map((walletKey: string) => ({
+        chainCode: selectedToRemove[walletKey].chainCode,
+        tokenCode: selectedToRemove[walletKey].currencyCode,
+        publicAddress: '0'
+      }))
     )
   }
 
-  selectWallet (wallet: GuiWallet) {
+  selectWallet (wallet: FioConnectionWalletItem) {
     const { selectedToRemove } = this.state
-    if (selectedToRemove[wallet.id]) {
-      delete selectedToRemove[wallet.id]
+    if (selectedToRemove[wallet.key]) {
+      delete selectedToRemove[wallet.key]
     } else {
-      selectedToRemove[wallet.id] = wallet
+      selectedToRemove[wallet.key] = wallet
     }
 
     this.setState({ selectedToRemove })
@@ -62,10 +66,10 @@ export class FioDisconnectWalletScene extends Component<Props, State> {
 
   keyExtractor = (item: {}, index: number) => index.toString()
 
-  renderWalletItem = ({ item: wallet }: { item: GuiWallet }) => {
+  renderWalletItem = ({ item: wallet }: { item: FioConnectionWalletItem }) => {
     const { selectedToRemove } = this.state
     if (wallet) {
-      const isSelected = !!selectedToRemove[wallet.id]
+      const isSelected = !!selectedToRemove[wallet.key]
 
       return (
         <TouchableHighlight

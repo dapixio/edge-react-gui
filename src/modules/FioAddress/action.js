@@ -33,7 +33,7 @@ export const setFioWalletByFioAddress = (fioAddressToUse: string) => async (disp
   }
 }
 
-export const updatePubAddressesToFioAddress = (fioAddress: string, wallets: { tokenCode: string, publicAddress: string }[]) => async (
+export const updatePubAddressesToFioAddress = (fioAddress: string, wallets: { chainCode: string, tokenCode: string, publicAddress: string }[]) => async (
   dispatch: Dispatch,
   getState: GetState
 ) => {
@@ -57,9 +57,9 @@ export const updatePubAddressesToFioAddress = (fioAddress: string, wallets: { to
   try {
     await wallet.otherMethods.fioAction('addPublicAddresses', {
       fioAddress,
-      publicAddresses: wallets.map(({ tokenCode, publicAddress }) => ({
+      publicAddresses: wallets.map(({ chainCode, tokenCode, publicAddress }) => ({
         token_code: tokenCode,
-        chain_code: tokenCode,
+        chain_code: chainCode,
         public_address: publicAddress
       })),
       maxFee
@@ -89,7 +89,23 @@ export const refreshPubAddresses = (fioAddress: string) => async (dispatch: Disp
     type: 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING'
   })
   for (const walletKey: string in wallets) {
-    if (!fioWallet || pubAddresses[wallets[walletKey].currencyCode]) continue
+    if (!fioWallet) continue
+    if (wallets[walletKey].enabledTokens && wallets[walletKey].enabledTokens.length) {
+      for (const enabledToken: string of wallets[walletKey].enabledTokens) {
+        try {
+          const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
+            fioAddress,
+            tokenCode: enabledToken,
+            chainCode: wallets[walletKey].currencyCode
+          })
+          pubAddresses[enabledToken] = public_address
+        } catch (e) {
+          //
+          console.log(e.json)
+        }
+      }
+    }
+    if (pubAddresses[wallets[walletKey].currencyCode] && pubAddresses[wallets[walletKey].currencyCode] !== '0') continue
     try {
       const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
         fioAddress,

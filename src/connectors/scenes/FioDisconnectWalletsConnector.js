@@ -17,8 +17,35 @@ const mapStateToProps = (state: State, ownProps): StateProps => {
   const connectedWallets = {}
 
   for (const walletKey: string in wallets) {
-    if (wallets[walletKey].receiveAddress.publicAddress === connectedPubAddresses[wallets[walletKey].currencyCode]) {
-      connectedWallets[wallets[walletKey].id] = wallets[walletKey]
+    const publicAddress = wallets[walletKey].receiveAddress.publicAddress
+    if (!publicAddress) continue
+    if (publicAddress === connectedPubAddresses[wallets[walletKey].currencyCode]) {
+      connectedWallets[`${publicAddress}-${wallets[walletKey].currencyCode}`] = {
+        key: `${publicAddress}-${wallets[walletKey].currencyCode}`,
+        id: wallets[walletKey].id,
+        publicAddress,
+        symbolImage: wallets[walletKey].symbolImage,
+        name: wallets[walletKey].name,
+        currencyCode: wallets[walletKey].currencyCode,
+        chainCode: wallets[walletKey].currencyCode
+      }
+    }
+    if (wallets[walletKey].enabledTokens && wallets[walletKey].enabledTokens.length) {
+      for (const enabledToken: string of wallets[walletKey].enabledTokens) {
+        const tokenData = wallets[walletKey].metaTokens.find(metaToken => metaToken.currencyCode === enabledToken)
+        if (!tokenData) continue
+        if (publicAddress === connectedPubAddresses[tokenData.currencyCode]) {
+          connectedWallets[`${publicAddress}-${tokenData.currencyCode}`] = {
+            key: `${publicAddress}-${tokenData.currencyCode}`,
+            id: wallets[walletKey].id,
+            publicAddress,
+            symbolImage: tokenData.symbolImage,
+            name: wallets[walletKey].name,
+            currencyCode: tokenData.currencyCode,
+            chainCode: wallets[walletKey].currencyCode
+          }
+        }
+      }
     }
   }
   const out: StateProps = {
@@ -29,7 +56,7 @@ const mapStateToProps = (state: State, ownProps): StateProps => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
-  disconnectWallets: (fioAddress: string, wallets: { tokenCode: string, publicAddress: string }[]) => {
+  disconnectWallets: (fioAddress: string, wallets: { chainCode: string, tokenCode: string, publicAddress: string }[]) => {
     dispatch(updatePubAddressesToFioAddress(fioAddress, wallets))
   },
   setFioWalletByFioAddress: (fioAddress: string) => {

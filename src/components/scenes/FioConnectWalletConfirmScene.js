@@ -9,7 +9,7 @@ import T from '../../modules/UI/components/FormattedText/index'
 import { Icon } from '../../modules/UI/components/Icon/Icon.ui'
 import ABSlider from '../../modules/UI/components/Slider/index.js'
 import styles from '../../styles/scenes/FioConnectWalletStyle'
-import type { GuiWallet, IsConnectedProp } from '../../types/types'
+import type { FioConnectionWalletItem, IsConnectedProp } from '../../types/types'
 import { SceneWrapper } from '../common/SceneWrapper'
 
 export type State = {
@@ -23,11 +23,11 @@ export type FioConnectWalletConfirmStateProps = {
 
 export type FioConnectWalletConfirmRouteProps = {
   fioAddressName: string,
-  selectedWallets: GuiWallet[]
+  selectedWallets: FioConnectionWalletItem[]
 }
 
 export type FioConnectWalletConfirmDispatchProps = {
-  connectToWallets: (fioAddressName: string, selectedWallets: { tokenCode: string, publicAddress: string }[]) => void,
+  connectToWallets: (fioAddressName: string, selectedWallets: { chainCode: string, tokenCode: string, publicAddress: string }[]) => void,
   setFioWalletByFioAddress: (fioAddressName: string) => void
 }
 
@@ -47,9 +47,10 @@ export class FioConnectWalletConfirmScene extends Component<Props, State> {
     if (isConnected) {
       connectToWallets(
         fioAddressName,
-        selectedWallets.map((wallet: GuiWallet) => ({
+        selectedWallets.map((wallet: FioConnectionWalletItem) => ({
           tokenCode: wallet.currencyCode,
-          publicAddress: wallet.receiveAddress.publicAddress
+          chainCode: wallet.chainCode,
+          publicAddress: wallet.publicAddress
         }))
       )
     }
@@ -77,7 +78,7 @@ export class FioConnectWalletConfirmScene extends Component<Props, State> {
             <View style={styles.spacer} />
             {selectedWallets.map(wallet => (
               <T key={wallet.id} style={styles.walletName}>
-                {wallet.name}
+                {wallet.name} ({wallet.currencyCode})
               </T>
             ))}
           </View>
