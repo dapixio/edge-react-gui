@@ -171,7 +171,7 @@ export const recordSend = (params: any) => async (dispatch: Dispatch, getState: 
   const state = getState()
   const { senderFioAddress, senderMsgRecipient, senderWallet } = state.ui.scenes.fioAddress
   if (senderFioAddress && senderMsgRecipient && senderWallet) {
-    const { payeeFIOAddress, payerPublicAddress, payeePublicAddress, amount, currencyCode, txid, memo } = params
+    const { payeeFIOAddress, payerPublicAddress, payeePublicAddress, amount, currencyCode, chainCode, txid, memo } = params
     await senderWallet.otherMethods.fioAction('recordObtData', {
       payerFIOAddress: senderFioAddress,
       payeeFIOAddress,
@@ -179,7 +179,7 @@ export const recordSend = (params: any) => async (dispatch: Dispatch, getState: 
       payeePublicAddress,
       amount,
       tokenCode: currencyCode,
-      chainCode: currencyCode,
+      chainCode,
       obtId: txid,
       memo,
       maxFee: 0,

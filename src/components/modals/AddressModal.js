@@ -80,12 +80,11 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
   }
 
   async _onDone () {
-    const { currencyCode, onDone, fioDemoServer } = this.props
+    const { currencyCode, coreWallet, onDone, fioDemoServer } = this.props
     const { uri, memo, memoError } = this.state
     this.setState({ fieldError: '' })
 
     if (memoError) return
-
     if (this.fioAddressCheck(uri)) {
       try {
         const apiUrl = fioDemoServer ? 'https://demo2.fio.dev:443/v1/' : 'https://testnet.fioprotocol.io:443/v1/'
@@ -97,7 +96,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
           },
           body: JSON.stringify({
             fio_address: uri,
-            chain_code: currencyCode,
+            chain_code: coreWallet.currencyInfo.currencyCode,
             token_code: currencyCode
           })
         })

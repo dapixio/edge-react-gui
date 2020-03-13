@@ -80,7 +80,7 @@ export class SelectFioAddress extends Component<Props, LocalState> {
           try {
             const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
               fioAddress,
-              chainCode: currencyCode,
+              chainCode: selectedWallet.currencyCode,
               tokenCode: currencyCode
             })
             if (public_address && public_address.length > 1) fioAddresses.push({ value: fioAddress })

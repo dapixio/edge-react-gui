@@ -220,6 +220,10 @@ export const parseScannedUri = (data: string, fioAddress: string = '', memo: str
               payeePublicAddress = edgeTransaction.otherParams.transactionJson.actions[0].data.to
               amount = edgeTransaction.otherParams.transactionJson.actions[0].data.quantity
             }
+            let chainCode
+            if (edgeTransaction.wallet && edgeTransaction.wallet.currencyInfo) {
+              chainCode = edgeTransaction.wallet.currencyInfo.currencyCode
+            }
             dispatch(
               recordSend({
                 payeeFIOAddress: fioAddress,
@@ -227,6 +231,7 @@ export const parseScannedUri = (data: string, fioAddress: string = '', memo: str
                 payeePublicAddress,
                 amount: amount && bns.div(amount, exchangeDenomination.multiplier, 18),
                 currencyCode: edgeTransaction.currencyCode,
+                chainCode: chainCode || guiWallet.currencyCode,
                 txid: edgeTransaction.txid,
                 memo
               })
