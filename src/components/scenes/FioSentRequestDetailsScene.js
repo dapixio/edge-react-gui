@@ -5,7 +5,9 @@ import { View } from 'react-native'
 
 import * as Constants from '../../constants/indexConstants'
 import { intl } from '../../locales/intl'
+import s from '../../locales/strings.js'
 import type { ExchangeRatesState } from '../../modules/ExchangeRates/reducer'
+import { isRejectedFioRequest, isSentFioRequest } from '../../modules/FioRequest/util'
 import T from '../../modules/UI/components/FormattedText/index'
 import SafeAreaView from '../../modules/UI/components/SafeAreaView/index'
 import styles from '../../styles/scenes/FioSentRequestDetailsStyle.js'
@@ -61,10 +63,22 @@ export class FioSentRequestDetailsComponent extends Component<Props, LocalState>
     )
   }
 
-  requestedField = (payer: string) => {
+  requestedField = (payer: string, status: string) => {
+    let statusLabel = (
+      <T style={styles.title}>
+        {s.strings.title_fio_requested} {s.strings.fragment_transaction_list_sent_prefix}
+        {s.strings.word_to_in_convert_from_to_string}
+      </T>
+    )
+    if (isSentFioRequest(status)) {
+      statusLabel = <T style={[styles.title, styles.titleReceived]}>{s.strings.fragment_transaction_list_receive_prefix}</T>
+    }
+    if (isRejectedFioRequest(status)) {
+      statusLabel = <T style={[styles.title, styles.titleRejected]}>{s.strings.fio_reject_status}</T>
+    }
     return (
       <View style={styles.row}>
-        <T style={styles.title}>Requested Sent To</T>
+        {statusLabel}
         <T style={styles.title}>{payer}</T>
       </View>
     )
@@ -86,7 +100,7 @@ export class FioSentRequestDetailsComponent extends Component<Props, LocalState>
   dateField = (date: Date) => {
     return (
       <View style={styles.row}>
-        <T style={styles.title}>Date</T>
+        <T style={styles.title}>{s.strings.fio_date_label}</T>
         <T style={styles.title}>{intl.formatExpDate(date, true)}</T>
       </View>
     )
@@ -104,7 +118,7 @@ export class FioSentRequestDetailsComponent extends Component<Props, LocalState>
               '$'
             )}
           </View>
-          <View>{this.requestedField(this.props.selectedFioSentRequest.payer_fio_address)}</View>
+          <View>{this.requestedField(this.props.selectedFioSentRequest.payer_fio_address, this.props.selectedFioSentRequest.status)}</View>
           <View>{this.dateField(new Date(this.props.selectedFioSentRequest.time_stamp))}</View>
           <View>{this.memoField(this.props.selectedFioSentRequest.content.memo)}</View>
           <View style={styles.row2}>

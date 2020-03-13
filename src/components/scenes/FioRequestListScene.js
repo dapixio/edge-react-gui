@@ -5,12 +5,15 @@ import { Alert, Animated, FlatList, Image, TouchableHighlight, TouchableOpacity,
 import { Actions } from 'react-native-router-flux'
 import slowlog from 'react-native-slowlog'
 
+import checkedIcon from '../../assets/images/createWallet/check_icon_lg.png'
+import invalidIcon from '../../assets/images/createWallet/invalid_icon.png'
 import fioRequestsIcon from '../../assets/images/fio/fio_sent_request.png'
 import * as Constants from '../../constants/indexConstants'
 import { intl } from '../../locales/intl'
 import s from '../../locales/strings.js'
 import FullScreenLoader from '../../modules/FioRequest/components/FullScreenLoader'
 import SwipeListView from '../../modules/FioRequest/components/SwipeListView'
+import { isRejectedFioRequest, isSentFioRequest } from '../../modules/FioRequest/util'
 import T from '../../modules/UI/components/FormattedText/index'
 import { styles as requestListStyles } from '../../styles/scenes/FioRequestListStyle'
 import styles from '../../styles/scenes/TransactionListStyle'
@@ -145,10 +148,10 @@ export class FioRequestList extends Component<Props, State> {
     }
   }
 
-  currencyField = (symbol: string, amount: string) => {
+  currencyField = (symbol: string, amount: string, styles: any) => {
     return (
       <View>
-        <T style={requestListStyles.currency}>
+        <T style={[requestListStyles.currency, styles]}>
           {symbol} {amount}
         </T>
       </View>
@@ -169,10 +172,11 @@ export class FioRequestList extends Component<Props, State> {
     return (fiatPerCrypto * amountToMultiply).toFixed(2)
   }
 
-  fiatField = (currencyCode: string, fiatSymbol: string, amount: string) => {
+  fiatField = (currencyCode: string, fiatSymbol: string, amount: string, styles: any) => {
+    console.log(styles)
     return (
       <View>
-        <T style={requestListStyles.fiat}>
+        <T style={[requestListStyles.fiat, styles]}>
           {fiatSymbol} {this.fiatAmount(currencyCode, amount)}
         </T>
       </View>
@@ -197,17 +201,46 @@ export class FioRequestList extends Component<Props, State> {
     )
   }
 
+  stylesByStatus = (status: string) => {
+    if (isRejectedFioRequest(status)) {
+      return requestListStyles.rejectedCol
+    }
+    if (isSentFioRequest(status)) {
+      return requestListStyles.receivedCol
+    }
+
+    return null
+  }
+
+  statusField = (status: string) => {
+    if (isRejectedFioRequest(status)) {
+      return <T style={requestListStyles.rejected}>{s.strings.fio_reject_status}</T>
+    }
+    if (isSentFioRequest(status)) {
+      return <T style={requestListStyles.received}>{s.strings.fragment_transaction_list_receive_prefix}</T>
+    }
+
+    return null
+  }
+
   requestedTimeAndMemo = (time: Date, memo: string) => {
     return (
       <View>
         <T style={requestListStyles.text}>
-          {this.getFormattedTime(time)} - {memo}
+          {this.getFormattedTime(time)}
+          {memo ? ` - ${memo}` : ''}
         </T>
       </View>
     )
   }
 
-  requestedIcon = () => {
+  requestedIcon = (status?: string = '') => {
+    if (isRejectedFioRequest(status)) {
+      return <Image style={styles.transactionLogo} source={invalidIcon} />
+    }
+    if (isSentFioRequest(status)) {
+      return <Image style={styles.transactionLogo} source={checkedIcon} />
+    }
     return (
       <View>
         <Image style={styles.transactionLogo} source={fioRequestsIcon} />
@@ -333,6 +366,7 @@ export class FioRequestList extends Component<Props, State> {
   }
 
   renderSentTx = (transaction: Object) => {
+    const textStyles = this.stylesByStatus(transaction.item.status)
     return (
       <TouchableHighlight
         onPress={() => this.selectSentRequest(transaction.item)}
@@ -353,15 +387,16 @@ export class FioRequestList extends Component<Props, State> {
           )}
           <View style={requestListStyles.rowItem}>
             <View style={requestListStyles.columnItem}>
-              <View>{this.requestedIcon()}</View>
+              <View>{this.requestedIcon(transaction.item.status)}</View>
               <View>
                 <View>{this.sentField(transaction.item.payer_fio_address)}</View>
                 <View>{this.requestedTimeAndMemo(new Date(transaction.item.time_stamp), transaction.item.content.memo)}</View>
               </View>
             </View>
             <View style={requestListStyles.columnCurrency}>
-              <View>{this.currencyField(transaction.item.token_code, transaction.item.content.amount)}</View>
-              <View>{this.fiatField(transaction.item.content.token_code, this.props.fiatSymbol, transaction.item.content.amount)}</View>
+              <View>{this.currencyField(transaction.item.token_code, transaction.item.content.amount, textStyles)}</View>
+              <View>{this.fiatField(transaction.item.content.token_code, this.props.fiatSymbol, transaction.item.content.amount, textStyles)}</View>
+              <View>{this.statusField(transaction.item.status)}</View>
             </View>
           </View>
         </View>

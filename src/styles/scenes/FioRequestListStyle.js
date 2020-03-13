@@ -93,13 +93,13 @@ export const styles = {
     marginBottom: scale(30)
   },
   currency: {
-    color: THEME.COLORS.ACCENT_RED,
+    color: THEME.COLORS.BLUE_3,
     fontSize: scale(16),
     fontWeight: 'normal',
     textAlign: 'right'
   },
   fiat: {
-    color: THEME.COLORS.ACCENT_RED,
+    color: THEME.COLORS.BLUE_3,
     fontSize: scale(14),
     fontWeight: 'normal',
     textAlign: 'right'
@@ -181,6 +181,24 @@ export const styles = {
   title: {
     fontSize: scale(16),
     fontWeight: 'normal'
+  },
+  rejectedCol: {
+    color: THEME.COLORS.ACCENT_RED
+  },
+  receivedCol: {
+    color: THEME.COLORS.ACCENT_MINT
+  },
+  rejected: {
+    fontSize: scale(12),
+    fontWeight: 'normal',
+    textAlign: 'right',
+    color: THEME.COLORS.ACCENT_RED
+  },
+  received: {
+    fontSize: scale(12),
+    fontWeight: 'normal',
+    textAlign: 'right',
+    color: THEME.COLORS.ACCENT_MINT
   },
   trash: {
     height: scale(25),

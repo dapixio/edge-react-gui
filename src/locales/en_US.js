@@ -677,6 +677,8 @@ const strings = {
   fio_reject_request_title: 'FIO Request',
   fio_reject_request_message: 'Reject Request?',
   fio_reject_request_yes: 'Yes, Reject',
+  fio_reject_status: 'Rejected',
+  fio_date_label: 'Date',
   fio_get_requests_error: 'There was an issue fetching requests',
   fio_confirm_request_error: 'There was an issue during request send',
   fio_reject_request_error: 'There was an issue during request rejection',

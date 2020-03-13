@@ -47,6 +47,12 @@ const styles = StyleSheet.create({
     fontSize: scale(16),
     fontWeight: 'normal',
     textAlign: 'center'
+  },
+  titleRejected: {
+    color: THEME.COLORS.ACCENT_RED
+  },
+  titleReceived: {
+    color: THEME.COLORS.ACCENT_MINT
   }
 })
 
