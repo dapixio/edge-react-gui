@@ -51,6 +51,12 @@ test('initialState', () => {
       addressRegistrationPaymentInfo: {},
       regInfoLoading: false
     },
+    fioRequest: {
+      fioRequestsPending: [],
+      fioRequestsSent: [],
+      pendingRequestsLoading: false,
+      sentRequestsLoading: false
+    },
     requestType: {
       useLegacyAddress: false,
       uniqueLegacyAddress: false

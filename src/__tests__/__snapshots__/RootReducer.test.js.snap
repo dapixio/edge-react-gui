@@ -145,6 +145,12 @@ Object {
         "regInfoLoading": false,
         "selectedWallet": null,
       },
+      "fioRequest": Object {
+        "fioRequestsPending": Array [],
+        "fioRequestsSent": Array [],
+        "pendingRequestsLoading": false,
+        "sentRequestsLoading": false,
+      },
       "passwordRecoveryReminderModal": Object {
         "isVisible": false,
       },
