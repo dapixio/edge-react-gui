@@ -1,4 +1,5 @@
 // @flow
+import type { EdgeCurrencyWallet } from 'edge-core-js'
 
 import { showError } from '../../components/services/AirshipInstance'
 import s from '../../locales/strings'
@@ -70,6 +71,36 @@ export const getFioRequestsSent = () => async (dispatch: Dispatch, getState: Get
     }
   }
   dispatch(requestListSent([], false))
+}
+
+export const confirmRequest = (
+  fioWalletByAddress: EdgeCurrencyWallet,
+  pendingRequest: FioRequest,
+  payerPublicAddress: string,
+  txId: string,
+  memo: string = '',
+  cb: Function
+) => async (dispatch: Dispatch) => {
+  try {
+    await fioWalletByAddress.otherMethods.fioAction('recordObtData', {
+      fioRequestId: pendingRequest.fio_request_id,
+      payerFioAddress: pendingRequest.payer_fio_address,
+      payeeFioAddress: pendingRequest.payee_fio_address,
+      payerPublicAddress: pendingRequest.payer_fio_public_key,
+      payeePublicAddress: pendingRequest.content.payee_public_address,
+      amount: pendingRequest.content.amount,
+      tokenCode: pendingRequest.content.token_code,
+      chainCode: pendingRequest.content.chain_code,
+      obtId: txId,
+      memo,
+      tpid: '',
+      status: 'sent_to_blockchain'
+    })
+    dispatch(getFioRequestsPending())
+    cb()
+  } catch (e) {
+    showError(s.strings.fio_confirm_request_error)
+  }
 }
 
 export const rejectRequest = (fioRequestId: string, payerFioAddress: string, cb: Function) => async (dispatch: Dispatch, getState: GetState) => {

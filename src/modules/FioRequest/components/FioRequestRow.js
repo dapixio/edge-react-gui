@@ -41,6 +41,7 @@ class FioRequestRow extends Component<Props> {
       },
       payee_fio_address: '',
       payer_fio_address: '',
+      payer_fio_public_key: '',
       status: '',
       time_stamp: ''
     },

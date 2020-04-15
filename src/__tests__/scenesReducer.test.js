@@ -49,7 +49,8 @@ test('initialState', () => {
         supportedCurrencies: {}
       },
       addressRegistrationPaymentInfo: {},
-      regInfoLoading: false
+      regInfoLoading: false,
+      fioWalletByAddress: null
     },
     fioRequest: {
       fioRequestsPending: [],

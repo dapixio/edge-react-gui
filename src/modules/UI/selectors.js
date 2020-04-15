@@ -83,6 +83,10 @@ export const getTransactions = (state: State): Array<TransactionListTx> => {
   return transactions
 }
 
+export const getFioWalletByAddress = (state: State): EdgeCurrencyWallet | null => {
+  return state.ui.scenes.fioAddress.fioWalletByAddress
+}
+
 export const getDenominations = (state: State, currencyCode: string) => {
   const wallet = getSelectedWallet(state)
   const denominations = Object.values(wallet.allDenominations[currencyCode])

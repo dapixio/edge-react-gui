@@ -138,6 +138,7 @@ Object {
         "fioAddressName": "",
         "fioAddresses": Array [],
         "fioAddressesLoading": false,
+        "fioWalletByAddress": null,
         "handleRegistrationInfo": Object {
           "activationCost": 40,
           "supportedCurrencies": Object {},
