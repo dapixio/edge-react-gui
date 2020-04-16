@@ -109,7 +109,7 @@ export const rejectRequest = (fioRequestId: string, payerFioAddress: string, cb:
     try {
       const { fee } = await wallet.otherMethods.fioAction('getFeeForRejectFundsRequest', { payerFioAddress })
       if (fee) {
-        return showError(`${s.strings.fio_no_bundled_err_title}. ${s.strings.fio_no_bundled_err_msg}`)
+        return showError(s.strings.fio_no_bundled_err_msg)
       }
       await wallet.otherMethods.fioAction('rejectFundsRequest', { fioRequestId: fioRequestId, payerFioAddress })
       cb()

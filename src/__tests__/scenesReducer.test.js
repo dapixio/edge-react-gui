@@ -50,7 +50,10 @@ test('initialState', () => {
       },
       addressRegistrationPaymentInfo: {},
       regInfoLoading: false,
-      fioWalletByAddress: null
+      fioWalletByAddress: null,
+      walletLoading: false,
+      renewalFee: null,
+      feeLoading: false
     },
     fioRequest: {
       fioRequestsPending: [],

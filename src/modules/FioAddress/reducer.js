@@ -25,7 +25,10 @@ export type FioAddressSceneState = {
     }
   },
   regInfoLoading: boolean,
-  fioWalletByAddress: EdgeCurrencyWallet | null
+  fioWalletByAddress: EdgeCurrencyWallet | null,
+  walletLoading: boolean,
+  renewalFee: number | null,
+  feeLoading: boolean
 }
 
 export type BuyAddressResponse = {
@@ -58,7 +61,10 @@ const initialState: FioAddressSceneState = {
   },
   addressRegistrationPaymentInfo: {},
   regInfoLoading: false,
-  fioWalletByAddress: null
+  fioWalletByAddress: null,
+  walletLoading: false,
+  renewalFee: null,
+  feeLoading: false
 }
 
 export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initialState, action: Action) => {
@@ -112,7 +118,15 @@ export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initia
       if (!action.data) throw new Error(`Invalid action FIO/FIO_WALLET_BY_ADDRESS`)
       return {
         ...state,
-        fioWalletByAddress: action.data.wallet
+        fioWalletByAddress: action.data.wallet,
+        walletLoading: !!action.data.loading
+      }
+    case 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE':
+      if (!action.data) throw new Error(`Invalid action FIO/SET_FIO_ADDRESS_RENEWAL_FEE`)
+      return {
+        ...state,
+        renewalFee: action.data.fee,
+        feeLoading: !!action.data.loading
       }
     default:
       return state

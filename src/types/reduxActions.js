@@ -243,7 +243,8 @@ export type Action =
         }
       }
     }
-  | { type: 'FIO/FIO_WALLET_BY_ADDRESS', data: { wallet: EdgeCurrencyWallet | null } }
+  | { type: 'FIO/FIO_WALLET_BY_ADDRESS', data: { wallet: EdgeCurrencyWallet | null, loading?: boolean } }
   | { type: 'FIO/FIO_REQUEST_LIST_PENDING', data: { fioRequestsPending: FioRequest[], isLoading: boolean, isReset: boolean } }
   | { type: 'FIO/FIO_REQUEST_LIST_SENT', data: { fioRequestsSent: FioRequest[], isLoading: boolean, isReset: boolean } }
   | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
+  | { type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE', data: { fee: number | null, loading?: boolean } }

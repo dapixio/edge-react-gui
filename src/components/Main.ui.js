@@ -41,12 +41,14 @@ import { CryptoExchangeSceneConnector as ExchangeConnector } from '../connectors
 import DefaultFiatSettingConnector from '../connectors/scenes/DefaultFiatSettingConnector'
 import EdgeLoginSceneConnector from '../connectors/scenes/EdgeLoginSceneConnector'
 import EditToken from '../connectors/scenes/EditTokenConnector.js'
+import { FioAccountSettingsConnector } from '../connectors/scenes/FioAccountSettingsConnector'
 import { FioAddressConfirmConnector } from '../connectors/scenes/FioAddressConfirmConnector'
 import { FioAddressDetailsConnector } from '../connectors/scenes/FioAddressDetailsConnector'
 import { FioAddressListConnector } from '../connectors/scenes/FioAddressListConnector'
 import { FioAddressRegisterConnector } from '../connectors/scenes/FioAddressRegisterConnector'
 import { FioAddressRegisterSelectWalletConnector } from '../connectors/scenes/FioAddressRegisterSelectWalletConnector'
 import { FioPendingRequestConnector } from '../connectors/scenes/FioPendingRequestConnector'
+import { FioRenewAddressConnector } from '../connectors/scenes/FioRenewAddressConnector'
 import { FioRequestConfirmationConnector } from '../connectors/scenes/FioRequestConfirmationConnector.js'
 import { FioRequestListConnector } from '../connectors/scenes/FioRequestListConnector'
 import { FioSentRequestConnector } from '../connectors/scenes/FioSentRequestConnector'
@@ -118,6 +120,8 @@ const CREATE_WALLET_SELECT_FIAT = s.strings.title_create_wallet_select_fiat
 const CREATE_WALLET = s.strings.title_create_wallet
 const CREATE_WALLET_ACCOUNT_SETUP = s.strings.create_wallet_create_account
 const CREATE_WALLET_ACCOUNT_ACTIVATE = s.strings.create_wallet_account_activate
+const FIO_ACCOUNT_SETTINGS = s.strings.title_fio_account_settings
+const FIO_RENEW_ADDRESS = s.strings.title_fio_renew_address
 const FIO_ADDRESS = s.strings.title_fio_address
 const FIO_ADDRESS_CONFIRMATION = s.strings.title_fio_address_confirmation
 const TRANSACTIONS_EXPORT = s.strings.title_export_transactions
@@ -708,6 +712,24 @@ export class MainComponent extends Component<Props> {
               renderTitle={this.renderTitle(FIO_ADDRESS)}
               renderLeftButton={this.renderBackButton(BACK)}
               renderRightButton={this.renderMenuButton()}
+            />
+            <Scene
+              key={Constants.FIO_ACCOUNT_SETTINGS}
+              navTransparent={true}
+              component={FioAccountSettingsConnector}
+              renderTitle={this.renderTitle(FIO_ACCOUNT_SETTINGS)}
+              renderLeftButton={this.renderBackButton(BACK)}
+              renderRightButton={this.renderMenuButton()}
+              onLeft={Actions.pop}
+            />
+            <Scene
+              key={Constants.FIO_RENEW_ADDRESS}
+              navTransparent={true}
+              component={FioRenewAddressConnector}
+              renderTitle={this.renderTitle(FIO_RENEW_ADDRESS)}
+              renderLeftButton={this.renderBackButton(BACK)}
+              renderRightButton={this.renderMenuButton()}
+              onLeft={Actions.pop}
             />
           </Stack>
 

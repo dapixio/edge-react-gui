@@ -8,10 +8,14 @@ import s from '../../locales/strings'
 import type { Dispatch, GetState } from '../../types/reduxTypes'
 import { getAccount } from '../Core/selectors'
 import { getExchangeDenomination } from '../Settings/selectors'
-import { findWalletByFioAddress, getFioWallets } from '../UI/selectors'
+import { findWalletByFioAddress, getFioWalletByAddress, getFioWallets } from '../UI/selectors'
 import type { BuyAddressResponse } from './reducer'
 
 export const setFioWalletByFioAddress = (fioAddressToUse: string) => async (dispatch: Dispatch, getState: GetState) => {
+  dispatch({
+    type: 'FIO/FIO_WALLET_BY_ADDRESS',
+    data: { wallet: null, loading: true }
+  })
   const wallet = await findWalletByFioAddress(getState(), fioAddressToUse)
   dispatch({
     type: 'FIO/FIO_WALLET_BY_ADDRESS',
@@ -111,5 +115,28 @@ export const getRegInfo = (fioAddress: string, selectedWallet: EdgeCurrencyWalle
   dispatch({
     type: 'FIO/FIO_ADDRESS_REG_INFO_LOADING',
     data: false
+  })
+}
+
+export const getRenewalFee = () => async (dispatch: Dispatch, getState: GetState) => {
+  const fioWallet: EdgeCurrencyWallet | null = getFioWalletByAddress(getState())
+  dispatch({
+    type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE',
+    data: { fee: null, loading: true }
+  })
+  if (fioWallet) {
+    try {
+      const { fee } = await fioWallet.otherMethods.fioAction('getFee', { endPoint: 'renew_fio_address', fioAddress: '' })
+      return dispatch({
+        type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE',
+        data: { fee }
+      })
+    } catch (e) {
+      //
+    }
+  }
+  dispatch({
+    type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE',
+    data: { fee: null, loading: false }
   })
 }

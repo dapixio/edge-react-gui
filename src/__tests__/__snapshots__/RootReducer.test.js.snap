@@ -135,6 +135,7 @@ Object {
         "addressRegistrationPaymentInfo": Object {},
         "expiration": 2020-01-01T10:10:10.000Z,
         "feeCollected": 0,
+        "feeLoading": false,
         "fioAddressName": "",
         "fioAddresses": Array [],
         "fioAddressesLoading": false,
@@ -144,7 +145,9 @@ Object {
           "supportedCurrencies": Object {},
         },
         "regInfoLoading": false,
+        "renewalFee": null,
         "selectedWallet": null,
+        "walletLoading": false,
       },
       "fioRequest": Object {
         "fioRequestsPending": Array [],
