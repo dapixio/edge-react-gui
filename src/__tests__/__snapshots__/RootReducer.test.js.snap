@@ -133,6 +133,7 @@ Object {
       },
       "fioAddress": Object {
         "addressRegistrationPaymentInfo": Object {},
+        "connectedWalletsByFioAddress": Object {},
         "expiration": 2020-01-01T10:10:10.000Z,
         "feeCollected": 0,
         "feeLoading": false,
@@ -140,6 +141,7 @@ Object {
         "fioAddresses": Array [],
         "fioAddressesLoading": false,
         "fioWalletByAddress": null,
+        "getPubAddressesLoading": false,
         "handleRegistrationInfo": Object {
           "activationCost": 40,
           "supportedCurrencies": Object {},

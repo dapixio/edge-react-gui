@@ -47,6 +47,7 @@ import { FioAddressDetailsConnector } from '../connectors/scenes/FioAddressDetai
 import { FioAddressListConnector } from '../connectors/scenes/FioAddressListConnector'
 import { FioAddressRegisterConnector } from '../connectors/scenes/FioAddressRegisterConnector'
 import { FioAddressRegisterSelectWalletConnector } from '../connectors/scenes/FioAddressRegisterSelectWalletConnector'
+import { FioConnectWalletConnector } from '../connectors/scenes/FioConnectWalletConnector'
 import { FioPendingRequestConnector } from '../connectors/scenes/FioPendingRequestConnector'
 import { FioRenewAddressConnector } from '../connectors/scenes/FioRenewAddressConnector'
 import { FioRequestConfirmationConnector } from '../connectors/scenes/FioRequestConfirmationConnector.js'
@@ -727,6 +728,15 @@ export class MainComponent extends Component<Props> {
               navTransparent={true}
               component={FioRenewAddressConnector}
               renderTitle={this.renderTitle(FIO_RENEW_ADDRESS)}
+              renderLeftButton={this.renderBackButton(BACK)}
+              renderRightButton={this.renderMenuButton()}
+              onLeft={Actions.pop}
+            />
+            <Scene
+              key={Constants.FIO_CONNECT_TO_WALLETS}
+              navTransparent={true}
+              component={FioConnectWalletConnector}
+              renderTitle={this.renderTitle(s.strings.title_fio_connect_to_wallet)}
               renderLeftButton={this.renderBackButton(BACK)}
               renderRightButton={this.renderMenuButton()}
               onLeft={Actions.pop}

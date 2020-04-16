@@ -8,7 +8,7 @@ import s from '../../locales/strings'
 import type { Dispatch, GetState } from '../../types/reduxTypes'
 import { getAccount } from '../Core/selectors'
 import { getExchangeDenomination } from '../Settings/selectors'
-import { findWalletByFioAddress, getFioWalletByAddress, getFioWallets } from '../UI/selectors'
+import { findWalletByFioAddress, getFioWalletByAddress, getFioWallets, getWallets } from '../UI/selectors'
 import type { BuyAddressResponse } from './reducer'
 
 export const setFioWalletByFioAddress = (fioAddressToUse: string) => async (dispatch: Dispatch, getState: GetState) => {
@@ -138,5 +138,53 @@ export const getRenewalFee = () => async (dispatch: Dispatch, getState: GetState
   dispatch({
     type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE',
     data: { fee: null, loading: false }
+  })
+}
+
+export const refreshPubAddresses = (fioAddress: string) => async (dispatch: Dispatch, getState: GetState) => {
+  const wallets = getWallets(getState())
+  const fioWallet = await findWalletByFioAddress(getState(), fioAddress)
+
+  const pubAddresses = {}
+  dispatch({
+    type: 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING'
+  })
+  for (const walletKey: string in wallets) {
+    if (!fioWallet) continue
+    if (wallets[walletKey].enabledTokens && wallets[walletKey].enabledTokens.length) {
+      for (const enabledToken: string of wallets[walletKey].enabledTokens) {
+        try {
+          const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
+            fioAddress,
+            tokenCode: enabledToken,
+            chainCode: wallets[walletKey].currencyCode
+          })
+          pubAddresses[enabledToken] = public_address
+        } catch (e) {
+          //
+          console.log(e.json)
+        }
+      }
+    }
+    if (pubAddresses[wallets[walletKey].currencyCode] && pubAddresses[wallets[walletKey].currencyCode] !== '0') continue
+    try {
+      const { public_address } = await fioWallet.otherMethods.fioAction('getPublicAddress', {
+        fioAddress,
+        tokenCode: wallets[walletKey].currencyCode,
+        chainCode: wallets[walletKey].currencyCode
+      })
+      pubAddresses[wallets[walletKey].currencyCode] = public_address
+    } catch (e) {
+      //
+      console.log(e.json)
+    }
+  }
+
+  dispatch({
+    type: 'FIO/FIO_UPDATE_PUB_ADDRESSES',
+    data: {
+      fioAddress,
+      pubAddresses
+    }
   })
 }
