@@ -19,7 +19,9 @@ const mapStateToProps = (state: State) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => ({
-  setFioWalletByFioAddress: (fioAddress: string) => dispatch(setFioWalletByFioAddress(fioAddress)),
+  setFioWalletByFioAddress: (fioAddress: string) => {
+    dispatch(setFioWalletByFioAddress(fioAddress))
+  },
   refreshPubAddresses: (fioAddressName: string) => {
     dispatch(refreshPubAddresses(fioAddressName))
   }

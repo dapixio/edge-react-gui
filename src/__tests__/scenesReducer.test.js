@@ -54,6 +54,7 @@ test('initialState', () => {
       walletLoading: false,
       renewalFee: null,
       feeLoading: false,
+      setPubAddressesLoading: false,
       connectedWalletsByFioAddress: {},
       getPubAddressesLoading: false
     },

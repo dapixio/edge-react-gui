@@ -149,6 +149,7 @@ Object {
         "regInfoLoading": false,
         "renewalFee": null,
         "selectedWallet": null,
+        "setPubAddressesLoading": false,
         "walletLoading": false,
       },
       "fioRequest": Object {

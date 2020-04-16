@@ -21,7 +21,7 @@ export type StateProps = {
   registerSuccess?: boolean
 }
 export type DispatchProps = {
-  setFioWalletByFioAddress: (fioAddress: string) => Promise<void>,
+  setFioWalletByFioAddress: string => void,
   refreshPubAddresses: string => void
 }
 

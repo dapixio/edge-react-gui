@@ -29,6 +29,7 @@ export type FioAddressSceneState = {
   walletLoading: boolean,
   renewalFee: number | null,
   feeLoading: boolean,
+  setPubAddressesLoading: boolean,
   connectedWalletsByFioAddress: {
     [fioAddress: string]: {
       [currencyCode: string]: string
@@ -71,6 +72,7 @@ const initialState: FioAddressSceneState = {
   walletLoading: false,
   renewalFee: null,
   feeLoading: false,
+  setPubAddressesLoading: false,
   connectedWalletsByFioAddress: {},
   getPubAddressesLoading: false
 }
@@ -149,6 +151,17 @@ export const fioAddress: Reducer<FioAddressSceneState, Action> = (state = initia
       return {
         ...state,
         getPubAddressesLoading: true
+      }
+    case 'FIO/FIO_CONNECT_WALLETS_REQUEST':
+      return {
+        ...state,
+        setPubAddressesLoading: true
+      }
+    case 'FIO/FIO_CONNECT_WALLETS_SUCCESS':
+    case 'FIO/FIO_CONNECT_WALLETS_FAILURE':
+      return {
+        ...state,
+        setPubAddressesLoading: false
       }
     default:
       return state
