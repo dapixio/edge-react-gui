@@ -93,6 +93,9 @@ Object {
   },
   "showMainApp": true,
   "ui": Object {
+    "fioObtData": Object {
+      "obtRecords": Array [],
+    },
     "passwordReminder": Object {
       "lastLoginDate": -Infinity,
       "lastPasswordUseDate": -Infinity,

@@ -8,7 +8,7 @@ import type { AccountActivationPaymentInfo, HandleActivationInfo, HandleAvailabl
 import { type TweakSource } from '../util/ReferralHelpers.js'
 import { type DeepLink } from './DeepLink.js'
 import { type AccountReferral, type DeviceReferral, type Promotion, type ReferralCache } from './ReferralTypes.js'
-import type { FioRequest } from './types'
+import type { FioObtRecord, FioRequest } from './types'
 import { type CustomTokenInfo, type FioAddress, type GuiContact, type GuiCurrencyInfo, type GuiSwapInfo, type GuiWallet } from './types.js'
 
 type LegacyActionName =
@@ -249,3 +249,4 @@ export type Action =
   | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
   | { type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS', data: { fioAddress: string, fioWallet: EdgeCurrencyWallet | null, error: string } }
   | { type: 'FIO/FIO_SET_SENDER_MSG_TO_RECIPIENT', data: { msg: string, msgError?: string } }
+  | { type: 'FIO/SET_OBT_DATA', data: FioObtRecord[] }
