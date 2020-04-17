@@ -247,3 +247,5 @@ export type Action =
   | { type: 'FIO/FIO_REQUEST_LIST_PENDING', data: { fioRequestsPending: FioRequest[], isLoading: boolean, isReset: boolean } }
   | { type: 'FIO/FIO_REQUEST_LIST_SENT', data: { fioRequestsSent: FioRequest[], isLoading: boolean, isReset: boolean } }
   | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
+  | { type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS', data: { fioAddress: string, fioWallet: EdgeCurrencyWallet | null, error: string } }
+  | { type: 'FIO/FIO_SET_SENDER_MSG_TO_RECIPIENT', data: { msg: string, msgError?: string } }

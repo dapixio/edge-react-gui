@@ -145,6 +145,11 @@ Object {
         },
         "regInfoLoading": false,
         "selectedWallet": null,
+        "senderFioAddress": "",
+        "senderFioError": "",
+        "senderMsgRecipient": "",
+        "senderMsgRecipientError": "",
+        "senderWallet": null,
       },
       "fioRequest": Object {
         "fioRequestsPending": Array [],
