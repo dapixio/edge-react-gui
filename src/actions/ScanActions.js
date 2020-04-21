@@ -262,12 +262,27 @@ export const parseScannedUri = (data: string, fioAddress: string = '') => (dispa
   )
 }
 
-export const qrCodeScanned = (data: string) => (dispatch: Dispatch, getState: GetState) => {
+export const qrCodeScanned = (data: string) => async (dispatch: Dispatch, getState: GetState) => {
   const state = getState()
   const isScanEnabled = state.ui.scenes.scan.scanEnabled
   if (!isScanEnabled) return
 
   dispatch({ type: 'DISABLE_SCAN' })
+
+  const account = CORE_SELECTORS.getAccount(state)
+  const fioPlugin = account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO]
+  const isFioAddress = await fioPlugin.otherMethods.isFioAddressValid(data)
+  try {
+    if (isFioAddress) {
+      const walletId: string = UI_SELECTORS.getSelectedWalletId(state)
+      const coreWallet: EdgeCurrencyWallet = CORE_SELECTORS.getWallet(state, walletId)
+      const currencyCode: string = UI_SELECTORS.getSelectedCurrencyCode(state)
+      const { public_address } = await fioPlugin.otherMethods.getConnectedPublicAddress(data, coreWallet.currencyInfo.currencyCode, currencyCode)
+      if (public_address && public_address.length > 1) return dispatch(parseScannedUri(public_address, data))
+    }
+  } catch (e) {
+    return showError(s.strings.err_no_address_title)
+  }
   dispatch(parseScannedUri(data))
 }
 
