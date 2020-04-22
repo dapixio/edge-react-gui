@@ -1,9 +1,9 @@
 // @flow
 
 import { FormField, InputAndButtonStyle, MaterialInputStyle, Modal, ModalStyle, PrimaryButton, SecondaryButton, TertiaryButton } from 'edge-components'
-import type { EdgeCurrencyWallet } from 'edge-core-js'
+import type { EdgeCurrencyConfig, EdgeCurrencyWallet } from 'edge-core-js'
 import React, { Component } from 'react'
-import { Clipboard, Text, View } from 'react-native'
+import { ActivityIndicator, Clipboard, Text, View } from 'react-native'
 import FAIcon from 'react-native-vector-icons/FontAwesome'
 import { sprintf } from 'sprintf-js'
 
@@ -15,8 +15,9 @@ import ResolutionError, { ResolutionErrorCode } from '../common/ResolutionError.
 
 // INTERACTIVE_MODAL /////////////////////////////////////////////////////////////////////////////
 type AddressModalProps = {
-  onDone: any => void,
+  onDone: ({ uri?: string, fioAddress?: string }) => void,
   coreWallet: EdgeCurrencyWallet,
+  fioPlugin: EdgeCurrencyConfig,
   currencyCode: string
 }
 
@@ -24,6 +25,8 @@ type AddressModalState = {
   clipboard: string,
   uri: string,
   statusLabel: string,
+  fioPublicAddress: string,
+  fieldError: string,
   cryptoAddress?: string
 }
 export class AddressModal extends Component<AddressModalProps, AddressModalState> {
@@ -34,14 +37,18 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
   static Footer = Footer
   static Item = Item
   static Row = Row */
+  fioCheckQueue: number = 0
 
   constructor (props: AddressModalProps) {
     super(props)
+    this.fioCheckQueue = 0
     this.state = {
       clipboard: '',
       uri: '',
-      statusLabel: s.strings.fragment_send_send_to_hint,
-      cryptoAddress: undefined
+      statusLabel: s.strings.fragment_send_address, // fragment_send_send_to_hint
+      cryptoAddress: undefined,
+      fioPublicAddress: '',
+      fieldError: ''
     }
   }
 
@@ -66,6 +73,16 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
     }
   }
 
+  _onAddressFocus = () => {
+    this.setState({ statusLabel: s.strings.fragment_send_send_to_hint_fio })
+  }
+
+  _onAddressBlur = () => {
+    if (!this.state.uri) {
+      this.setState({ statusLabel: s.strings.fragment_send_address })
+    }
+  }
+
   setStatusLabel = (status: string) => {
     this.setState({ statusLabel: status })
   }
@@ -79,6 +96,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
     if (this.checkIfDomain(domain)) {
       this.resolveAddress(domain, currencyCode)
     }
+    this.checkIfFioAddress(domain)
     this.updateUri(domain)
   }
 
@@ -115,13 +133,47 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
     } catch (err) {
       if (err instanceof ResolutionError) {
         const message = sprintf(s.strings[err.code], domain, currencyTicker)
-        if (domain === '') this.setStatusLabel(s.strings.fragment_send_send_to_hint)
+        if (domain === '') this.setStatusLabel(s.strings.fragment_send_send_to_hint_fio)
         else {
           this.setStatusLabel(message)
           this.setCryptoAddress(undefined)
         }
       }
     }
+  }
+
+  checkFioPubAddress (uri: string) {
+    this.setStatusLabel(s.strings.resolving)
+    this.fioCheckQueue++
+    setTimeout(async () => {
+      // do not check if user continue typing fio address
+      if (this.fioCheckQueue > 1) {
+        return --this.fioCheckQueue
+      }
+      this.fioCheckQueue = 0
+      try {
+        const { currencyCode, coreWallet, fioPlugin } = this.props
+        const { public_address } = await fioPlugin.otherMethods.getConnectedPublicAddress(uri, coreWallet.currencyInfo.currencyCode, currencyCode)
+        this.setStatusLabel(s.strings.fragment_send_send_to_hint_fio)
+        if (public_address && public_address.length > 1) return this.setState({ fioPublicAddress: public_address })
+      } catch (e) {
+        this.setStatusLabel(s.strings.fragment_send_send_to_hint_fio)
+        return this.setState({ fieldError: s.strings.err_no_address_title })
+      }
+    }, 1000)
+  }
+
+  async checkIfFioAddress (uri: string) {
+    this.setState({ fieldError: '' })
+
+    if (await this.fioAddressCheck(uri)) {
+      this.checkFioPubAddress(uri)
+    }
+  }
+
+  fioAddressCheck = (fioAddress: string) => {
+    const { fioPlugin } = this.props
+    return fioPlugin.otherMethods.isFioAddressValid(fioAddress)
   }
 
   updateUri = (uri: string) => {
@@ -132,19 +184,32 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
 
   onPasteFromClipboard = () => {
     const { clipboard } = this.state
-    this.props.onDone(clipboard)
+    this.setState({ uri: clipboard }, async () => {
+      if (await this.fioAddressCheck(clipboard)) {
+        await this.checkIfFioAddress(clipboard)
+      }
+      this.handleSubmit()
+    })
   }
 
   handleSubmit = () => {
-    const { uri, cryptoAddress } = this.state
-    const submitData = cryptoAddress || uri
-    console.log(`submiting ${submitData}`)
+    const { uri, cryptoAddress, fioPublicAddress } = this.state
+    let submitData = { uri: cryptoAddress || uri }
+    if (fioPublicAddress) {
+      const { fieldError } = this.state
+      if (fieldError) return
+
+      submitData = {
+        uri: fioPublicAddress,
+        fioAddress: uri
+      }
+    }
     this.props.onDone(submitData)
   }
 
   render () {
     const copyMessage = this.state.clipboard ? sprintf(s.strings.string_paste_address, this.state.clipboard) : null
-    const { uri, statusLabel } = this.state
+    const { uri, statusLabel, fieldError } = this.state
     return (
       <View style={ModalStyle.modal}>
         <Modal.Icon>
@@ -153,7 +218,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
         <Modal.Container>
           <Modal.Icon.AndroidHackSpacer />
           <Modal.Title style={{ textAlign: 'center' }}>
-            <Text>{s.strings.fragment_send_address_dialog_title}</Text>
+            <Text>{s.strings.fragment_send_address_dialog_title_short}</Text>
           </Modal.Title>
           <Modal.Body>
             <View>
@@ -161,10 +226,11 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
                 style={MaterialInputStyle}
                 value={uri}
                 onChangeText={this.onChangeTextDelayed}
-                error={''}
-                placeholder={s.strings.fragment_send_send_to_hint}
+                error={fieldError}
                 label={statusLabel}
                 onSubmit={this.handleSubmit}
+                onFocus={this._onAddressFocus}
+                onBlur={this._onAddressBlur}
               />
             </View>
           </Modal.Body>
@@ -177,11 +243,15 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
               </Modal.Row>
             )}
             <Modal.Row style={[InputAndButtonStyle.row]}>
-              <SecondaryButton onPress={() => this.props.onDone(null)} style={[InputAndButtonStyle.noButton]}>
+              <SecondaryButton onPress={() => this.props.onDone({})} style={[InputAndButtonStyle.noButton]}>
                 <SecondaryButton.Text style={[InputAndButtonStyle.buttonText]}>{s.strings.string_cancel_cap}</SecondaryButton.Text>
               </SecondaryButton>
-              <PrimaryButton onPress={this.handleSubmit} style={[InputAndButtonStyle.yesButton]}>
-                <PrimaryButton.Text style={[InputAndButtonStyle.buttonText]}>{s.strings.string_done_cap}</PrimaryButton.Text>
+              <PrimaryButton onPress={this.handleSubmit} style={[InputAndButtonStyle.yesButton]} disabled={statusLabel === s.strings.resolving}>
+                {statusLabel === s.strings.resolving ? (
+                  <ActivityIndicator size="small" />
+                ) : (
+                  <PrimaryButton.Text style={[InputAndButtonStyle.buttonText]}>{s.strings.string_done_cap}</PrimaryButton.Text>
+                )}
               </PrimaryButton>
             </Modal.Row>
           </Modal.Footer>
@@ -194,6 +264,7 @@ export class AddressModal extends Component<AddressModalProps, AddressModalState
 export type AddressModalOpts = {
   walletId: string,
   coreWallet: EdgeCurrencyWallet,
+  fioPlugin: EdgeCurrencyConfig,
   currencyCode: string
 }
 

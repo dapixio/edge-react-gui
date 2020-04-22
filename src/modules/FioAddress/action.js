@@ -236,3 +236,42 @@ export const updatePubAddressesToFioAddress = (fioAddress: string, wallets: { ch
   showToast(wallets[0].publicAddress === '0' ? s.strings.fio_disconnect_wallets_success : s.strings.fio_connect_wallets_success)
   Actions.popTo(Constants.FIO_ADDRESS_DETAILS)
 }
+
+export const setSenderFioAddress = (fioAddress: string) => async (dispatch: Dispatch, getState: GetState) => {
+  const fioWallet = await findWalletByFioAddress(getState(), fioAddress)
+  let error = ''
+
+  if (!fioWallet) {
+    error = s.strings.fio_select_address_no_wallet_err
+    showError(error)
+    return dispatch({
+      type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS',
+      data: {
+        fioAddress,
+        fioWallet,
+        error
+      }
+    })
+  }
+
+  try {
+    const getFeeResult = await fioWallet.otherMethods.fioAction('getFee', {
+      endPoint: 'record_obt_data',
+      fioAddress: fioAddress
+    })
+    if (getFeeResult.fee) {
+      error = s.strings.fio_no_bundled_err_msg
+    }
+  } catch (e) {
+    showError(s.strings.fio_get_fee_err_msg)
+  }
+
+  dispatch({
+    type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS',
+    data: {
+      fioAddress,
+      fioWallet,
+      error
+    }
+  })
+}

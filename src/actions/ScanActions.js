@@ -1,5 +1,6 @@
 // @flow
 
+import { bns } from 'biggystring'
 import { createThreeButtonModal, createYesNoModal } from 'edge-components'
 import type { EdgeCurrencyWallet, EdgeParsedUri, EdgeSpendInfo, EdgeSpendTarget, EdgeTransaction } from 'edge-core-js'
 import React from 'react'
@@ -11,8 +12,10 @@ import URL from 'url-parse'
 import { selectWalletForExchange } from '../actions/CryptoExchangeActions.js'
 import { launchModal } from '../components/common/ModalProvider.js'
 import { createAddressModal } from '../components/modals/AddressModal.js'
+import { showError } from '../components/services/AirshipInstance'
 import {
   ADD_TOKEN,
+  CURRENCY_PLUGIN_NAMES,
   EXCHANGE_SCENE,
   FA_MONEY_ICON,
   getSpecialCurrencyInfo,
@@ -22,6 +25,7 @@ import {
   PLUGIN_BUY,
   SEND_CONFIRMATION,
   SHOPPING_CART,
+  TRANSACTION_DETAILS,
   WARNING
 } from '../constants/indexConstants.js'
 import s from '../locales/strings.js'
@@ -39,6 +43,7 @@ import type { Dispatch, GetState } from '../types/reduxTypes.js'
 import type { GuiWallet } from '../types/types.js'
 import { denominationToDecimalPlaces, noOp } from '../util/utils.js'
 import { launchDeepLink } from './DeepLinkingActions.js'
+import { recordSend } from './FioObtDataActions'
 import { sweepPrivateKeyFail, sweepPrivateKeyStart, sweepPrivateKeySuccess } from './PrivateKeyModalActions.js'
 import { secondaryModalActivated } from './SecondaryModalActions.js'
 import { paymentProtocolUriReceived } from './SendConfirmationActions.js'
@@ -96,7 +101,7 @@ export const doRequestAddress = (dispatch: Dispatch, edgeWallet: EdgeCurrencyWal
   }
 }
 
-export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: GetState) => {
+export const parseScannedUri = (data: string, fioAddress: string = '') => (dispatch: Dispatch, getState: GetState) => {
   if (!data) return
   const state = getState()
   const selectedWalletId = state.ui.wallets.selectedWalletId
@@ -180,6 +185,65 @@ export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: 
         uniqueIdentifier: parsedUri.uniqueIdentifier,
         nativeAmount
       }
+
+      if (fioAddress) {
+        const exchangeDenomination = UI_SELECTORS.getExchangeDenomination(state, currencyCode)
+        guiMakeSpendInfo.fioAddress = fioAddress
+        guiMakeSpendInfo.isSendToFioAddress = true
+        guiMakeSpendInfo.beforeTransaction = async () => {
+          const { senderFioAddress, senderWallet, senderFioError } = state.ui.scenes.fioAddress
+          if (senderWallet && senderFioAddress && !senderFioError) {
+            try {
+              const getFeeResult = await senderWallet.otherMethods.fioAction('getFee', {
+                endPoint: 'record_obt_data',
+                fioAddress: senderFioAddress
+              })
+              if (getFeeResult.fee) {
+                showError(s.strings.fio_no_bundled_err_msg)
+                throw new Error(s.strings.fio_no_bundled_err_msg)
+              }
+            } catch (e) {
+              showError(s.strings.fio_get_fee_err_msg)
+              throw e
+            }
+          }
+        }
+        guiMakeSpendInfo.onDone = (error: Error | null, edgeTransaction?: EdgeTransaction) => {
+          if (error) {
+            setTimeout(() => {
+              showError(s.strings.create_wallet_account_error_sending_transaction)
+            }, 750)
+          } else if (edgeTransaction) {
+            let payerPublicAddress, payeePublicAddress, amount
+            if (
+              edgeTransaction.otherParams &&
+              edgeTransaction.otherParams.transactionJson &&
+              edgeTransaction.otherParams.transactionJson.actions &&
+              edgeTransaction.otherParams.transactionJson.actions.length
+            ) {
+              payerPublicAddress = edgeTransaction.otherParams.transactionJson.actions[0].data.from
+              payeePublicAddress = edgeTransaction.otherParams.transactionJson.actions[0].data.to
+              amount = edgeTransaction.otherParams.transactionJson.actions[0].data.quantity
+              let chainCode
+              if (edgeTransaction.wallet && edgeTransaction.wallet.currencyInfo) {
+                chainCode = edgeTransaction.wallet.currencyInfo.currencyCode
+              }
+              dispatch(
+                recordSend({
+                  payeeFioAddress: fioAddress,
+                  payerPublicAddress,
+                  payeePublicAddress,
+                  amount: amount && bns.div(amount, exchangeDenomination.multiplier, 18),
+                  currencyCode: edgeTransaction.currencyCode,
+                  chainCode: chainCode || guiWallet.currencyCode,
+                  txid: edgeTransaction.txid
+                })
+              )
+            }
+            Actions.replace(TRANSACTION_DETAILS, { edgeTransaction })
+          }
+        }
+      }
       Actions[SEND_CONFIRMATION]({ guiMakeSpendInfo })
       // dispatch(sendConfirmationUpdateTx(parsedUri))
     },
@@ -200,12 +264,27 @@ export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: 
   )
 }
 
-export const qrCodeScanned = (data: string) => (dispatch: Dispatch, getState: GetState) => {
+export const qrCodeScanned = (data: string) => async (dispatch: Dispatch, getState: GetState) => {
   const state = getState()
   const isScanEnabled = state.ui.scenes.scan.scanEnabled
   if (!isScanEnabled) return
 
   dispatch({ type: 'DISABLE_SCAN' })
+
+  const account = CORE_SELECTORS.getAccount(state)
+  const fioPlugin = account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO]
+  const isFioAddress = await fioPlugin.otherMethods.isFioAddressValid(data)
+  try {
+    if (isFioAddress) {
+      const walletId: string = UI_SELECTORS.getSelectedWalletId(state)
+      const coreWallet: EdgeCurrencyWallet = CORE_SELECTORS.getWallet(state, walletId)
+      const currencyCode: string = UI_SELECTORS.getSelectedCurrencyCode(state)
+      const { public_address } = await fioPlugin.otherMethods.getConnectedPublicAddress(data, coreWallet.currencyInfo.currencyCode, currencyCode)
+      if (public_address && public_address.length > 1) return dispatch(parseScannedUri(public_address, data))
+    }
+  } catch (e) {
+    return showError(s.strings.err_no_address_title)
+  }
   dispatch(parseScannedUri(data))
 }
 
@@ -231,14 +310,17 @@ export const toggleAddressModal = () => async (dispatch: Dispatch, getState: Get
   const walletId: string = UI_SELECTORS.getSelectedWalletId(state)
   const coreWallet: EdgeCurrencyWallet = CORE_SELECTORS.getWallet(state, walletId)
   const currencyCode: string = UI_SELECTORS.getSelectedCurrencyCode(state)
+  const account = CORE_SELECTORS.getAccount(state)
+  const fioPlugin = account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO]
   const addressModal = createAddressModal({
     walletId,
     coreWallet,
+    fioPlugin,
     currencyCode
   })
-  const uri = await launchModal(addressModal)
+  const { uri, fioAddress } = await launchModal(addressModal)
   if (uri) {
-    dispatch(parseScannedUri(uri))
+    dispatch(parseScannedUri(uri, fioAddress))
   }
 }
 

@@ -12,6 +12,7 @@ import { UniqueIdentifierModalConnect as UniqueIdentifierModal } from '../../con
 import { FEE_ALERT_THRESHOLD, FEE_COLOR_THRESHOLD, getSpecialCurrencyInfo } from '../../constants/indexConstants.js'
 import { intl } from '../../locales/intl'
 import s from '../../locales/strings.js'
+import { SelectFioAddressConnector as SelectFioAddress } from '../../modules/FioAddress/components/SelectFioAddress'
 import ExchangeRate from '../../modules/UI/components/ExchangeRate/index.js'
 import type { ExchangedFlipInputAmounts } from '../../modules/UI/components/FlipInput/ExchangedFlipInput2.js'
 import { ExchangedFlipInput } from '../../modules/UI/components/FlipInput/ExchangedFlipInput2.js'
@@ -62,7 +63,9 @@ export type SendConfirmationStateProps = {
   sceneState: SendConfirmationState,
   toggleCryptoOnTop: number,
   guiWallet: GuiWallet,
-  isConnected: boolean
+  isConnected: boolean,
+  senderFioError?: string,
+  senderMsgRecipientError?: string
 }
 
 export type SendConfirmationDispatchProps = {
@@ -214,7 +217,10 @@ export class SendConfirmation extends Component<Props, State> {
     const feeCalculated = !!networkFee || !!parentNetworkFee
 
     const sliderDisabled =
-      this.props.sliderDisabled || !feeCalculated || (!getSpecialCurrencyInfo(this.props.currencyCode).allowZeroTx && this.props.nativeAmount === '0')
+      this.props.sliderDisabled ||
+      !feeCalculated ||
+      (!getSpecialCurrencyInfo(this.props.currencyCode).allowZeroTx && this.props.nativeAmount === '0') ||
+      !!this.props.senderMsgRecipientError
 
     const isTaggableCurrency = !!getSpecialCurrencyInfo(currencyCode).uniqueIdentifier
     const networkFeeData = this.getNetworkFeeData()
@@ -240,6 +246,11 @@ export class SendConfirmation extends Component<Props, State> {
               ) : (
                 <ExchangeRate secondaryDisplayAmount={this.props.fiatPerCrypto} primaryInfo={primaryInfo} secondaryInfo={secondaryInfo} />
               )}
+              {this.props.senderFioError ? (
+                <Text style={[styles.error, styles.errorText]} numberOfLines={2}>
+                  {this.props.senderFioError}
+                </Text>
+              ) : null}
             </View>
 
             <View style={styles.main}>
@@ -332,6 +343,8 @@ export class SendConfirmation extends Component<Props, State> {
                   )}
                 </Scene.Item>
               </Scene.Padding>
+
+              {this.props.guiMakeSpendInfo && !!this.props.guiMakeSpendInfo.isSendToFioAddress && <SelectFioAddress />}
             </View>
             <Scene.Footer style={[styles.footer, isTaggableCurrency && styles.footerWithPaymentId]}>
               <ABSlider

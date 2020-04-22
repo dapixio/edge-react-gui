@@ -56,7 +56,12 @@ test('initialState', () => {
       feeLoading: false,
       setPubAddressesLoading: false,
       connectedWalletsByFioAddress: {},
-      getPubAddressesLoading: false
+      getPubAddressesLoading: false,
+      senderFioAddress: '',
+      senderWallet: null,
+      senderMsgRecipient: '',
+      senderFioError: '',
+      senderMsgRecipientError: ''
     },
     fioRequest: {
       fioRequestsPending: [],

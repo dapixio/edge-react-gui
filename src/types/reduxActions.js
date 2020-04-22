@@ -252,3 +252,5 @@ export type Action =
   | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
   | { type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE', data: { fee: number | null, loading?: boolean } }
   | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES', data: { fioAddress: string, pubAddresses: { [currencyCode: string]: string } } }
+  | { type: 'FIO/FIO_SET_SENDER_FIO_ADDRESS', data: { fioAddress: string, fioWallet: EdgeCurrencyWallet | null, error: string } }
+  | { type: 'FIO/FIO_SET_SENDER_MSG_TO_RECIPIENT', data: { msg: string, msgError?: string } }
