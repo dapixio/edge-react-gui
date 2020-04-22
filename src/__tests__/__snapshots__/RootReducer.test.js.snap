@@ -92,6 +92,9 @@ Object {
     "location": "undetermined",
   },
   "ui": Object {
+    "fioObtData": Object {
+      "obtRecords": Array [],
+    },
     "passwordReminder": Object {
       "lastLoginDate": -Infinity,
       "lastPasswordUseDate": -Infinity,

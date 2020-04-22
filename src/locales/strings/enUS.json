@@ -89,6 +89,7 @@
   "fragment_send_send_to_fio_memo_error": "Invalid Memo",
   "fragment_send_send_to_fio_error_memo_inline": "Memo must be less than 64 characters and contain symbols from latin alphabet",
   "fragment_send_subtitle": "Send",
+  "fragment_send_from_label": "from",
   "fragment_transaction_exchange": "Exchange",
   "fragment_transaction_expense": "Expense",
   "fragment_transaction_income": "Income",

@@ -8,6 +8,9 @@ const dummyAction = { type: 'DUMMY_ACTION_PLEASE_IGNORE' }
 
 test('initialState', () => {
   const initialState = {
+    fioObtData: {
+      obtRecords: []
+    },
     passwordReminder: passwordReminder(undefined, dummyAction),
     scenes: scenes(undefined, dummyAction),
     wallets: wallets(undefined, dummyAction),
