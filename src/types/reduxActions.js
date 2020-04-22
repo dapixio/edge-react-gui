@@ -8,6 +8,7 @@ import type { AccountActivationPaymentInfo, HandleActivationInfo, HandleAvailabl
 import { type TweakSource } from '../util/ReferralHelpers.js'
 import { type DeepLink } from './DeepLink.js'
 import { type AccountReferral, type DeviceReferral, type Promotion, type ReferralCache } from './ReferralTypes.js'
+import type { FioRequest } from './types'
 import { type CustomTokenInfo, type FioAddress, type GuiContact, type GuiCurrencyInfo, type GuiSwapInfo, type GuiWallet } from './types.js'
 
 type LegacyActionName =
@@ -45,6 +46,9 @@ type LegacyActionName =
   | 'UPDATE_SHOW_PASSWORD_RECOVERY_REMINDER_MODAL'
   | 'UPDATE_WALLET_FIAT_BALANCE_VISIBILITY'
   | 'UPDATE_WALLET_LOADING_PROGRESS'
+  | 'FIO/FIO_REQUEST_LIST_PENDING'
+  | 'FIO/FIO_REQUEST_LIST_SENT'
+  | 'FIO/FIO_REQUEST_LIST_REMOVE'
 
 // Actions with no payload:
 type NoDataActionName =
@@ -238,3 +242,8 @@ export type Action =
         }
       }
     }
+  | { type: 'FIO/FIO_WALLET_BY_ADDRESS', data: { wallet: EdgeCurrencyWallet | null, loading?: boolean } }
+  | { type: 'FIO/FIO_REQUEST_LIST_PENDING', data: { fioRequestsPending: FioRequest[], isLoading: boolean, isReset: boolean } }
+  | { type: 'FIO/FIO_REQUEST_LIST_SENT', data: { fioRequestsSent: FioRequest[], isLoading: boolean, isReset: boolean } }
+  | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
+  | { type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE', data: { fee: number | null, loading?: boolean } }

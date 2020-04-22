@@ -19,12 +19,15 @@ export type StateProps = {
   expiration: Date,
   registerSuccess?: boolean
 }
+export type DispatchProps = {
+  setFioWalletByFioAddress: (fioAddress: string) => Promise<void>
+}
 
 export type SceneProps = {
   fioAddress: string
 }
 
-type Props = StateProps & SceneProps
+type Props = StateProps & SceneProps & DispatchProps
 
 export class FioAddressDetailsScene extends Component<Props, State> {
   componentDidMount () {
@@ -35,6 +38,12 @@ export class FioAddressDetailsScene extends Component<Props, State> {
         { text: s.strings.fio_address_details_screen_alert_button }
       ])
     }
+  }
+
+  _onToggleAccountSettings = () => {
+    const { fioAddressName, expiration, setFioWalletByFioAddress } = this.props
+    setFioWalletByFioAddress(fioAddressName)
+    Actions[Constants.FIO_ACCOUNT_SETTINGS]({ fioAddressName, expiration: intl.formatExpDate(expiration) })
   }
 
   renderButton () {
@@ -49,6 +58,16 @@ export class FioAddressDetailsScene extends Component<Props, State> {
         </View>
       )
     }
+
+    return (
+      <View style={styles.buttons}>
+        <TouchableHighlight style={styles.bottomButton} onPress={this._onToggleAccountSettings} underlayColor={styles.underlay.color}>
+          <View style={styles.bottomButtonTextWrap}>
+            <T style={styles.bottomButtonText}>{s.strings.fio_address_details_screen_manage_account_settings}</T>
+          </View>
+        </TouchableHighlight>
+      </View>
+    )
   }
 
   render () {

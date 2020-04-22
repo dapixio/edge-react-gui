@@ -49,7 +49,17 @@ test('initialState', () => {
         supportedCurrencies: {}
       },
       addressRegistrationPaymentInfo: {},
-      regInfoLoading: false
+      regInfoLoading: false,
+      fioWalletByAddress: null,
+      walletLoading: false,
+      renewalFee: null,
+      feeLoading: false
+    },
+    fioRequest: {
+      fioRequestsPending: [],
+      fioRequestsSent: [],
+      pendingRequestsLoading: false,
+      sentRequestsLoading: false
     },
     requestType: {
       useLegacyAddress: false,
