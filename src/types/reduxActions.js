@@ -108,6 +108,10 @@ type NoDataActionName =
   | 'USE_LEGACY_REQUEST_ADDRESS'
   | 'USE_REGULAR_REQUEST_ADDRESS'
   | 'FIO/SET_FIO_ADDRESSES_PROGRESS'
+  | 'FIO/FIO_CONNECT_WALLETS_REQUEST'
+  | 'FIO/FIO_CONNECT_WALLETS_SUCCESS'
+  | 'FIO/FIO_CONNECT_WALLETS_FAILURE'
+  | 'FIO/FIO_UPDATE_PUB_ADDRESSES_LOADING'
 
 export type Action =
   | { type: LegacyActionName, data: any }
@@ -247,3 +251,4 @@ export type Action =
   | { type: 'FIO/FIO_REQUEST_LIST_SENT', data: { fioRequestsSent: FioRequest[], isLoading: boolean, isReset: boolean } }
   | { type: 'FIO/FIO_REQUEST_LIST_REMOVE', data: { requestId: string } }
   | { type: 'FIO/SET_FIO_ADDRESS_RENEWAL_FEE', data: { fee: number | null, loading?: boolean } }
+  | { type: 'FIO/FIO_UPDATE_PUB_ADDRESSES', data: { fioAddress: string, pubAddresses: { [currencyCode: string]: string } } }

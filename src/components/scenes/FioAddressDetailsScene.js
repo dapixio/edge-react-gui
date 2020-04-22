@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react'
-import { Alert, Image, TouchableHighlight, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, TouchableHighlight, View } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 
 import fioAddressDetailsIcon from '../../assets/images/details_fioAddress.png'
@@ -17,10 +17,12 @@ export type State = {}
 export type StateProps = {
   fioAddressName: string,
   expiration: Date,
+  getPubAddressesLoading: boolean,
   registerSuccess?: boolean
 }
 export type DispatchProps = {
-  setFioWalletByFioAddress: (fioAddress: string) => Promise<void>
+  setFioWalletByFioAddress: string => void,
+  refreshPubAddresses: string => void
 }
 
 export type SceneProps = {
@@ -38,9 +40,16 @@ export class FioAddressDetailsScene extends Component<Props, State> {
         { text: s.strings.fio_address_details_screen_alert_button }
       ])
     }
+
+    if (!this.props.registerSuccess) this.props.refreshPubAddresses(fioAddress)
   }
 
-  _onToggleAccountSettings = () => {
+  _onToggleConnectWallets = (): void => {
+    const { fioAddressName } = this.props
+    Actions[Constants.FIO_CONNECT_TO_WALLETS]({ fioAddressName })
+  }
+
+  _onToggleAccountSettings = (): void => {
     const { fioAddressName, expiration, setFioWalletByFioAddress } = this.props
     setFioWalletByFioAddress(fioAddressName)
     Actions[Constants.FIO_ACCOUNT_SETTINGS]({ fioAddressName, expiration: intl.formatExpDate(expiration) })
@@ -59,8 +68,21 @@ export class FioAddressDetailsScene extends Component<Props, State> {
       )
     }
 
+    const { getPubAddressesLoading } = this.props
+
     return (
       <View style={styles.buttons}>
+        <TouchableHighlight
+          style={styles.bottomButton}
+          disabled={getPubAddressesLoading}
+          onPress={this._onToggleConnectWallets}
+          underlayColor={styles.underlay.color}
+        >
+          <View style={[styles.bottomButtonTextWrap, styles.buttonWithLoader]}>
+            <T style={styles.bottomButtonText}>{s.strings.fio_address_details_screen_connect_to_wallets}</T>
+            {getPubAddressesLoading && <ActivityIndicator style={styles.loading} size="small" />}
+          </View>
+        </TouchableHighlight>
         <TouchableHighlight style={styles.bottomButton} onPress={this._onToggleAccountSettings} underlayColor={styles.underlay.color}>
           <View style={styles.bottomButtonTextWrap}>
             <T style={styles.bottomButtonText}>{s.strings.fio_address_details_screen_manage_account_settings}</T>

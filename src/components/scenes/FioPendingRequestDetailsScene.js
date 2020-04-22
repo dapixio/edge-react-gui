@@ -31,7 +31,7 @@ export type FioPendingRequestDetailsStateProps = {
   fromCurrencyCode: string,
   toCurrencyCode: string,
   wallets: { [string]: GuiWallet },
-  supportedWalletTypes: GuiWalletType[],
+  guiWalletTypes: GuiWalletType[],
   exchangeRates: ExchangeRatesState,
   selectedWallet: GuiWallet | null,
   fioWalletByAddress: EdgeCurrencyWallet | null,
@@ -85,7 +85,7 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
   }
 
   getWalletsListData (): { allowedWallets: GuiWallet[], supportedWalletTypes: GuiWalletType[] } {
-    const { toCurrencyCode, wallets } = this.props
+    const { toCurrencyCode, guiWalletTypes, wallets } = this.props
     const walletCurrencyCodes = []
     const allowedWallets = []
     for (const id in wallets) {
@@ -108,7 +108,8 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
       }
     }
     const supportedWalletTypes = []
-    for (const swt of this.props.supportedWalletTypes) {
+    for (let i = 0; i < guiWalletTypes.length; i++) {
+      const swt = guiWalletTypes[i]
       if (!walletCurrencyCodes.includes(swt.currencyCode) && swt.currencyCode !== 'EOS' && toCurrencyCode !== swt.currencyCode) {
         supportedWalletTypes.push(swt)
       }
@@ -247,7 +248,7 @@ export class FioPendingRequestDetailsComponent extends Component<Props, LocalSta
       <WalletListModal
         bridge={bridge}
         wallets={allowedWallets}
-        type={Constants.FROM}
+        type="from"
         supportedWalletTypes={supportedWalletTypes}
         excludedCurrencyCode={[]}
         showWalletCreators={false}
