@@ -241,3 +241,13 @@ export type FioRequest = {
   time_stamp: string,
   fioWalletId?: string
 }
+
+export type FioConnectionWalletItem = {
+  key: string,
+  id: string,
+  publicAddress: string,
+  symbolImage: string,
+  name: string,
+  currencyCode: string,
+  chainCode: string
+}
