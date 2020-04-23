@@ -89,6 +89,7 @@ const strings = {
   request_xlm_minimum_notification_body:
     'Stellar (XLM) wallets require a 1 XLM minimum balance. You must deposit at least 1 XLM to this address before this wallet will show a balance or transactions. 1 XLM will be unspendable for the lifetime of this wallet address.',
   fragment_send_address_dialog_title: 'Send to Public Address',
+  fragment_send_address_dialog_title_short: 'Send to Address',
   fragment_send_address: 'Address',
   fragment_send_flash: 'Flash',
   fragment_send_other_wallet_header_title: 'Choose a wallet to transfer funds to:',
@@ -725,6 +726,7 @@ const strings = {
   fio_connect_wallets_err: 'There was an issue during operation execution. Please try later.',
   fio_connect_wallets_success: 'Wallets connected. Your FIO Address is now connected to your wallets and ready to use.',
   fio_disconnect_wallets_success: 'Wallets disconnected.',
+  send_to_hint_fio: 'Public Address, Private Key or FIO Address',
   // Unstoppable resolution error codes
   resolving: 'Resolving...',
   UnregisteredDomain: 'Domain %1$s is not registered',

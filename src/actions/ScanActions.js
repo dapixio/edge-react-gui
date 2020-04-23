@@ -11,8 +11,10 @@ import URL from 'url-parse'
 import { selectWalletForExchange } from '../actions/CryptoExchangeActions.js'
 import { launchModal } from '../components/common/ModalProvider.js'
 import { createAddressModal } from '../components/modals/AddressModal.js'
+import { showError } from '../components/services/AirshipInstance'
 import {
   ADD_TOKEN,
+  CURRENCY_PLUGIN_NAMES,
   EXCHANGE_SCENE,
   FA_MONEY_ICON,
   getSpecialCurrencyInfo,
@@ -22,6 +24,7 @@ import {
   PLUGIN_BUY,
   SEND_CONFIRMATION,
   SHOPPING_CART,
+  TRANSACTION_DETAILS,
   WARNING
 } from '../constants/indexConstants.js'
 import s from '../locales/strings.js'
@@ -96,7 +99,7 @@ export const doRequestAddress = (dispatch: Dispatch, edgeWallet: EdgeCurrencyWal
   }
 }
 
-export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: GetState) => {
+export const parseScannedUri = (data: string, fioAddress: string = '') => (dispatch: Dispatch, getState: GetState) => {
   if (!data) return
   const state = getState()
   const selectedWalletId = state.ui.wallets.selectedWalletId
@@ -180,6 +183,19 @@ export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: 
         uniqueIdentifier: parsedUri.uniqueIdentifier,
         nativeAmount
       }
+
+      if (fioAddress) {
+        guiMakeSpendInfo.fioAddress = fioAddress
+        guiMakeSpendInfo.onDone = (error: Error | null, edgeTransaction?: EdgeTransaction) => {
+          if (error) {
+            setTimeout(() => {
+              showError(s.strings.create_wallet_account_error_sending_transaction)
+            }, 750)
+          } else if (edgeTransaction) {
+            Actions.replace(TRANSACTION_DETAILS, { edgeTransaction })
+          }
+        }
+      }
       Actions[SEND_CONFIRMATION]({ guiMakeSpendInfo })
       // dispatch(sendConfirmationUpdateTx(parsedUri))
     },
@@ -200,12 +216,29 @@ export const parseScannedUri = (data: string) => (dispatch: Dispatch, getState: 
   )
 }
 
-export const qrCodeScanned = (data: string) => (dispatch: Dispatch, getState: GetState) => {
+export const qrCodeScanned = (data: string) => async (dispatch: Dispatch, getState: GetState) => {
   const state = getState()
   const isScanEnabled = state.ui.scenes.scan.scanEnabled
   if (!isScanEnabled) return
 
   dispatch({ type: 'DISABLE_SCAN' })
+
+  const account = CORE_SELECTORS.getAccount(state)
+  if (account && account.currencyConfig) {
+    const fioPlugin = account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO]
+    const isFioAddress = await fioPlugin.otherMethods.isFioAddressValid(data)
+    try {
+      if (isFioAddress) {
+        const walletId: string = UI_SELECTORS.getSelectedWalletId(state)
+        const coreWallet: EdgeCurrencyWallet = CORE_SELECTORS.getWallet(state, walletId)
+        const currencyCode: string = UI_SELECTORS.getSelectedCurrencyCode(state)
+        const { public_address } = await fioPlugin.otherMethods.getConnectedPublicAddress(data, coreWallet.currencyInfo.currencyCode, currencyCode)
+        if (public_address && public_address.length > 1) return dispatch(parseScannedUri(public_address, data))
+      }
+    } catch (e) {
+      return showError(s.strings.err_no_address_title)
+    }
+  }
   dispatch(parseScannedUri(data))
 }
 
@@ -231,14 +264,17 @@ export const toggleAddressModal = () => async (dispatch: Dispatch, getState: Get
   const walletId: string = UI_SELECTORS.getSelectedWalletId(state)
   const coreWallet: EdgeCurrencyWallet = CORE_SELECTORS.getWallet(state, walletId)
   const currencyCode: string = UI_SELECTORS.getSelectedCurrencyCode(state)
+  const account = CORE_SELECTORS.getAccount(state)
+  const fioPlugin = account.currencyConfig[CURRENCY_PLUGIN_NAMES.FIO]
   const addressModal = createAddressModal({
     walletId,
     coreWallet,
+    fioPlugin,
     currencyCode
   })
-  const uri = await launchModal(addressModal)
+  const { uri, fioAddress } = await launchModal(addressModal)
   if (uri) {
-    dispatch(parseScannedUri(uri))
+    dispatch(parseScannedUri(uri, fioAddress))
   }
 }
 
