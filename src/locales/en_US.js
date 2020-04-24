@@ -726,7 +726,7 @@ const strings = {
   fio_connect_wallets_err: 'There was an issue during operation execution. Please try later.',
   fio_connect_wallets_success: 'Wallets connected. Your FIO Address is now connected to your wallets and ready to use.',
   fio_disconnect_wallets_success: 'Wallets disconnected.',
-  send_to_hint_fio: 'Public Address, Private Key or FIO Address',
+  send_to_hint_fio: 'Public Address / Private Key / FIO Address',
   // Unstoppable resolution error codes
   resolving: 'Resolving...',
   UnregisteredDomain: 'Domain %1$s is not registered',
