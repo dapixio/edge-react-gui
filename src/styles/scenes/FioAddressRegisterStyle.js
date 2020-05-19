@@ -22,9 +22,9 @@ export const styles = StyleSheet.create({
     paddingVertical: scale(8)
   },
   inputContainer: {
-    width: deviceWidth - scale(30) - scale(40),
-    marginTop: scale(14),
-    marginBottom: scale(8)
+    width: 'auto',
+    marginTop: 0,
+    marginBottom: 0
   },
   statusIconError: {
     color: THEME.COLORS.ACCENT_RED
@@ -35,9 +35,21 @@ export const styles = StyleSheet.create({
   formFieldView: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: scale(4)
+    marginTop: scale(14),
+    marginBottom: scale(12)
+  },
+  formFieldViewContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: deviceWidth - scale(30) - scale(40)
+  },
+  statusIconContainer: {
+    width: scale(25),
+    height: scale(25)
   },
   statusIcon: {
+    alignSelf: 'flex-end',
+    marginTop: scale(29),
     width: scale(25),
     height: scale(25)
   },
@@ -49,5 +61,24 @@ export const styles = StyleSheet.create({
     paddingHorizontal: scale(18),
     paddingBottom: scale(10),
     backgroundColor: THEME.COLORS.GRAY_3
+  },
+  selectWalletBtn: {
+    marginTop: scale(15),
+    paddingVertical: scale(10),
+    paddingHorizontal: scale(5),
+    backgroundColor: THEME.COLORS.BLUE_3
+  },
+  domain: {
+    marginTop: scale(24),
+    marginLeft: scale(5),
+    paddingHorizontal: scale(10),
+    paddingVertical: scale(4),
+    borderRadius: scale(5),
+    borderColor: THEME.COLORS.BLUE_3,
+    borderWidth: scale(2)
+  },
+  domainText: {
+    color: THEME.COLORS.BLUE_3,
+    fontSize: scale(16)
   }
 })
