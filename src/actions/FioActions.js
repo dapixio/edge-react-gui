@@ -46,11 +46,10 @@ export const checkFioObtData = (walletId: string, transactions: EdgeTransaction[
   const fioWallets = getFioWallets(state)
 
   const wallet = currencyWallets[walletId]
-  const obtDataRecords = await getFioObtData(fioWallets)
 
   for (const transaction: EdgeTransaction of transactions) {
     const edgeMetadata: EdgeMetadata = transaction.metadata || { notes: '' }
-    const obtForTx: FioObtRecord | void = obtDataRecords.find(obtRecord => obtRecord.content.obt_id === transaction.txid)
+    const obtForTx: FioObtRecord | null = await getFioObtData(fioWallets, transaction.txid)
     if (!obtForTx) return
     if (!edgeMetadata.notes) edgeMetadata.notes = ''
     let fioNotes = `${s.strings.fragment_transaction_list_sent_prefix}${s.strings.word_to_in_convert_from_to_string} ${obtForTx.payee_fio_address}`
