@@ -424,16 +424,16 @@ export const recordSend = async (
   }
 }
 
-export const getFioObtData = async (fioWallets: EdgeCurrencyWallet[]): Promise<FioObtRecord[]> => {
-  let obtDataRecords = []
+export const getFioObtData = async (fioWallets: EdgeCurrencyWallet[], txId: string): Promise<FioObtRecord | null> => {
+  let obtRecord = null
   for (const fioWallet: EdgeCurrencyWallet of fioWallets) {
     try {
-      const { obt_data_records } = await fioWallet.otherMethods.fioAction('getObtData', {})
-      obtDataRecords = [...obtDataRecords, ...obt_data_records]
+      obtRecord = await fioWallet.otherMethods.getObtDataById(txId)
+      if (obtRecord) return obtRecord
     } catch (e) {
       //
     }
   }
 
-  return obtDataRecords
+  return obtRecord
 }
