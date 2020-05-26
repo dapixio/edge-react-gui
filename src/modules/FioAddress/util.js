@@ -2,6 +2,7 @@
 
 import { bns } from 'biggystring'
 import type { EdgeAccount, EdgeCurrencyConfig, EdgeCurrencyWallet, EdgeDenomination } from 'edge-core-js'
+import { sprintf } from 'sprintf-js'
 
 import { FIO_DOMAIN_DEFAULT, FIO_STR, FIO_WALLET_TYPE } from '../../constants/WalletAndCurrencyConstants'
 import s from '../../locales/strings'
@@ -510,4 +511,44 @@ export const getRegInfo = async (
   }
 
   throw new Error(s.strings.fio_get_reg_info_err_msg)
+}
+
+export const getRenewalFee = async (fioWallet: EdgeCurrencyWallet | null, forDomain?: boolean = false): Promise<number> => {
+  if (fioWallet) {
+    try {
+      const { fee } = await fioWallet.otherMethods.fioAction('getFee', {
+        endPoint: forDomain ? 'renew_fio_domain' : 'renew_fio_address',
+        fioAddress: ''
+      })
+
+      return fee
+    } catch (e) {
+      throw new Error(s.strings.fio_get_fee_err_msg)
+    }
+  }
+  throw new Error(s.strings.fio_get_fee_err_msg)
+}
+
+export const renewFioAddress = async (fioWallet: EdgeCurrencyWallet | null, fioAddress: string, fee: number): Promise<{ expiration: string }> => {
+  if (fioWallet) {
+    try {
+      const { expiration } = await fioWallet.otherMethods.fioAction('renewFioAddress', { fioAddress, maxFee: fee })
+      return { expiration }
+    } catch (e) {
+      throw new Error(sprintf(s.strings.fio_renew_err_msg, s.strings.fio_address_register_form_field_label))
+    }
+  }
+  throw new Error(sprintf(s.strings.fio_renew_err_msg, s.strings.fio_address_register_form_field_label))
+}
+
+export const renewFioDomain = async (fioWallet: EdgeCurrencyWallet | null, fioDomain: string, fee: number): Promise<{ expiration: string }> => {
+  if (fioWallet) {
+    try {
+      const { expiration } = await fioWallet.otherMethods.fioAction('renewFioDomain', { fioDomain, maxFee: fee })
+      return { expiration }
+    } catch (e) {
+      throw new Error(sprintf(s.strings.fio_renew_err_msg, s.strings.fio_domain_label))
+    }
+  }
+  throw new Error(sprintf(s.strings.fio_renew_err_msg, s.strings.fio_domain_label))
 }

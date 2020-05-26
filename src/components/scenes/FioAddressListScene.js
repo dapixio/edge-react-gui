@@ -9,7 +9,7 @@ import IonIcon from 'react-native-vector-icons/Ionicons'
 import fioAddressDetailsIcon from '../../assets/images/details_fioAddress.png'
 import * as Constants from '../../constants/indexConstants'
 import s from '../../locales/strings.js'
-import { FioName } from '../../modules/FioAddress/components/FioName'
+import { FioAddressItem, FioDomainItem } from '../../modules/FioAddress/components/FioName'
 import { Button } from '../../modules/UI/components/ControlPanel/Component/Button/Button.ui'
 import T from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
 import Gradient from '../../modules/UI/components/Gradient/Gradient.ui'
@@ -87,12 +87,16 @@ export class FioAddressListScene extends Component<Props> {
     })
   }
 
-  onAddressPress = (fioAddressName: string, expiration: string) => {
-    Actions[Constants.FIO_ADDRESS_DETAILS]({ fioAddressName, expiration })
+  onAddressPress = (fioAddress: FioAddress) => {
+    const { name, expiration } = fioAddress
+    Actions[Constants.FIO_ADDRESS_DETAILS]({ fioAddressName: name, expiration })
   }
 
-  onDomainPress = (domain: string, expirationValue: string) => {
-    //
+  onDomainPress = (fioDomain: FioDomain) => {
+    const { fioWallets } = this.props
+    const { name, expiration, walletId } = fioDomain
+    const fioWallet = fioWallets.find((fioWallet: EdgeCurrencyWallet) => fioWallet.id === walletId)
+    Actions[Constants.FIO_DOMAIN_SETTINGS]({ fioWallet, fioDomainName: name, expiration })
   }
 
   render() {
@@ -114,8 +118,8 @@ export class FioAddressListScene extends Component<Props> {
           <View style={styles.addressListRow}>
             <SettingsHeaderRow icon={<Image source={fioAddressDetailsIcon} style={styles.headerIcon} />} text={s.strings.title_fio_address} />
             <ScrollView style={styles.list}>
-              {fioAddresses.map(address => (
-                <FioName key={`${address.name}`} item={address} onPress={this.onAddressPress} />
+              {fioAddresses.map((address: FioAddress) => (
+                <FioAddressItem key={`${address.name}`} item={address} onPress={this.onAddressPress} />
               ))}
               {loading && <ActivityIndicator style={styles.loading} size="large" />}
             </ScrollView>
@@ -128,8 +132,8 @@ export class FioAddressListScene extends Component<Props> {
                   {s.strings.no} {s.strings.title_fio_domains}
                 </T>
               )}
-              {fioDomains.map(domain => (
-                <FioName key={`${domain.name}`} item={domain} onPress={this.onDomainPress} isDomain />
+              {fioDomains.map((domain: FioDomain) => (
+                <FioDomainItem key={`${domain.name}`} item={domain} onPress={this.onDomainPress} />
               ))}
               {loading && <ActivityIndicator style={styles.loading} size="large" />}
             </ScrollView>
