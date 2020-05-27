@@ -107,8 +107,8 @@ android {
         applicationId "co.edgesecure.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 21000000
-        versionName "99.99.99"
+        versionCode 3
+        versionName "1.0.1"
         renderscriptTargetApi 23
         renderscriptSupportModeEnabled true
     }
