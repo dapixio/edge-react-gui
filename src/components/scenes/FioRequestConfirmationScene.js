@@ -89,9 +89,10 @@ export class FioRequestConfirmationComponent extends Component<Props, LocalState
   }
 
   onNextPress = async () => {
-    const { walletAddresses, selectedFioAddress } = this.state
+    const { walletAddresses, selectedFioAddress, loading } = this.state
     const walletAddress = walletAddresses.find(({ fioAddress }) => fioAddress === selectedFioAddress)
 
+    if (loading) return
     if (walletAddress) {
       const { fioWallet } = walletAddress
       const val = bns.div(this.props.amounts.nativeAmount, this.props.primaryCurrencyInfo.exchangeDenomination.multiplier, 18)
@@ -197,7 +198,7 @@ export class FioRequestConfirmationComponent extends Component<Props, LocalState
           <T style={styles.text}>{this.props.fioModalData.memo}</T>
         </View>
         <View style={styles.button}>
-          <PrimaryButton onPress={this.onNextPress}>
+          <PrimaryButton onPress={this.onNextPress} disabled={loading}>
             {loading ? <ActivityIndicator size="small" /> : <PrimaryButton.Text>{s.strings.string_next_capitalized}</PrimaryButton.Text>}
           </PrimaryButton>
         </View>
