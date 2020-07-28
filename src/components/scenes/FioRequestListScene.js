@@ -58,6 +58,7 @@ export type OwnProps = {
 
 type Props = OwnProps & StateProps & DispatchProps
 
+const ITEMS_PER_PAGE = 5
 export class FioRequestList extends React.Component<Props, LocalState> {
   headerIconSize = THEME.rem(1.375)
   willFocusSubscription: { remove: () => void } | null = null
@@ -65,19 +66,20 @@ export class FioRequestList extends React.Component<Props, LocalState> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      loadingPending: true,
+      loadingPending: false,
       loadingSent: true,
       addressCachedUpdated: false,
       rejectLoading: false,
       fioRequestsPending: [],
-      fioRequestsSent: []
+      fioRequestsSent: [],
+      page: 1
     }
     slowlog(this, /.*/, global.slowlogOptions)
   }
 
   componentDidMount = () => {
     this.willFocusSubscription = this.props.navigation.addListener('didFocus', () => {
-      this.getFioRequestsPending()
+      // this.getFioRequestsPending()
       this.getFioRequestsSent()
     })
   }
@@ -106,7 +108,9 @@ export class FioRequestList extends React.Component<Props, LocalState> {
 
   getFioRequestsPending = async () => {
     const { fioWallets } = this.props
-    let fioRequestsPending = []
+    const { page, fioRequestsPending } = this.state
+    let nextFioRequestsPending = []
+    this.setState({ loadingPending: true })
     if (fioWallets.length) {
       try {
         for (const wallet of fioWallets) {
@@ -114,10 +118,22 @@ export class FioRequestList extends React.Component<Props, LocalState> {
           const fioAddresses = await wallet.otherMethods.getFioAddresses()
           if (fioAddresses.length > 0) {
             try {
-              const { requests } = await wallet.otherMethods.fioAction('getPendingFioRequests', { fioPublicKey })
+              console.log('query========')
+              console.log({
+                fioPublicKey,
+                limit: ITEMS_PER_PAGE,
+                offset: (page - 1) * ITEMS_PER_PAGE
+              })
+              const { requests } = await wallet.otherMethods.fioAction('getPendingFioRequests', {
+                fioPublicKey,
+                limit: ITEMS_PER_PAGE,
+                offset: (page - 1) * ITEMS_PER_PAGE
+              })
+              console.log('requests========')
+              console.log(requests)
               if (requests) {
-                fioRequestsPending = [
-                  ...fioRequestsPending,
+                nextFioRequestsPending = [
+                  ...nextFioRequestsPending,
                   ...requests.map(request => {
                     request.fioWalletId = wallet.id
                     return request
@@ -135,6 +151,7 @@ export class FioRequestList extends React.Component<Props, LocalState> {
         showError(s.strings.fio_get_requests_error)
       }
     }
+    fioRequestsPending.push(...nextFioRequestsPending)
 
     this.setState({ fioRequestsPending: fioRequestsPending.sort((a, b) => (a.time_stamp < b.time_stamp ? -1 : 1)), loadingPending: false })
   }
@@ -363,6 +380,16 @@ export class FioRequestList extends React.Component<Props, LocalState> {
     return item.fio_request_id.toString()
   }
 
+  lazyLoad = () => {
+    const { page, loadingPending, fioRequestsPending } = this.state
+    console.log('lazyLoad =============')
+    console.log(loadingPending, page)
+    if (!loadingPending && page < 3) {
+      this.setState({ page: page + 1 })
+      this.getFioRequestsPending()
+    }
+  }
+
   renderPending = (itemObj: { item: FioRequest, index: number }) => {
     const { item: fioRequest, index } = itemObj
     const isLastOfDate =
@@ -422,6 +449,7 @@ export class FioRequestList extends React.Component<Props, LocalState> {
                 renderHiddenItem={this.renderHiddenItem}
                 renderSectionHeader={this.headerRowUsingTitle}
                 rightOpenValue={scale(-75)}
+                onEndReached={this.lazyLoad}
                 disableRightSwipe
               />
             </View>
