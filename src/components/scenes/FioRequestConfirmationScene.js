@@ -133,7 +133,9 @@ export class FioRequestConfirmationConnected extends React.Component<Props, Stat
         Actions.popTo(Constants.REQUEST)
       } catch (error) {
         this.setState({ loading: false })
-        showError(`${s.strings.fio_request_error_header}. ${error.json ? JSON.stringify(error.json.fields[0].error) : ''}`)
+        showError(
+          `${s.strings.fio_request_error_header}. ${error.json && error.json.fields && error.json.fields[0] ? JSON.stringify(error.json.fields[0].error) : ''}`
+        )
       }
     } else {
       showError(s.strings.fio_wallet_missing_for_fio_address)
