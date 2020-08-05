@@ -29,7 +29,7 @@ import type { WalletListResult } from '../modals/WalletListModal'
 import { WalletListModal } from '../modals/WalletListModal'
 import { Airship, showError } from '../services/AirshipInstance'
 
-const SCROLL_THRESHOLD = 0.5
+const SCROLL_THRESHOLD = 0.1
 
 export type LocalState = {
   loadingPending: boolean,
@@ -71,17 +71,23 @@ export class FioRequestList extends React.Component<Props, LocalState> {
     super(props)
     this.state = {
       loadingPending: false,
-      loadingSent: true,
+      loadingSent: false,
       addressCachedUpdated: false,
       rejectLoading: false,
       fioRequestsPending: [],
       fioRequestsSent: [],
-      prevPendingAmount: 0,
-      prevSentAmount: 0,
+      prevPendingAmount: -1,
+      prevSentAmount: -1,
       pendingRequestPaging: {},
       sentRequestPaging: {}
     }
     slowlog(this, /.*/, global.slowlogOptions)
+  }
+
+  componentDidMount = () => {
+    this.willFocusSubscription = this.props.navigation.addListener('didFocus', () => {
+      this.getFioRequestsSent()
+    })
   }
 
   componentWillUnmount(): void {
@@ -420,14 +426,15 @@ export class FioRequestList extends React.Component<Props, LocalState> {
 
   pendingLazyLoad = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
     const { loadingPending, fioRequestsPending, prevPendingAmount } = this.state
-    if (!loadingPending && (prevPendingAmount < fioRequestsPending.length || fioRequestsPending.length === 0 || distanceFromEnd < 0)) {
+    if (!loadingPending && (prevPendingAmount < fioRequestsPending.length || (distanceFromEnd < 0 && fioRequestsPending.length > 0))) {
       this.getFioRequestsPending()
     }
   }
 
   sentLazyLoad = ({ distanceFromEnd }: { distanceFromEnd: number }) => {
     const { loadingSent, fioRequestsSent, prevSentAmount } = this.state
-    if (!loadingSent && (prevSentAmount < fioRequestsSent.length || fioRequestsSent.length === 0 || distanceFromEnd < 0)) {
+    console.log('sentLazyLoad=========')
+    if (!loadingSent && (prevSentAmount < fioRequestsSent.length || (distanceFromEnd < 0 && fioRequestsSent.length > 0))) {
       this.getFioRequestsSent()
     }
   }
@@ -495,7 +502,7 @@ export class FioRequestList extends React.Component<Props, LocalState> {
                 renderSectionHeader={this.headerRowUsingTitle}
                 rightOpenValue={scale(-75)}
                 onEndReached={this.pendingLazyLoad}
-                onEndReachedThreshold={0.1}
+                onEndReachedThreshold={SCROLL_THRESHOLD}
                 disableRightSwipe
               />
             </View>
@@ -518,7 +525,7 @@ export class FioRequestList extends React.Component<Props, LocalState> {
                     style={styles.transactionsScrollWrap}
                     data={fioRequestsSent}
                     renderItem={this.renderSent}
-                    initialNumToRender={fioRequestsSent ? fioRequestsSent.length : 0}
+                    initialNumToRender={5}
                     onEndReached={this.sentLazyLoad}
                     onEndReachedThreshold={SCROLL_THRESHOLD}
                     keyExtractor={item => item.fio_request_id.toString()}
