@@ -2,41 +2,38 @@
 
 import { type EdgeCurrencyConfig, type EdgeCurrencyWallet } from 'edge-core-js'
 import * as React from 'react'
-import { ActivityIndicator, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { Actions } from 'react-native-router-flux'
+import IonIcon from 'react-native-vector-icons/Ionicons'
+import { connect } from 'react-redux'
 
-import fioAddressIcon from '../../assets/images/list_fioAddress.png'
 import * as Constants from '../../constants/indexConstants'
 import s from '../../locales/strings.js'
-import { DomainListModal } from '../../modules/FioAddress/components/DomainListModal'
 import { PrimaryButton } from '../../modules/UI/components/Buttons/PrimaryButton.ui.js'
 import { TextAndIconButton, TextAndIconButtonStyle } from '../../modules/UI/components/Buttons/TextAndIconButton.ui.js'
 import T from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
 import Gradient from '../../modules/UI/components/Gradient/Gradient.ui'
 import { Icon } from '../../modules/UI/components/Icon/Icon.ui'
 import SafeAreaView from '../../modules/UI/components/SafeAreaView/SafeAreaView.ui.js'
+import { getFioWallets } from '../../modules/UI/selectors'
 import { THEME } from '../../theme/variables/airbitz.js'
-import { PLATFORM } from '../../theme/variables/platform.js'
-import type { FioDomain, FioPublicDomain } from '../../types/types'
-import { scale } from '../../util/scaling.js'
+import type { State } from '../../types/reduxTypes'
 import { FormField, MaterialInputOnWhite } from '../common/FormField.js'
 import type { WalletListResult } from '../modals/WalletListModal'
 import { WalletListModal } from '../modals/WalletListModal'
 import { Airship, showError, showToast } from '../services/AirshipInstance'
+import { styles } from './FioAddressRegisterScene'
 
-export type State = {
+export type LocalState = {
   selectedWallet: EdgeCurrencyWallet | null,
-  selectedDomain: FioDomain,
-  publicDomains: FioDomain[],
-  fioAddress: string,
+  fioDomain: string,
   isValid: boolean,
   touched: boolean,
   loading: boolean,
   walletLoading: boolean,
   domainsLoading: boolean,
   isAvailable: boolean | null,
-  fieldPos: number,
-  inputWidth: number
+  fieldPos: number
 }
 
 export type StateProps = {
@@ -51,29 +48,26 @@ export type DispatchProps = {
 
 type Props = StateProps & DispatchProps
 
-export class FioAddressRegisterScene extends React.Component<Props, State> {
+const ionIconSize = THEME.rem(4)
+class FioDomainRegister extends React.Component<Props, LocalState> {
   fioCheckQueue: number = 0
   clearButtonMode = 'while-editing'
   returnKeyType = 'next'
 
   state = {
     selectedWallet: null,
-    selectedDomain: Constants.FIO_DOMAIN_DEFAULT,
-    publicDomains: [],
-    fioAddress: '',
+    fioDomain: '',
     isValid: true,
     touched: false,
     isAvailable: false,
     loading: false,
     walletLoading: false,
     domainsLoading: true,
-    fieldPos: 200,
-    inputWidth: scale(200)
+    fieldPos: 200
   }
 
   componentDidMount() {
     const { fioWallets } = this.props
-    this.getPublicDomains()
     if (fioWallets.length > 0) {
       this.setState({
         selectedWallet: fioWallets[0]
@@ -81,29 +75,6 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
     } else {
       this.createFioWallet()
     }
-  }
-
-  getPublicDomains = async () => {
-    const { fioPlugin } = this.props
-    try {
-      const publicDomains = await fioPlugin.otherMethods.getDomains()
-      const publicDomainsConverted = publicDomains
-        .sort(publicDomain => (publicDomain.domain === Constants.FIO_DOMAIN_DEFAULT.name ? -1 : 1))
-        .map((publicDomain: FioPublicDomain) => ({
-          name: publicDomain.domain,
-          expiration: new Date().toDateString(),
-          isPublic: true,
-          walletId: '',
-          isFree: publicDomain.free
-        }))
-      this.setState({
-        publicDomains: publicDomainsConverted,
-        selectedDomain: publicDomainsConverted[0]
-      })
-    } catch (e) {
-      //
-    }
-    this.setState({ domainsLoading: false })
   }
 
   createFioWallet = async (): Promise<void> => {
@@ -124,32 +95,21 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
 
   handleNextButton = () => {
     const { isConnected } = this.props
-    const { fioAddress, selectedWallet, selectedDomain, isValid, isAvailable, loading, walletLoading } = this.state
+    const { fioDomain, selectedWallet, isValid, isAvailable, loading, walletLoading } = this.state
     if (isValid && isAvailable && !loading && !walletLoading) {
       if (isConnected) {
         if (!selectedWallet) return showError(s.strings.create_wallet_failed_message)
-        const fullAddress = `${fioAddress}${Constants.FIO_ADDRESS_DELIMITER}${selectedDomain.name}`
-        if (selectedDomain.isFree) {
-          Actions[Constants.FIO_NAME_CONFIRM]({
-            fioName: fullAddress,
-            paymentWallet: selectedWallet,
-            fee: 0,
-            ownerPublicKey: selectedWallet.publicWalletInfo.keys.publicKey
-          })
-        } else {
-          Actions[Constants.FIO_ADDRESS_REGISTER_SELECT_WALLET]({
-            fioAddress: fullAddress,
-            selectedWallet,
-            selectedDomain
-          })
-        }
-      } else {
-        showError(s.strings.fio_network_alert_text)
+        Actions[Constants.FIO_DOMAIN_REGISTER_SELECT_WALLET]({
+          fioDomain,
+          selectedWallet
+        })
       }
+    } else {
+      showError(s.strings.fio_network_alert_text)
     }
   }
 
-  checkFioAddress(fioAddress: string, domain: string) {
+  checkFioDomain(fioDomain: string) {
     this.setState({
       loading: true
     })
@@ -162,8 +122,7 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
       this.fioCheckQueue = 0
       try {
         const { fioPlugin } = this.props
-        const fullAddress = `${fioAddress}${Constants.FIO_ADDRESS_DELIMITER}${domain}`
-        const isAvailable = fioPlugin.otherMethods ? await fioPlugin.otherMethods.validateAccount(fullAddress) : false
+        const isAvailable = fioPlugin.otherMethods ? await fioPlugin.otherMethods.validateAccount(fioDomain, true) : false
         this.setState({
           isAvailable,
           loading: false
@@ -176,25 +135,25 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
     }, 1000)
   }
 
-  handleFioAddressChange = (fioAddressChanged: string) => {
+  handleFioDomainChange = (fioDomainChanged: string) => {
     if (!this.props.isConnected) {
       return this.setState({
-        fioAddress: fioAddressChanged,
+        fioDomain: fioDomainChanged,
         touched: true,
         isAvailable: null,
         loading: false
       })
     }
-    this.checkFioAddress(fioAddressChanged, this.state.selectedDomain.name)
+    this.checkFioDomain(fioDomainChanged)
 
     this.setState({
-      fioAddress: fioAddressChanged.toLowerCase(),
+      fioDomain: fioDomainChanged.toLowerCase(),
       touched: true,
       isAvailable: null
     })
   }
 
-  handleFioAddressFocus = () => {
+  handleFioDomainFocus = () => {
     this.refs._scrollView.scrollTo({ x: 0, y: this.state.fieldPos, animated: true })
   }
 
@@ -222,19 +181,6 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
         }
       }
     )
-  }
-
-  selectFioDomain = () => {
-    Airship.show(bridge => <DomainListModal bridge={bridge} publicDomains={this.state.publicDomains} />).then((response: FioDomain | null) => {
-      if (response) {
-        this.setState({ selectedDomain: response })
-        this.checkFioAddress(this.state.fioAddress, response.name)
-      }
-    })
-  }
-
-  domainOnLayout = (event: { nativeEvent: { layout: { x: number, y: number, width: number, height: number } } }) => {
-    this.setState({ inputWidth: calcInputWidth(event.nativeEvent.layout.width) })
   }
 
   renderButton() {
@@ -286,7 +232,7 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
   }
 
   render() {
-    const { fioAddress, selectedDomain, touched, isAvailable, domainsLoading, walletLoading } = this.state
+    const { fioDomain, touched, isAvailable, domainsLoading, walletLoading } = this.state
     let chooseHandleErrorMessage = ''
     if (touched && !this.props.isConnected) {
       chooseHandleErrorMessage = s.strings.fio_address_register_screen_cant_check
@@ -300,7 +246,7 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
       container: {
         ...MaterialInputOnWhite.container,
         ...styles.inputContainer,
-        width: this.state.inputWidth
+        width: '100%'
       }
     }
 
@@ -309,15 +255,12 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
         <Gradient style={styles.scrollableGradient} />
         <ScrollView ref="_scrollView">
           <View style={styles.scrollableView}>
-            <Image source={fioAddressIcon} style={styles.image} resizeMode="cover" />
+            <IonIcon name="ios-at" style={styles.iconIon} color={THEME.COLORS.BLUE_3} size={ionIconSize} />
             <View style={[styles.createWalletPromptArea, styles.paddings, styles.title]}>
-              <T style={styles.instructionalText}>{s.strings.fio_address_first_screen_title}</T>
+              <T style={styles.instructionalText}>{s.strings.fio_domain_reg_text}</T>
             </View>
-            <View style={[styles.createWalletPromptArea, styles.paddings]}>
-              <T style={styles.handleRequirementsText}>{s.strings.fio_address_features}</T>
-            </View>
-            <View style={[styles.createWalletPromptArea, styles.paddings]}>
-              <T style={styles.handleRequirementsText}>{s.strings.fio_address_first_screen_end}</T>
+            <View style={[styles.createWalletPromptArea, styles.paddings, styles.title]}>
+              <T style={styles.instructionalText}>{s.strings.fio_domain_reg_descr}</T>
             </View>
 
             <View style={styles.formFieldView} ref="_fieldView" onLayout={this.fieldViewOnLayout}>
@@ -327,30 +270,19 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
                   clearButtonMode={this.clearButtonMode}
                   autoCorrect={false}
                   autoCapitalize="none"
-                  placeholder={s.strings.fio_address_confirm_screen_label}
+                  placeholder={s.strings.fio_domain_label}
                   caretHidden
-                  onFocus={this.handleFioAddressFocus}
-                  onChangeText={this.handleFioAddressChange}
+                  onFocus={this.handleFioDomainFocus}
+                  onChangeText={this.handleFioDomainChange}
                   onSubmitEditing={this.handleNextButton}
                   selectionColor={THEME.COLORS.ACCENT_MINT}
-                  label={s.strings.fio_address_choose_label}
-                  value={fioAddress}
+                  label={s.strings.fio_domain_choose_label}
+                  value={fioDomain}
                   returnKeyType={this.returnKeyType}
                   error={chooseHandleErrorMessage}
                   disabled={walletLoading || domainsLoading}
+                  prefix="@"
                 />
-                <TouchableOpacity style={styles.domain} onPress={this.selectFioDomain} disabled={domainsLoading}>
-                  <View onLayout={this.domainOnLayout}>
-                    {domainsLoading ? (
-                      <ActivityIndicator size="small" />
-                    ) : (
-                      <T style={styles.domainText}>
-                        {Constants.FIO_ADDRESS_DELIMITER}
-                        {selectedDomain.name}
-                      </T>
-                    )}
-                  </View>
-                </TouchableOpacity>
               </View>
               {this.renderLoader()}
             </View>
@@ -365,128 +297,23 @@ export class FioAddressRegisterScene extends React.Component<Props, State> {
   }
 }
 
-const calcInputWidth = (domainWidth: number) => styles.formFieldViewContainer.width - scale(33) - domainWidth
-
-const rawStyles = {
-  scrollableGradient: {
-    height: THEME.HEADER
-  },
-  scrollableView: {
-    position: 'relative',
-    paddingHorizontal: 20
-  },
-  createWalletPromptArea: {
-    paddingTop: scale(16),
-    paddingBottom: scale(8)
-  },
-  instructionalText: {
-    fontSize: scale(16),
-    textAlign: 'center',
-    color: THEME.COLORS.GRAY_1
-  },
-  handleRequirementsText: {
-    fontSize: scale(16),
-    textAlign: 'left',
-    color: THEME.COLORS.GRAY_1
-  },
-  buttons: {
-    marginTop: scale(24),
-    flexDirection: 'row'
-  },
-  next: {
-    marginLeft: scale(1),
-    flex: 1
-  },
-
-  image: {
-    alignSelf: 'center',
-    marginTop: scale(24),
-    height: scale(50),
-    width: scale(55)
-  },
-  title: {
-    paddingTop: scale(24)
-  },
-  paddings: {
-    paddingVertical: scale(8)
-  },
-  inputContainer: {
-    width: 'auto',
-    marginTop: 0,
-    marginBottom: 0
-  },
-  statusIconError: {
-    color: THEME.COLORS.ACCENT_RED
-  },
-  statusIconOk: {
-    color: THEME.COLORS.ACCENT_MINT
-  },
-  formFieldView: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: scale(14),
-    marginBottom: scale(12)
-  },
-  formFieldViewContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: PLATFORM.deviceWidth - scale(30) - scale(40)
-  },
-  statusIconContainer: {
-    width: scale(25),
-    height: scale(25)
-  },
-  statusIcon: {
-    alignSelf: 'flex-end',
-    marginTop: scale(29),
-    width: scale(25),
-    height: scale(25)
-  },
-  bottomSpace: {
-    paddingBottom: scale(500)
-  },
-  selectWalletBlock: {
-    marginTop: scale(48),
-    paddingHorizontal: scale(18),
-    paddingBottom: scale(10),
-    backgroundColor: THEME.COLORS.GRAY_3
-  },
-  selectWalletBtn: {
-    marginTop: scale(15),
-    paddingVertical: scale(10),
-    paddingHorizontal: scale(5),
-    backgroundColor: THEME.COLORS.BLUE_3
-  },
-  domain: {
-    marginTop: scale(24),
-    marginLeft: scale(5),
-    paddingHorizontal: scale(10),
-    paddingVertical: scale(4),
-    borderRadius: scale(5),
-    borderColor: THEME.COLORS.BLUE_3,
-    borderWidth: scale(2)
-  },
-  domainText: {
-    color: THEME.COLORS.BLUE_3,
-    fontSize: scale(16)
-  },
-  domainListRowName: {
-    flex: 1,
-    fontSize: THEME.rem(1),
-    color: THEME.COLORS.SECONDARY
-  },
-  domainListRowContainerTop: {
-    height: 'auto',
-    paddingLeft: THEME.rem(0.75),
-    paddingRight: THEME.rem(0.75),
-    paddingVertical: THEME.rem(0.75)
-  },
-  iconIon: {
-    alignSelf: 'center',
-    marginTop: THEME.rem(1.5),
-    height: THEME.rem(4),
-    width: THEME.rem(4),
-    textAlign: 'center'
+const FioDomainRegisterScene = connect((state: State) => {
+  const { account } = state.core
+  if (!account || !account.currencyConfig) {
+    return {
+      fioWallets: [],
+      fioPlugin: {},
+      isConnected: state.network.isConnected
+    }
   }
-}
-export const styles: typeof rawStyles = StyleSheet.create(rawStyles)
+  const fioWallets: EdgeCurrencyWallet[] = getFioWallets(state)
+  const fioPlugin = account.currencyConfig[Constants.CURRENCY_PLUGIN_NAMES.FIO]
+
+  const out: StateProps = {
+    fioWallets,
+    fioPlugin,
+    isConnected: state.network.isConnected
+  }
+  return out
+}, {})(FioDomainRegister)
+export { FioDomainRegisterScene }
