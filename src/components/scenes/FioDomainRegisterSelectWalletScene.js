@@ -24,7 +24,7 @@ import type { Dispatch, State } from '../../types/reduxTypes'
 import type { GuiWallet } from '../../types/types'
 import { type WalletListResult, WalletListModal } from '../modals/WalletListModal'
 import { Airship, showError } from '../services/AirshipInstance'
-import { styles } from './FioAddressRegisterSelectWalletScene'
+import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
 
 export type StateProps = {
   state: State,
@@ -52,7 +52,7 @@ type LocalState = {
   activationCost: number
 }
 
-type Props = NavigationProps & StateProps & DispatchProps
+type Props = NavigationProps & StateProps & DispatchProps & ThemeProps
 
 const ionIconSize = THEME.rem(4)
 
@@ -159,7 +159,9 @@ class FioDomainRegisterSelectWallet extends React.Component<Props, LocalState> {
   }
 
   renderSelectWallet = () => {
+    const { theme } = this.props
     const { activationCost, loading } = this.state
+    const styles = getStyles(theme)
     const isSelectWalletDisabled = !activationCost || activationCost === 0
 
     return (
@@ -188,7 +190,9 @@ class FioDomainRegisterSelectWallet extends React.Component<Props, LocalState> {
   }
 
   render() {
+    const { theme } = this.props
     const { activationCost, loading } = this.state
+    const styles = getStyles(theme)
     const detailsText = sprintf(s.strings.fio_domain_wallet_selection_text, loading ? '-' : activationCost)
     return (
       <SafeAreaView>
@@ -209,6 +213,68 @@ class FioDomainRegisterSelectWallet extends React.Component<Props, LocalState> {
     )
   }
 }
+
+const getStyles = cacheStyles((theme: Theme) => ({
+  scene: {
+    flex: 1,
+    backgroundColor: theme.primaryText
+  },
+  scrollableGradient: {
+    height: THEME.HEADER
+  },
+  scrollableView: {
+    position: 'relative',
+    paddingHorizontal: 20
+  },
+  createWalletPromptArea: {
+    paddingTop: theme.rem(1),
+    paddingBottom: theme.rem(0.5)
+  },
+  instructionalText: {
+    fontSize: theme.rem(1),
+    textAlign: 'center',
+    color: theme.deactivatedText
+  },
+  buttons: {
+    marginTop: theme.rem(1.5),
+    flexDirection: 'row'
+  },
+  next: {
+    marginLeft: theme.rem(1),
+    flex: 1
+  },
+  selectPaymentLower: {
+    backgroundColor: THEME.COLORS.GRAY_4,
+    width: '100%',
+    marginVertical: theme.rem(0.5),
+    paddingHorizontal: theme.rem(1)
+  },
+  paymentArea: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: theme.rem(0.75),
+    flex: 1
+  },
+  paymentLeft: {
+    fontSize: theme.rem(1),
+    color: theme.deactivatedText
+  },
+  paymentRight: {
+    fontFamily: THEME.FONTS.BOLD,
+    fontSize: theme.rem(1),
+    color: theme.deactivatedText
+  },
+  bottomSpace: {
+    paddingBottom: theme.rem(30)
+  },
+  iconIon: {
+    alignSelf: 'center',
+    marginTop: theme.rem(1.5),
+    height: theme.rem(4),
+    width: theme.rem(4),
+    textAlign: 'center'
+  }
+}))
 
 const FioDomainRegisterSelectWalletScene = connect(
   (state: State) => {
@@ -236,5 +302,5 @@ const FioDomainRegisterSelectWalletScene = connect(
       dispatch({ type: 'UI/WALLETS/SELECT_WALLET', data: { currencyCode: currencyCode, walletId: walletId } })
     }
   })
-)(FioDomainRegisterSelectWallet)
+)(withTheme(FioDomainRegisterSelectWallet))
 export { FioDomainRegisterSelectWalletScene }

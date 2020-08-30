@@ -4,7 +4,7 @@ import { bns } from 'biggystring'
 import { Scene } from 'edge-components'
 import { type EdgeCurrencyConfig, type EdgeCurrencyWallet } from 'edge-core-js'
 import * as React from 'react'
-import { Alert, StyleSheet, View } from 'react-native'
+import { Alert, View } from 'react-native'
 import { Actions } from 'react-native-router-flux'
 import { connect } from 'react-redux'
 
@@ -13,11 +13,11 @@ import s from '../../locales/strings.js'
 import { getDisplayDenomination } from '../../modules/Settings/selectors'
 import T from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
 import { Slider } from '../../modules/UI/components/Slider/Slider.ui.js'
-import { THEME } from '../../theme/variables/airbitz.js'
 import type { State } from '../../types/reduxTypes'
 import { getFeeDisplayed, truncateDecimals } from '../../util/utils'
 import { SceneWrapper } from '../common/SceneWrapper'
 import { showError } from '../services/AirshipInstance'
+import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
 
 export type LocalState = {
   balance: number | null,
@@ -38,7 +38,7 @@ export type NavigationProps = {
   ownerPublicKey: string
 }
 
-type Props = NavigationProps & StateProps
+type Props = NavigationProps & StateProps & ThemeProps
 
 class FioNameConfirm extends React.Component<Props, LocalState> {
   state: LocalState = {
@@ -166,8 +166,9 @@ class FioNameConfirm extends React.Component<Props, LocalState> {
   }
 
   render() {
-    const { fioName, fee } = this.props
+    const { fioName, fee, theme } = this.props
     const { balance, loading } = this.state
+    const styles = getStyles(theme)
 
     return (
       <SceneWrapper>
@@ -207,7 +208,7 @@ class FioNameConfirm extends React.Component<Props, LocalState> {
   }
 }
 
-const rawStyles = {
+const getStyles = cacheStyles((theme: Theme) => ({
   scene: {
     flex: 1,
     flexDirection: 'column',
@@ -215,44 +216,37 @@ const rawStyles = {
     alignItems: 'stretch'
   },
   info: {
-    paddingTop: THEME.rem(2),
-    paddingLeft: THEME.rem(0.5),
-    paddingRight: THEME.rem(0.5)
-  },
-  toggleButton: {
-    backgroundColor: THEME.COLORS.PRIMARY,
-    height: THEME.rem(5),
-    justifyContent: 'flex-start',
-    alignItems: 'center'
+    paddingTop: theme.rem(2),
+    paddingLeft: theme.rem(0.5),
+    paddingRight: theme.rem(0.5)
   },
   title: {
-    color: THEME.COLORS.WHITE,
-    fontSize: THEME.rem(1),
+    color: theme.primaryText,
+    fontSize: theme.rem(1),
     fontWeight: 'normal',
     textAlign: 'center'
   },
   titleDisabled: {
-    color: THEME.COLORS.ACCENT_RED,
-    fontSize: THEME.rem(1),
+    color: theme.negativeText,
+    fontSize: theme.rem(1),
     fontWeight: 'normal',
     textAlign: 'center'
   },
   titleLarge: {
-    color: THEME.COLORS.WHITE,
-    fontSize: THEME.rem(1.5),
+    color: theme.primaryText,
+    fontSize: theme.rem(1.5),
     fontWeight: 'bold',
     textAlign: 'center'
   },
   blockPadding: {
-    paddingTop: THEME.rem(4),
-    paddingLeft: THEME.rem(1.25),
-    paddingRight: THEME.rem(1.25)
+    paddingTop: theme.rem(4),
+    paddingLeft: theme.rem(1.25),
+    paddingRight: theme.rem(1.25)
   },
   spacer: {
-    paddingTop: THEME.rem(1.25)
+    paddingTop: theme.rem(1.25)
   }
-}
-const styles: typeof rawStyles = StyleSheet.create(rawStyles)
+}))
 
 const FioNameConfirmScene = connect((state: State) => {
   const { account } = state.core
@@ -265,5 +259,5 @@ const FioNameConfirmScene = connect((state: State) => {
     isConnected: state.network.isConnected
   }
   return out
-}, {})(FioNameConfirm)
+}, {})(withTheme(FioNameConfirm))
 export { FioNameConfirmScene }

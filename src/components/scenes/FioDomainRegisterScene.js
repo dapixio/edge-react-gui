@@ -17,12 +17,14 @@ import { Icon } from '../../modules/UI/components/Icon/Icon.ui'
 import SafeAreaView from '../../modules/UI/components/SafeAreaView/SafeAreaView.ui.js'
 import { getFioWallets } from '../../modules/UI/selectors'
 import { THEME } from '../../theme/variables/airbitz.js'
+import { PLATFORM } from '../../theme/variables/platform'
 import type { State } from '../../types/reduxTypes'
 import { FormField, MaterialInputOnWhite } from '../common/FormField.js'
 import type { WalletListResult } from '../modals/WalletListModal'
 import { WalletListModal } from '../modals/WalletListModal'
 import { Airship, showError, showToast } from '../services/AirshipInstance'
-import { styles } from './FioAddressRegisterScene'
+import type { Theme, ThemeProps } from '../services/ThemeContext'
+import { cacheStyles, withTheme } from '../services/ThemeContext'
 
 export type LocalState = {
   selectedWallet: EdgeCurrencyWallet | null,
@@ -46,7 +48,7 @@ export type DispatchProps = {
   createFioWallet: () => Promise<EdgeCurrencyWallet>
 }
 
-type Props = StateProps & DispatchProps
+type Props = StateProps & DispatchProps & ThemeProps
 
 const ionIconSize = THEME.rem(4)
 class FioDomainRegister extends React.Component<Props, LocalState> {
@@ -184,7 +186,9 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
   }
 
   renderButton() {
+    const { theme } = this.props
     const { isValid, isAvailable, loading, walletLoading } = this.state
+    const styles = getStyles(theme)
 
     if (isValid && isAvailable && !loading) {
       return (
@@ -200,7 +204,9 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
   }
 
   renderLoader() {
+    const { theme } = this.props
     const { isValid, touched, isAvailable, loading } = this.state
+    const styles = getStyles(theme)
 
     let icon = null
     if ((!isValid || isAvailable === false) && touched) {
@@ -214,8 +220,9 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
   }
 
   renderFioWallets() {
-    const { fioWallets } = this.props
+    const { fioWallets, theme } = this.props
     const { selectedWallet } = this.state
+    const styles = getStyles(theme)
     if (fioWallets && fioWallets.length > 1) {
       const title = `${s.strings.title_fio_connect_to_wallet}: ${
         selectedWallet && selectedWallet.name ? selectedWallet.name : s.strings.fio_address_register_no_wallet_name
@@ -232,7 +239,9 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
   }
 
   render() {
+    const { theme } = this.props
     const { fioDomain, touched, isAvailable, domainsLoading, walletLoading } = this.state
+    const styles = getStyles(theme)
     let chooseHandleErrorMessage = ''
     if (touched && !this.props.isConnected) {
       chooseHandleErrorMessage = s.strings.fio_address_register_screen_cant_check
@@ -297,6 +306,122 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
   }
 }
 
+const getStyles = cacheStyles((theme: Theme) => ({
+  scrollableGradient: {
+    height: THEME.HEADER
+  },
+  scrollableView: {
+    position: 'relative',
+    paddingHorizontal: theme.rem(1)
+  },
+  createWalletPromptArea: {
+    paddingTop: theme.rem(1),
+    paddingBottom: theme.rem(0.5)
+  },
+  instructionalText: {
+    fontSize: theme.rem(1),
+    textAlign: 'center',
+    color: theme.deactivatedText
+  },
+  handleRequirementsText: {
+    fontSize: theme.rem(1),
+    textAlign: 'left',
+    color: theme.deactivatedText
+  },
+  buttons: {
+    marginTop: theme.rem(1.5),
+    flexDirection: 'row'
+  },
+  next: {
+    flex: 1
+  },
+
+  image: {
+    alignSelf: 'center',
+    marginTop: theme.rem(1.5),
+    height: theme.rem(3.1),
+    width: theme.rem(3.5)
+  },
+  title: {
+    paddingTop: theme.rem(1.5)
+  },
+  paddings: {
+    paddingVertical: theme.rem(0.5)
+  },
+  inputContainer: {
+    width: 'auto',
+    marginTop: 0,
+    marginBottom: 0
+  },
+  statusIconError: {
+    color: theme.negativeText
+  },
+  statusIconOk: {
+    color: theme.positiveText
+  },
+  formFieldView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: theme.rem(0.8),
+    marginBottom: theme.rem(0.75)
+  },
+  formFieldViewContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: PLATFORM.deviceWidth - theme.rem(4.5)
+  },
+  statusIconContainer: {
+    width: theme.rem(1.5),
+    height: theme.rem(1.5)
+  },
+  statusIcon: {
+    alignSelf: 'flex-end',
+    marginTop: theme.rem(1.75),
+    width: theme.rem(1.5),
+    height: theme.rem(1.5)
+  },
+  bottomSpace: {
+    paddingBottom: theme.rem(30)
+  },
+  selectWalletBtn: {
+    marginTop: theme.rem(1),
+    paddingVertical: theme.rem(0.6),
+    paddingHorizontal: theme.rem(0.3),
+    backgroundColor: theme.backgroundGradientLeft
+  },
+  domain: {
+    marginTop: theme.rem(1),
+    marginLeft: theme.rem(0.3),
+    paddingHorizontal: theme.rem(0.6),
+    paddingVertical: theme.rem(0.25),
+    borderRadius: theme.rem(0.4),
+    borderColor: theme.backgroundGradientLeft,
+    borderWidth: theme.rem(0.1)
+  },
+  domainText: {
+    color: theme.backgroundGradientLeft,
+    fontSize: theme.rem(1)
+  },
+  domainListRowName: {
+    flex: 1,
+    fontSize: theme.rem(1),
+    color: theme.secondaryText
+  },
+  domainListRowContainerTop: {
+    height: 'auto',
+    paddingLeft: theme.rem(0.75),
+    paddingRight: theme.rem(0.75),
+    paddingVertical: theme.rem(0.75)
+  },
+  iconIon: {
+    alignSelf: 'center',
+    marginTop: theme.rem(1.5),
+    height: theme.rem(4),
+    width: theme.rem(4),
+    textAlign: 'center'
+  }
+}))
+
 const FioDomainRegisterScene = connect((state: State) => {
   const { account } = state.core
   if (!account || !account.currencyConfig) {
@@ -315,5 +440,5 @@ const FioDomainRegisterScene = connect((state: State) => {
     isConnected: state.network.isConnected
   }
   return out
-}, {})(FioDomainRegister)
+}, {})(withTheme(FioDomainRegister))
 export { FioDomainRegisterScene }
