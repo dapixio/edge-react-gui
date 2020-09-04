@@ -12,14 +12,12 @@ import s from '../../locales/strings.js'
 import { PrimaryButton } from '../../modules/UI/components/Buttons/PrimaryButton.ui.js'
 import { TextAndIconButton, TextAndIconButtonStyle } from '../../modules/UI/components/Buttons/TextAndIconButton.ui.js'
 import T from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
-import Gradient from '../../modules/UI/components/Gradient/Gradient.ui'
 import { Icon } from '../../modules/UI/components/Icon/Icon.ui'
-import SafeAreaView from '../../modules/UI/components/SafeAreaView/SafeAreaView.ui.js'
 import { getFioWallets } from '../../modules/UI/selectors'
-import { THEME } from '../../theme/variables/airbitz.js'
 import { PLATFORM } from '../../theme/variables/platform'
 import type { State } from '../../types/reduxTypes'
 import { FormField, MaterialInputOnWhite } from '../common/FormField.js'
+import { SceneWrapper } from '../common/SceneWrapper.js'
 import type { WalletListResult } from '../modals/WalletListModal'
 import { WalletListModal } from '../modals/WalletListModal'
 import { Airship, showError, showToast } from '../services/AirshipInstance'
@@ -50,7 +48,6 @@ export type DispatchProps = {
 
 type Props = StateProps & DispatchProps & ThemeProps
 
-const ionIconSize = THEME.rem(4)
 class FioDomainRegister extends React.Component<Props, LocalState> {
   fioCheckQueue: number = 0
   clearButtonMode = 'while-editing'
@@ -194,7 +191,11 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
       return (
         <View style={styles.buttons}>
           <PrimaryButton style={styles.next} onPress={this.handleNextButton} disabled={!isAvailable || walletLoading}>
-            {walletLoading ? <ActivityIndicator size="small" /> : <PrimaryButton.Text>{s.strings.string_next_capitalized}</PrimaryButton.Text>}
+            {walletLoading ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <PrimaryButton.Text style={styles.nextText}>{s.strings.string_next_capitalized}</PrimaryButton.Text>
+            )}
           </PrimaryButton>
         </View>
       )
@@ -210,10 +211,19 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
 
     let icon = null
     if ((!isValid || isAvailable === false) && touched) {
-      icon = <Icon style={[styles.statusIcon, styles.statusIconError]} type={Constants.MATERIAL_COMMUNITY} name={Constants.CLOSE_CIRCLE_ICON} size={25} />
+      icon = (
+        <Icon
+          style={[styles.statusIcon, styles.statusIconError]}
+          type={Constants.MATERIAL_COMMUNITY}
+          name={Constants.CLOSE_CIRCLE_ICON}
+          size={theme.rem(1.5)}
+        />
+      )
     }
     if (isValid && isAvailable && touched) {
-      icon = <Icon style={[styles.statusIcon, styles.statusIconOk]} type={Constants.MATERIAL_COMMUNITY} name={Constants.CHECK_CIRCLE_ICON} size={25} />
+      icon = (
+        <Icon style={[styles.statusIcon, styles.statusIconOk]} type={Constants.MATERIAL_COMMUNITY} name={Constants.CHECK_CIRCLE_ICON} size={theme.rem(1.5)} />
+      )
     }
 
     return <View style={styles.statusIconContainer}>{loading ? <ActivityIndicator style={styles.statusIcon} size="small" /> : icon}</View>
@@ -229,7 +239,24 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
       }`
       return (
         <TextAndIconButton
-          style={{ ...TextAndIconButtonStyle, container: styles.selectWalletBtn }}
+          style={{
+            ...TextAndIconButtonStyle,
+            container: styles.selectWalletBtn,
+            text: {
+              color: theme.secondaryButtonText,
+              fontSize: theme.rem(1)
+            },
+            textPressed: {
+              color: theme.deactivatedText,
+              fontSize: theme.rem(1)
+            },
+            icon: {
+              color: theme.secondaryButtonText
+            },
+            iconPressed: {
+              color: theme.deactivatedText
+            }
+          }}
           onPress={this.selectFioWallet}
           icon={Constants.KEYBOARD_ARROW_DOWN}
           title={title}
@@ -256,15 +283,21 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
         ...MaterialInputOnWhite.container,
         ...styles.inputContainer,
         width: '100%'
+      },
+      baseColor: theme.primaryText,
+      tintColor: theme.primaryText,
+      errorColor: theme.negativeText,
+      textColor: theme.primaryText,
+      affixTextStyle: {
+        color: theme.negativeText
       }
     }
 
     return (
-      <SafeAreaView>
-        <Gradient style={styles.scrollableGradient} />
+      <SceneWrapper background="header" bodySplit={theme.rem(1.5)}>
         <ScrollView ref="_scrollView">
           <View style={styles.scrollableView}>
-            <IonIcon name="ios-at" style={styles.iconIon} color={THEME.COLORS.BLUE_3} size={ionIconSize} />
+            <IonIcon name="ios-at" style={styles.iconIon} color={theme.icon} size={theme.rem(4)} />
             <View style={[styles.createWalletPromptArea, styles.paddings, styles.title]}>
               <T style={styles.instructionalText}>{s.strings.fio_domain_reg_text}</T>
             </View>
@@ -284,7 +317,7 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
                   onFocus={this.handleFioDomainFocus}
                   onChangeText={this.handleFioDomainChange}
                   onSubmitEditing={this.handleNextButton}
-                  selectionColor={THEME.COLORS.ACCENT_MINT}
+                  selectionColor={theme.textLink}
                   label={s.strings.fio_domain_choose_label}
                   value={fioDomain}
                   returnKeyType={this.returnKeyType}
@@ -301,15 +334,12 @@ class FioDomainRegister extends React.Component<Props, LocalState> {
             <View style={styles.bottomSpace} />
           </View>
         </ScrollView>
-      </SafeAreaView>
+      </SceneWrapper>
     )
   }
 }
 
 const getStyles = cacheStyles((theme: Theme) => ({
-  scrollableGradient: {
-    height: THEME.HEADER
-  },
   scrollableView: {
     position: 'relative',
     paddingHorizontal: theme.rem(1)
@@ -321,19 +351,23 @@ const getStyles = cacheStyles((theme: Theme) => ({
   instructionalText: {
     fontSize: theme.rem(1),
     textAlign: 'center',
-    color: theme.deactivatedText
+    color: theme.primaryText
   },
   handleRequirementsText: {
     fontSize: theme.rem(1),
     textAlign: 'left',
-    color: theme.deactivatedText
+    color: theme.primaryText
   },
   buttons: {
     marginTop: theme.rem(1.5),
     flexDirection: 'row'
   },
   next: {
-    flex: 1
+    flex: 1,
+    backgroundColor: theme.primaryButton
+  },
+  nextText: {
+    color: theme.primaryButtonText
   },
 
   image: {
@@ -351,13 +385,14 @@ const getStyles = cacheStyles((theme: Theme) => ({
   inputContainer: {
     width: 'auto',
     marginTop: 0,
-    marginBottom: 0
+    marginBottom: 0,
+    color: theme.primaryText
   },
   statusIconError: {
     color: theme.negativeText
   },
   statusIconOk: {
-    color: theme.positiveText
+    color: theme.textLink
   },
   formFieldView: {
     flexDirection: 'row',
@@ -387,7 +422,11 @@ const getStyles = cacheStyles((theme: Theme) => ({
     marginTop: theme.rem(1),
     paddingVertical: theme.rem(0.6),
     paddingHorizontal: theme.rem(0.3),
-    backgroundColor: theme.backgroundGradientLeft
+    backgroundColor: theme.secondaryButton,
+    borderColor: theme.secondaryButtonOutline,
+    color: theme.secondaryButtonText,
+    borderStyle: 'solid',
+    borderWidth: theme.rem(0.125)
   },
   domain: {
     marginTop: theme.rem(1),
@@ -395,17 +434,17 @@ const getStyles = cacheStyles((theme: Theme) => ({
     paddingHorizontal: theme.rem(0.6),
     paddingVertical: theme.rem(0.25),
     borderRadius: theme.rem(0.4),
-    borderColor: theme.backgroundGradientLeft,
+    borderColor: theme.secondaryButton,
     borderWidth: theme.rem(0.1)
   },
   domainText: {
-    color: theme.backgroundGradientLeft,
+    color: theme.primaryText,
     fontSize: theme.rem(1)
   },
   domainListRowName: {
     flex: 1,
     fontSize: theme.rem(1),
-    color: theme.secondaryText
+    color: theme.primaryText
   },
   domainListRowContainerTop: {
     height: 'auto',

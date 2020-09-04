@@ -353,13 +353,6 @@ const rawStyles = {
     paddingLeft: THEME.rem(0.75),
     paddingRight: THEME.rem(0.75),
     paddingVertical: THEME.rem(0.75)
-  },
-  iconIon: {
-    alignSelf: 'center',
-    marginTop: THEME.rem(1.5),
-    height: THEME.rem(4),
-    width: THEME.rem(4),
-    textAlign: 'center'
   }
 }
 export const styles: typeof rawStyles = StyleSheet.create(rawStyles)

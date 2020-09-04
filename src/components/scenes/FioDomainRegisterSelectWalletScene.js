@@ -16,12 +16,10 @@ import { getExchangeDenomination } from '../../modules/Settings/selectors'
 import * as SETTINGS_SELECTORS from '../../modules/Settings/selectors'
 import { PrimaryButton } from '../../modules/UI/components/Buttons/PrimaryButton.ui.js'
 import T from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
-import Gradient from '../../modules/UI/components/Gradient/Gradient.ui'
-import SafeAreaView from '../../modules/UI/components/SafeAreaView/SafeAreaView.ui.js'
 import { getFioWallets } from '../../modules/UI/selectors'
-import { THEME } from '../../theme/variables/airbitz'
 import type { Dispatch, State } from '../../types/reduxTypes'
 import type { GuiWallet } from '../../types/types'
+import { SceneWrapper } from '../common/SceneWrapper'
 import { type WalletListResult, WalletListModal } from '../modals/WalletListModal'
 import { Airship, showError } from '../services/AirshipInstance'
 import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../services/ThemeContext.js'
@@ -53,8 +51,6 @@ type LocalState = {
 }
 
 type Props = NavigationProps & StateProps & DispatchProps & ThemeProps
-
-const ionIconSize = THEME.rem(4)
 
 class FioDomainRegisterSelectWallet extends React.Component<Props, LocalState> {
   state: LocalState = {
@@ -171,7 +167,7 @@ class FioDomainRegisterSelectWallet extends React.Component<Props, LocalState> {
             {isSelectWalletDisabled || loading ? (
               <ActivityIndicator />
             ) : (
-              <PrimaryButton.Text>{s.strings.create_wallet_account_select_wallet}</PrimaryButton.Text>
+              <PrimaryButton.Text style={styles.nextText}>{s.strings.create_wallet_account_select_wallet}</PrimaryButton.Text>
             )}
           </PrimaryButton>
         </View>
@@ -195,33 +191,23 @@ class FioDomainRegisterSelectWallet extends React.Component<Props, LocalState> {
     const styles = getStyles(theme)
     const detailsText = sprintf(s.strings.fio_domain_wallet_selection_text, loading ? '-' : activationCost)
     return (
-      <SafeAreaView>
-        <View style={styles.scene}>
-          <Gradient style={styles.scrollableGradient} />
-          <ScrollView>
-            <View style={styles.scrollableView}>
-              <IonIcon name="ios-at" style={styles.iconIon} color={THEME.COLORS.BLUE_3} size={ionIconSize} />
-              <View style={styles.createWalletPromptArea}>
-                <T style={styles.instructionalText}>{detailsText}</T>
-              </View>
-              {this.renderSelectWallet()}
-              <View style={styles.bottomSpace} />
+      <SceneWrapper background="header" bodySplit={theme.rem(1.5)}>
+        <ScrollView>
+          <View style={styles.scrollableView}>
+            <IonIcon name="ios-at" style={styles.iconIon} color={theme.primaryText} size={theme.rem(4)} />
+            <View style={styles.createWalletPromptArea}>
+              <T style={styles.instructionalText}>{detailsText}</T>
             </View>
-          </ScrollView>
-        </View>
-      </SafeAreaView>
+            {this.renderSelectWallet()}
+            <View style={styles.bottomSpace} />
+          </View>
+        </ScrollView>
+      </SceneWrapper>
     )
   }
 }
 
 const getStyles = cacheStyles((theme: Theme) => ({
-  scene: {
-    flex: 1,
-    backgroundColor: theme.primaryText
-  },
-  scrollableGradient: {
-    height: THEME.HEADER
-  },
   scrollableView: {
     position: 'relative',
     paddingHorizontal: 20
@@ -233,7 +219,7 @@ const getStyles = cacheStyles((theme: Theme) => ({
   instructionalText: {
     fontSize: theme.rem(1),
     textAlign: 'center',
-    color: theme.deactivatedText
+    color: theme.primaryText
   },
   buttons: {
     marginTop: theme.rem(1.5),
@@ -241,10 +227,14 @@ const getStyles = cacheStyles((theme: Theme) => ({
   },
   next: {
     marginLeft: theme.rem(1),
-    flex: 1
+    flex: 1,
+    backgroundColor: theme.primaryButton
+  },
+  nextText: {
+    color: theme.primaryButtonText
   },
   selectPaymentLower: {
-    backgroundColor: THEME.COLORS.GRAY_4,
+    backgroundColor: theme.backgroundGradientLeft,
     width: '100%',
     marginVertical: theme.rem(0.5),
     paddingHorizontal: theme.rem(1)
@@ -257,12 +247,12 @@ const getStyles = cacheStyles((theme: Theme) => ({
   },
   paymentLeft: {
     fontSize: theme.rem(1),
-    color: theme.deactivatedText
+    color: theme.primaryText
   },
   paymentRight: {
-    fontFamily: THEME.FONTS.BOLD,
+    fontFamily: theme.fontFaceBold,
     fontSize: theme.rem(1),
-    color: theme.deactivatedText
+    color: theme.primaryText
   },
   bottomSpace: {
     paddingBottom: theme.rem(30)

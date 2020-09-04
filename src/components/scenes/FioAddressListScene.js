@@ -170,8 +170,8 @@ const rawStyles = {
     marginLeft: scale(5)
   },
   button: {
-    paddingVertical: scale(5),
-    paddingHorizontal: scale(10)
+    paddingVertical: THEME.rem(0.33),
+    paddingHorizontal: THEME.rem(0.66)
   },
   toggleButton: {
     backgroundColor: THEME.COLORS.PRIMARY,
