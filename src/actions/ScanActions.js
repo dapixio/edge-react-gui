@@ -115,10 +115,8 @@ export const parseScannedUri = (data: string) => async (dispatch: Dispatch, getS
     const currencyCode: string = UI_SELECTORS.getSelectedCurrencyCode(state)
     try {
       const publicAddress = await checkPubAddress(fioPlugin, data.toLowerCase(), coreWallet.currencyInfo.currencyCode, currencyCode)
-      if (publicAddress) {
-        fioAddress = data.toLowerCase()
-        data = publicAddress
-      }
+      fioAddress = data.toLowerCase()
+      data = publicAddress
     } catch (e) {
       return showError(e.message)
     }
