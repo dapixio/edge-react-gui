@@ -592,6 +592,7 @@ const strings = {
   fio_domain_reg_text: 'Note that you need to use FIO to register an address on a custom domain.',
   fio_domain_reg_descr:
     'FIO Addresses consist of a username and a domain. If you purchase your custom domain, only you will able to register FIO Addresses on it. FIO Address registrations will have to be paid for with FIO tokens from the same wallet which owns the domain.',
+  fio_address_reg_free: 'Register Free FIO Address',
   fio_domain_label: 'FIO Domain',
   fio_domain_free: 'Free',
   fio_address_wallet_selection_text:
@@ -701,6 +702,7 @@ const strings = {
   fio_sender_memo_placeholder: 'Your message.',
   scan_address_modal_title: 'Enter Recipient FIO, ENS, or Public Address',
   address_modal_default_header: 'Enter Address',
+  open_url_err: 'Can not open this url - %s',
   // Unstoppable resolution error codes
   resolving: 'Resolving...',
   UnregisteredDomain: 'Domain %1$s is not registered',

@@ -485,8 +485,9 @@ export const getRegInfo = async (
       }
     }
   }
-  const referralCode = isFallback ? fioPlugin.currencyInfo.defaultSettings.fallbackRef : fioPlugin.currencyInfo.defaultSettings.defaultRef
-  return buyAddressRequest(fioPlugin, fioAddress, referralCode, selectedWallet, activationCost)
+  // todo: temporary commented to use fallback referral code by default.
+  // const referralCode = isFallback ? fioPlugin.currencyInfo.defaultSettings.fallbackRef : fioPlugin.currencyInfo.defaultSettings.defaultRef
+  return buyAddressRequest(fioPlugin, fioAddress, fioPlugin.currencyInfo.defaultSettings.fallbackRef, selectedWallet, activationCost)
 }
 
 /**
@@ -515,8 +516,10 @@ export const getDomainRegInfo = async (
   } catch (e) {
     throw new Error(s.strings.fio_get_fee_err_msg)
   }
+  // todo: temporary commented to use fallback referral code by default.
+  // const referralCode = isFallback ? fioPlugin.currencyInfo.defaultSettings.fallbackRef : fioPlugin.currencyInfo.defaultSettings.defaultRef
 
-  return buyAddressRequest(fioPlugin, fioDomain, fioPlugin.currencyInfo.defaultSettings.defaultRef, selectedWallet, activationCost)
+  return buyAddressRequest(fioPlugin, fioDomain, fioPlugin.currencyInfo.defaultSettings.fallbackRef, selectedWallet, activationCost)
 }
 
 const buyAddressRequest = async (

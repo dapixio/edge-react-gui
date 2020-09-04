@@ -3,6 +3,8 @@
 import { bns, div, eq, gte, mul, toFixed } from 'biggystring'
 import type { EdgeCurrencyInfo, EdgeCurrencyWallet, EdgeDenomination, EdgeMetaToken, EdgeReceiveAddress, EdgeTransaction } from 'edge-core-js'
 import _ from 'lodash'
+import { Linking, Platform } from 'react-native'
+import SafariView from 'react-native-safari-view'
 
 import { FIAT_CODES_SYMBOLS, getSymbolFromCurrency } from '../constants/indexConstants.js'
 import * as intl from '../locales/intl.js'
@@ -599,4 +601,28 @@ export async function asyncWaterfall(asyncFuncs: Array<AsyncFunction>, timeoutMs
       }
     }
   }
+}
+
+export function openLink(url: string): void {
+  if (Platform.OS === 'ios') {
+    return SafariView.isAvailable()
+      .then(SafariView.show({ url }))
+      .catch(error => {
+        console.log(error)
+        Linking.canOpenURL(url).then(supported => {
+          if (supported) {
+            Linking.openURL(url)
+          } else {
+            throw new Error(`Don't know how to open URI: ${url}`)
+          }
+        })
+      })
+  }
+  Linking.canOpenURL(url).then(supported => {
+    if (supported) {
+      Linking.openURL(url)
+    } else {
+      throw new Error(`Don't know how to open URI: ${url}`)
+    }
+  })
 }
