@@ -19,11 +19,12 @@ import { Slider } from '../../modules/UI/components/Slider/Slider.ui'
 import * as UI_SELECTORS from '../../modules/UI/selectors.js'
 import THEME from '../../theme/variables/airbitz'
 import type { State as StateType } from '../../types/reduxTypes'
-import type { GuiCurrencyInfo, GuiDenomination, GuiWallet } from '../../types/types'
+import type { FioAddress, GuiCurrencyInfo, GuiDenomination, GuiWallet } from '../../types/types'
 import { emptyCurrencyInfo } from '../../types/types'
 import { getDenomFromIsoCode } from '../../util/utils'
 import { SceneWrapper } from '../common/SceneWrapper'
 import { AddressModal } from '../modals/AddressModal.js'
+import { ButtonsModal } from '../modals/ButtonsModal'
 import { TransactionDetailsNotesInput } from '../modals/TransactionDetailsNotesInput.js'
 import { Airship, showError, showToast } from '../services/AirshipInstance'
 
@@ -49,7 +50,7 @@ type Props = StateProps & NavigationProps
 
 type State = {
   loading: boolean,
-  walletAddresses: { fioAddress: string, fioWallet: EdgeCurrencyWallet }[],
+  walletAddresses: { fioAddress: string, expiration: string, fioWallet: EdgeCurrencyWallet }[],
   fioAddressFrom: string,
   fioAddressTo: string,
   memo: string,
@@ -79,10 +80,10 @@ export class FioRequestConfirmationConnected extends React.Component<Props, Stat
       const walletAddresses = []
       for (const fioWallet: EdgeCurrencyWallet of this.props.fioWallets) {
         try {
-          const fioAddresses: string[] = await fioWallet.otherMethods.getFioAddressNames()
+          const fioAddresses: FioAddress[] = await fioWallet.otherMethods.getFioAddresses()
           if (fioAddresses.length > 0) {
             for (const fioAddress of fioAddresses) {
-              walletAddresses.push({ fioAddress, fioWallet })
+              walletAddresses.push({ fioAddress: fioAddress.name, expiration: fioAddress.expiration, fioWallet })
             }
           }
         } catch (e) {
@@ -102,7 +103,7 @@ export class FioRequestConfirmationConnected extends React.Component<Props, Stat
     const walletAddress = walletAddresses.find(({ fioAddress }) => fioAddress === fioAddressFrom)
 
     if (walletAddress) {
-      const { fioWallet } = walletAddress
+      const { fioWallet, expiration } = walletAddress
       const val = bns.div(this.props.amounts.nativeAmount, this.props.primaryCurrencyInfo.exchangeDenomination.multiplier, 18)
       try {
         if (!this.props.isConnected) {
@@ -115,7 +116,26 @@ export class FioRequestConfirmationConnected extends React.Component<Props, Stat
           const getFeeRes = await fioWallet.otherMethods.fioAction('getFee', { endPoint: 'new_funds_request', fioAddress: this.state.fioAddressFrom })
           if (getFeeRes.fee) {
             this.setState({ loading: false })
-            return showError(s.strings.fio_no_bundled_err_msg)
+            const answer = await Airship.show(bridge => (
+              <ButtonsModal
+                bridge={bridge}
+                title={s.strings.fio_no_bundled_err_msg}
+                message={s.strings.fio_no_bundled_renew_err_msg}
+                buttons={{
+                  ok: { label: s.strings.title_fio_renew_address },
+                  cancel: { label: s.strings.string_cancel_cap, type: 'secondary' }
+                }}
+              />
+            ))
+            if (answer === 'ok') {
+              Actions[Constants.FIO_ADDRESS_SETTINGS]({
+                showRenew: true,
+                fioWallet,
+                fioAddressName: this.state.fioAddressFrom,
+                expiration: intl.formatExpDate(expiration)
+              })
+            }
+            return
           }
         } catch (e) {
           this.setState({ loading: false })

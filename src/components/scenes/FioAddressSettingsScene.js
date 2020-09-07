@@ -42,7 +42,10 @@ export type DispatchProps = {
 export type NavigationProps = {
   fioWallet: EdgeCurrencyWallet,
   fioAddressName: string,
-  expiration: string
+  expiration: string,
+  showRenew?: boolean,
+  refreshAfterRenew?: boolean,
+  popTo?: string
 }
 
 type Props = NavigationProps & StateProps & DispatchProps
@@ -56,6 +59,14 @@ export class FioAddressSettingsScene extends React.Component<Props, State> {
     renewLoading: false,
     displayFee: 0,
     balance: 0
+  }
+
+  componentDidMount(): * {
+    const { showRenew } = this.props
+    if (showRenew) {
+      this.setBalance()
+      this.setFee()
+    }
   }
 
   setFee = async (): Promise<void> => {
@@ -99,7 +110,7 @@ export class FioAddressSettingsScene extends React.Component<Props, State> {
   }
 
   onConfirm = async () => {
-    const { fioWallet, fioAddressName, isConnected, refreshAllFioAddresses } = this.props
+    const { fioWallet, fioAddressName, isConnected, refreshAllFioAddresses, refreshAfterRenew, popTo } = this.props
     const { renewalFee } = this.state
 
     if (!isConnected) {
@@ -127,10 +138,16 @@ export class FioAddressSettingsScene extends React.Component<Props, State> {
 
       this.setState({ showRenew: false })
       showToast(s.strings.fio_request_renew_ok_text)
-      Actions.pop()
-      window.requestAnimationFrame(() => {
-        Actions.refresh({ fioAddressName, expiration: intl.formatExpDate(expiration) })
-      })
+      if (popTo) {
+        Actions.popTo(popTo)
+      } else {
+        Actions.pop()
+      }
+      if (refreshAfterRenew) {
+        window.requestAnimationFrame(() => {
+          Actions.refresh({ fioAddressName, expiration: intl.formatExpDate(expiration) })
+        })
+      }
     } catch (e) {
       showError(e.message)
       this.setState({ renewError: e.message })

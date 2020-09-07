@@ -3,12 +3,15 @@
 import type { EdgeCurrencyWallet } from 'edge-core-js'
 import * as React from 'react'
 import { ActivityIndicator, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
+import { Actions } from 'react-native-router-flux'
 import { connect } from 'react-redux'
 
 import { AddressModal } from '../../../components/modals/AddressModal'
+import { ButtonsModal } from '../../../components/modals/ButtonsModal'
 import { TransactionDetailsNotesInput } from '../../../components/modals/TransactionDetailsNotesInput'
 import { Airship, showError } from '../../../components/services/AirshipInstance'
 import * as Constants from '../../../constants/indexConstants'
+import * as intl from '../../../locales/intl'
 import s from '../../../locales/strings.js'
 import { THEME } from '../../../theme/variables/airbitz.js'
 import type { State } from '../../../types/reduxTypes'
@@ -17,7 +20,7 @@ import { scale } from '../../../util/scaling.js'
 import { TextAndIconButton, TextAndIconButtonStyle } from '../../UI/components/Buttons/TextAndIconButton.ui.js'
 import Text from '../../UI/components/FormattedText/FormattedText.ui.js'
 import * as UI_SELECTORS from '../../UI/selectors.js'
-import { checkRecordSendFee, findWalletByFioAddress } from '../util'
+import { checkRecordSendFee, findWalletByFioAddress, FIO_NO_BUNDLED_ERR_CODE } from '../util'
 
 export type SelectFioAddressOwnProps = {
   selected: string,
@@ -114,8 +117,35 @@ class SelectFioAddress extends React.Component<Props, LocalState> {
         await checkRecordSendFee(fioWallet, fioAddress)
       }
     } catch (e) {
-      error = e.message
-      showError(e.message)
+      if (e.code && e.code === FIO_NO_BUNDLED_ERR_CODE) {
+        this.props.onSelect(fioAddress, fioWallet, e.message)
+        const walletFioAddresses = await fioWallet.otherMethods.getFioAddresses()
+        const selectedFioAddress = walletFioAddresses.find(item => item.name === fioAddress)
+        const answer = await Airship.show(bridge => (
+          <ButtonsModal
+            bridge={bridge}
+            title={s.strings.fio_no_bundled_err_msg}
+            message={s.strings.fio_no_bundled_renew_err_msg}
+            buttons={{
+              ok: { label: s.strings.title_fio_renew_address },
+              cancel: { label: s.strings.string_cancel_cap, type: 'secondary' }
+            }}
+          />
+        ))
+        if (answer === 'ok') {
+          return Actions[Constants.FIO_ADDRESS_SETTINGS]({
+            showRenew: true,
+            fioWallet,
+            fioAddressName: fioAddress,
+            expiration: intl.formatExpDate(selectedFioAddress.expiration),
+            popTo: Constants.FIO_REQUEST_LIST
+          })
+        }
+        error = e.message
+      } else {
+        error = e.message
+        showError(e.message)
+      }
     }
     this.props.onSelect(fioAddress, fioWallet, error)
   }

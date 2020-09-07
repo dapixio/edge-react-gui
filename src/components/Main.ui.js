@@ -703,6 +703,9 @@ export class MainComponent extends React.Component<Props> {
               renderRightButton={this.renderMenuButton()}
               onLeft={Actions.pop}
             />
+          </Stack>
+
+          <Stack key={Constants.FIO_ADDRESS_SETTINGS}>
             <Scene
               key={Constants.FIO_ADDRESS_SETTINGS}
               navTransparent

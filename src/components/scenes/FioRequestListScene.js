@@ -20,11 +20,12 @@ import { getExchangeDenomination } from '../../modules/Settings/selectors'
 import T from '../../modules/UI/components/FormattedText/FormattedText.ui.js'
 import { THEME } from '../../theme/variables/airbitz.js'
 import type { State } from '../../types/reduxTypes'
-import type { FioRequest, GuiWallet } from '../../types/types'
+import type { FioAddress, FioRequest, GuiWallet } from '../../types/types'
 import { scale } from '../../util/scaling.js'
 import FullScreenLoader from '../common/FullScreenLoader'
 import { SceneWrapper } from '../common/SceneWrapper'
 import { SettingsHeaderRow } from '../common/SettingsHeaderRow.js'
+import { ButtonsModal } from '../modals/ButtonsModal'
 import type { WalletListResult } from '../modals/WalletListModal'
 import { WalletListModal } from '../modals/WalletListModal'
 import { Airship, showError } from '../services/AirshipInstance.js'
@@ -37,7 +38,8 @@ export type LocalState = {
   rejectLoading: boolean,
   addressCachedUpdated: boolean,
   fioRequestsPending: FioRequest[],
-  fioRequestsSent: FioRequest[]
+  fioRequestsSent: FioRequest[],
+  fioAddresses: { [name: string]: FioAddress }
 }
 
 export type StateProps = {
@@ -70,7 +72,8 @@ export class FioRequestList extends React.Component<Props, LocalState> {
       addressCachedUpdated: false,
       rejectLoading: false,
       fioRequestsPending: [],
-      fioRequestsSent: []
+      fioRequestsSent: [],
+      fioAddresses: {}
     }
     slowlog(this, /.*/, global.slowlogOptions)
   }
@@ -111,9 +114,15 @@ export class FioRequestList extends React.Component<Props, LocalState> {
       try {
         for (const wallet of fioWallets) {
           const fioPublicKey = wallet.publicWalletInfo.keys.publicKey
-          const fioAddresses = await wallet.otherMethods.getFioAddresses()
+          const walletFioAddresses = await wallet.otherMethods.getFioAddresses()
           const approveNeededFioRequests = await wallet.otherMethods.getApproveNeededFioRequests()
-          if (fioAddresses.length > 0) {
+          if (walletFioAddresses.length > 0) {
+            const { fioAddresses } = this.state
+            walletFioAddresses.reduce((acc, { name, expiration }) => {
+              acc[name] = { name, expiration }
+              return acc
+            }, fioAddresses)
+            this.setState({ fioAddresses })
             try {
               const { requests } = await wallet.otherMethods.fioAction('getPendingFioRequests', { fioPublicKey })
               if (requests) {
@@ -195,7 +204,27 @@ export class FioRequestList extends React.Component<Props, LocalState> {
       try {
         const { fee } = await fioWallet.otherMethods.fioAction('getFeeForRejectFundsRequest', { payerFioAddress })
         if (fee) {
-          showError(`${s.strings.fio_no_bundled_err_title}. ${s.strings.fio_no_bundled_err_msg}`)
+          const { fioAddresses } = this.state
+          this.setState({ rejectLoading: false })
+          const answer = await Airship.show(bridge => (
+            <ButtonsModal
+              bridge={bridge}
+              title={s.strings.fio_no_bundled_err_msg}
+              message={s.strings.fio_no_bundled_renew_err_msg}
+              buttons={{
+                ok: { label: s.strings.title_fio_renew_address },
+                cancel: { label: s.strings.string_cancel_cap, type: 'secondary' }
+              }}
+            />
+          ))
+          if (answer === 'ok') {
+            return Actions[Constants.FIO_ADDRESS_SETTINGS]({
+              showRenew: true,
+              fioWallet,
+              fioAddressName: payerFioAddress,
+              expiration: intl.formatExpDate(fioAddresses[payerFioAddress].expiration)
+            })
+          }
         } else {
           await fioWallet.otherMethods.fioAction('rejectFundsRequest', { fioRequestId: request.fio_request_id, payerFioAddress })
           this.removeFioPendingRequest(request.fio_request_id)
