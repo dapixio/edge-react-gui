@@ -44,7 +44,7 @@ import { FioAddressListConnector } from '../connectors/scenes/FioAddressListConn
 import { FioAddressRegisterConnector } from '../connectors/scenes/FioAddressRegisterConnector'
 import { FioAddressRegisterSelectWalletConnector } from '../connectors/scenes/FioAddressRegisterSelectWalletConnector'
 import { FioConnectWalletConfirmConnector } from '../connectors/scenes/FioConnectWalletConfirmConnector'
-import { FioRequestListConnector } from '../connectors/scenes/FioRequestListConnector'
+import { FioRequestListScene } from '../components/scenes/FioRequestListScene'
 import { FioSentRequestConnector } from '../connectors/scenes/FioSentRequestConnector'
 import ManageTokens from '../connectors/scenes/ManageTokensConnector.js'
 import PasswordRecoveryConnector from '../connectors/scenes/PasswordRecoveryConnector.js'
@@ -766,7 +766,7 @@ export class MainComponent extends React.Component<Props> {
             <Scene
               key={Constants.FIO_REQUEST_LIST}
               navTransparent
-              component={ifLoggedIn(FioRequestListConnector)}
+              component={ifLoggedIn(FioRequestListScene)}
               renderTitle={this.renderTitle(s.strings.drawer_fio_requests)}
               renderLeftButton={this.renderBackButton()}
               renderRightButton={this.renderMenuButton()}

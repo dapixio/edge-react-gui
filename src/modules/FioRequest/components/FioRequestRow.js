@@ -2,10 +2,10 @@
 
 import type { EdgeDenomination } from 'edge-core-js'
 import * as React from 'react'
-import { Image, TouchableHighlight, View } from 'react-native'
+import { TouchableHighlight, View } from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
 
-import fioRequestsIcon from '../../../assets/images/sidenav/fiorequests.png'
 import { type Theme, type ThemeProps, cacheStyles, withTheme } from '../../../components/services/ThemeContext'
 import * as intl from '../../../locales/intl.js'
 import s from '../../../locales/strings'
@@ -128,9 +128,7 @@ class FioRequestRow extends React.PureComponent<Props> {
         >
           <View style={styles.requestInfoWrap}>
             <View style={styles.requestLeft}>
-              <View style={styles.requestLeftLogoWrap}>
-                <Image style={styles.requestLogo} source={fioRequestsIcon} />
-              </View>
+              <FontAwesome name={isSent ? 'paper-plane' : 'history'} style={styles.icon} />
             </View>
 
             <View style={styles.requestRight}>
@@ -198,17 +196,11 @@ const getStyles = cacheStyles((theme: Theme) => ({
     width: theme.rem(1.175),
     height: theme.rem(1.175)
   },
-  requestLeftLogoWrap: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: theme.rem(2.25),
-    height: theme.rem(2.25),
-    borderRadius: theme.rem(1.125),
-    borderWidth: theme.rem(0.05),
-    borderColor: theme.primaryText,
-    padding: theme.rem(0.95),
-    marginTop: theme.rem(0.25),
-    marginRight: theme.rem(0.625)
+  icon: {
+    marginTop: theme.rem(0.75),
+    marginRight: theme.rem(0.625),
+    color: theme.primaryText,
+    fontSize: theme.rem(1.25)
   },
   name: {
     flex: 1,

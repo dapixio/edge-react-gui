@@ -187,7 +187,7 @@ export function formatToNativeNumber(value: string, options?: IntlNumberFormatOp
  */
 export function formatExpDate(expiration: Date | string, monthShort?: boolean = false): string {
   const expirationDate = new Date(expiration)
-  return expirationDate.toLocaleString(locale.localeIdentifier.replace('_', '-'))
+  return expirationDate.toLocaleDateString(locale.localeIdentifier.replace('_', '-'))
 }
 
 /**
@@ -196,10 +196,15 @@ export function formatExpDate(expiration: Date | string, monthShort?: boolean = 
  * @returns {string}
  */
 export function formatTime(date: Date): string {
-  return new Intl.DateTimeFormat(locale.localeIdentifier.replace('_', '-'), {
-    hour: 'numeric',
-    minute: 'numeric'
-  }).format(date)
+  try {
+    return new Intl.DateTimeFormat(locale.localeIdentifier.replace('_', '-'), {
+      hour: 'numeric',
+      minute: 'numeric'
+    }).format(date)
+  } catch (e) {
+    console.log(e)
+  }
+  return date.toLocaleDateString()
 }
 
 export function setIntlLocale(l: IntlLocaleType): void {
